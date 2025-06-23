@@ -1,8 +1,14 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:icons_plus/icons_plus.dart';
+import 'package:mediora/patients/views/ambulance_services.dart';
 import 'package:mediora/patients/views/doctor_booking_screen.dart';
+import 'package:mediora/patients/views/my_bookings.dart';
 import 'package:mediora/patients/views/organization_screen.dart';
 import 'package:mediora/patients/views/pharmacy_home_screen.dart';
 import 'package:mediora/patients/views/view_all_doctors_screen.dart';
+import 'package:mediora/patients/views/view_all_organizations.dart';
+import 'package:mediora/patients/views/view_all_pharmacies.dart';
 
 class PatientHomeScreen extends StatelessWidget {
   const PatientHomeScreen({super.key});
@@ -10,89 +16,72 @@ class PatientHomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(0),
-        child: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                Color(0xFF2E86AB), // Medical blue
-                Color(0xFF4ECDC4), // Calm teal
-                Color(0xFF45B7D1), // Light blue
-              ], // Adjust colors as needed
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-          ),
-          child: AppBar(
-            toolbarHeight: 0,
-
+      backgroundColor: const Color(0xFFF8FAFC),
+      body: CustomScrollView(
+        slivers: [
+          SliverAppBar(
             backgroundColor: Colors.transparent,
             elevation: 0,
+            expandedHeight: 330,
+            floating: true,
+            snap: true,
+
+            // pinned: true,
+            flexibleSpace: FlexibleSpaceBar(
+              background: _buildHeader(context),
+              collapseMode: CollapseMode.pin,
+            ),
+            toolbarHeight: 0,
+            automaticallyImplyLeading: false,
           ),
-        ),
-      ),
-      /*  appBar: AppBar(
-        toolbarHeight: 0,
-        systemOverlayStyle: const SystemUiOverlayStyle(
-          statusBarColor: Color(0xFF3CB8B8),
-          statusBarIconBrightness: Brightness.light,
-          statusBarBrightness: Brightness.dark,
-        ),
-        backgroundColor: Color(0xFF3CB8B8),
-        elevation: 0,
-      ), */
-      backgroundColor: const Color(0xFFF8FAFC),
-      body: SingleChildScrollView(
-        // padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Header with greeting
-            _buildHeader(),
-            const SizedBox(height: 24),
-            _buildSection(
-              type: "doctor",
-              count: 2,
-              title: "Top Doctors Near You",
-              icon: Icons.medical_services,
-              items: _getDoctors(),
-              onViewMore: () => _navigateToViewMore('doctors', context),
+          SliverToBoxAdapter(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: 24),
+                _buildSection(
+                  type: "doctor",
+                  count: 2,
+                  title: "Top Doctors Near You",
+                  icon: FontAwesome.stethoscope_solid,
+                  items: _getDoctors(),
+                  onViewMore: () => _navigateToViewMore('doctors', context),
+                ),
+                const SizedBox(height: 24),
+                _buildSection(
+                  type: "hospital",
+                  count: 1,
+                  title: "Nearest Clinics/Hospitals",
+                  icon: FontAwesome.hospital_solid,
+                  items: _getClinics(),
+                  onViewMore: () => _navigateToViewMore('clinics', context),
+                ),
+                const SizedBox(height: 24),
+                _buildSection(
+                  type: "pharmacy",
+                  count: 2,
+                  title: "Nearest Pharmacies",
+                  icon: FontAwesome.suitcase_medical_solid,
+                  items: _getPharmacies(),
+                  onViewMore: () => _navigateToViewMore('pharmacies', context),
+                ),
+                const SizedBox(height: 20),
+              ],
             ),
-            // Nearest Clinics/Hospitals
-            const SizedBox(height: 24),
-            _buildSection(
-              type: "hospital",
-              count: 1,
-              title: "Nearest Clinics/Hospitals",
-              icon: Icons.local_hospital,
-              items: _getClinics(),
-              onViewMore: () => _navigateToViewMore('clinics', context),
-            ),
-
-            // Top Doctors
-            const SizedBox(height: 24),
-
-            // Nearest Pharmacies
-            _buildSection(
-              type: "pharmacy",
-              count: 2,
-              title: "Nearest Pharmacies",
-              icon: Icons.local_pharmacy,
-              items: _getPharmacies(),
-              onViewMore: () => _navigateToViewMore('pharmacies', context),
-            ),
-            const SizedBox(height: 20),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeader(BuildContext context) {
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 24, 20, 20),
       decoration: BoxDecoration(
+        borderRadius: BorderRadius.only(
+          bottomLeft: Radius.elliptical(100, 10),
+          bottomRight: Radius.elliptical(100, 10),
+        ),
         gradient: const LinearGradient(
           colors: [
             Color(0xFF2E86AB), // Medical blue
@@ -146,11 +135,11 @@ class PatientHomeScreen extends StatelessWidget {
                       'Good Morning,',
                       style: TextStyle(
                         color: Colors.white70,
-                        fontSize: 14,
+                        fontSize: 12,
                         fontWeight: FontWeight.w400,
                       ),
                     ),
-                    const SizedBox(height: 2),
+                    // const SizedBox(height: 2),
                     const Text(
                       'Sanal Pk',
                       style: TextStyle(
@@ -160,7 +149,7 @@ class PatientHomeScreen extends StatelessWidget {
                         letterSpacing: -0.3,
                       ),
                     ),
-                    const SizedBox(height: 4),
+                    // const SizedBox(height: 4),
                     Row(
                       children: [
                         const Icon(
@@ -270,125 +259,140 @@ class PatientHomeScreen extends StatelessWidget {
           Row(
             children: [
               Expanded(
-                child: Container(
-                  padding: const EdgeInsets.all(14),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.12),
-                    borderRadius: BorderRadius.circular(14),
-                    border: Border.all(color: Colors.white.withOpacity(0.2)),
-                  ),
-                  child: Column(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF4ECDC4).withOpacity(0.8),
-                          borderRadius: BorderRadius.circular(10),
+                child: InkWell(
+                  onTap: () {
+                    Navigator.of(
+                      context,
+                    ).push(MaterialPageRoute(builder: (_) => MyBookingsPage()));
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.all(14),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.12),
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(color: Colors.white.withOpacity(0.2)),
+                    ),
+                    child: Column(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF4ECDC4).withOpacity(0.8),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: const Icon(
+                            Icons.medical_services_outlined,
+                            color: Colors.white,
+                            size: 16,
+                          ),
                         ),
-                        child: const Icon(
-                          Icons.medical_services_outlined,
-                          color: Colors.white,
-                          size: 16,
+                        const SizedBox(height: 8),
+                        const Text(
+                          'My Bookings',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 8),
-                      const Text(
-                        'New Doctors',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      const Text(
-                        '15 specialists joined',
-                        style: TextStyle(color: Colors.white70, fontSize: 10),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-
-              const SizedBox(width: 12),
-
-              Expanded(
-                child: Container(
-                  padding: const EdgeInsets.all(14),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.12),
-                    borderRadius: BorderRadius.circular(14),
-                    border: Border.all(color: Colors.white.withOpacity(0.2)),
-                  ),
-                  child: Column(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF45B7D1).withOpacity(0.8),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: const Icon(
-                          Icons.local_pharmacy_outlined,
-                          color: Colors.white,
-                          size: 16,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      const Text(
-                        'Pharmacy Deals',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      const Text(
-                        'Up to 30% off',
-                        style: TextStyle(color: Colors.white70, fontSize: 10),
-                      ),
-                    ],
+                        /*    const Text(
+                          '1 ',
+                          style: TextStyle(color: Colors.white70, fontSize: 10),
+                        ), */
+                      ],
+                    ),
                   ),
                 ),
               ),
 
+              // const SizedBox(width: 12),
+
+              // Expanded(
+              //   child: Container(
+              //     padding: const EdgeInsets.all(14),
+              //     decoration: BoxDecoration(
+              //       color: Colors.white.withOpacity(0.12),
+              //       borderRadius: BorderRadius.circular(14),
+              //       border: Border.all(color: Colors.white.withOpacity(0.2)),
+              //     ),
+              //     child: Column(
+              //       children: [
+              //         Container(
+              //           padding: const EdgeInsets.all(8),
+              //           decoration: BoxDecoration(
+              //             color: const Color(0xFF45B7D1).withOpacity(0.8),
+              //             borderRadius: BorderRadius.circular(10),
+              //           ),
+              //           child: const Icon(
+              //             Icons.local_pharmacy_outlined,
+              //             color: Colors.white,
+              //             size: 16,
+              //           ),
+              //         ),
+              //         const SizedBox(height: 8),
+              //         const Text(
+              //           'Pharmacy Deals',
+              //           style: TextStyle(
+              //             color: Colors.white,
+              //             fontSize: 13,
+              //             fontWeight: FontWeight.w600,
+              //           ),
+              //         ),
+              //         // const Text(
+              //         //   'Up to 30% off',
+              //         //   style: TextStyle(color: Colors.white70, fontSize: 10),
+              //         // ),
+              //       ],
+              //     ),
+              //   ),
+              // ),
               const SizedBox(width: 12),
 
               Expanded(
-                child: Container(
-                  padding: const EdgeInsets.all(14),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.12),
-                    borderRadius: BorderRadius.circular(14),
-                    border: Border.all(color: Colors.white.withOpacity(0.2)),
-                  ),
-                  child: Column(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF2E86AB).withOpacity(0.8),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: const Icon(
-                          Icons.store_outlined,
-                          color: Colors.white,
-                          size: 16,
-                        ),
+                child: GestureDetector(
+                  onTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => NearestAmbulanceScreen(),
                       ),
-                      const SizedBox(height: 8),
-                      const Text(
-                        'New Clinics',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600,
+                    );
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.all(14),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.12),
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(color: Colors.white.withOpacity(0.2)),
+                    ),
+                    child: Column(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF2E86AB).withOpacity(0.8),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: const Icon(
+                            Icons.emoji_objects_sharp,
+                            color: Colors.white,
+                            size: 16,
+                          ),
                         ),
-                      ),
-                      const Text(
-                        '3 near you',
-                        style: TextStyle(color: Colors.white70, fontSize: 10),
-                      ),
-                    ],
+                        const SizedBox(height: 8),
+                        const Text(
+                          'Emergency',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        // const Text(
+                        //   '3 near you',
+                        //   style: TextStyle(color: Colors.white70, fontSize: 10),
+                        // ),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -398,60 +402,60 @@ class PatientHomeScreen extends StatelessWidget {
           const SizedBox(height: 16),
 
           // Emergency Contact Banner
-          Container(
-            padding: const EdgeInsets.all(14),
-            decoration: BoxDecoration(
-              color: const Color(0xFFFF6B6B).withOpacity(0.15),
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(
-                color: const Color(0xFFFF6B6B).withOpacity(0.3),
-              ),
-            ),
-            child: Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFFF6B6B),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: const Icon(
-                    Icons.emergency,
-                    color: Colors.white,
-                    size: 16,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                const Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Emergency Services',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      Text(
-                        '24/7 medical assistance available',
-                        style: TextStyle(color: Colors.white70, fontSize: 11),
-                      ),
-                    ],
-                  ),
-                ),
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: const Icon(Icons.phone, color: Colors.white, size: 16),
-                ),
-              ],
-            ),
-          ),
+          // Container(
+          //   padding: const EdgeInsets.all(14),
+          //   decoration: BoxDecoration(
+          //     color: const Color(0xFFFF6B6B).withOpacity(0.15),
+          //     borderRadius: BorderRadius.circular(14),
+          //     border: Border.all(
+          //       color: const Color(0xFFFF6B6B).withOpacity(0.3),
+          //     ),
+          //   ),
+          //   child: Row(
+          //     children: [
+          //       Container(
+          //         padding: const EdgeInsets.all(8),
+          //         decoration: BoxDecoration(
+          //           color: const Color(0xFFFF6B6B),
+          //           borderRadius: BorderRadius.circular(10),
+          //         ),
+          //         child: const Icon(
+          //           Icons.emergency,
+          //           color: Colors.white,
+          //           size: 16,
+          //         ),
+          //       ),
+          //       const SizedBox(width: 12),
+          //       const Expanded(
+          //         child: Column(
+          //           crossAxisAlignment: CrossAxisAlignment.start,
+          //           children: [
+          //             Text(
+          //               'Emergency Services',
+          //               style: TextStyle(
+          //                 color: Colors.white,
+          //                 fontSize: 14,
+          //                 fontWeight: FontWeight.w600,
+          //               ),
+          //             ),
+          //             Text(
+          //               '24/7 medical assistance available',
+          //               style: TextStyle(color: Colors.white70, fontSize: 11),
+          //             ),
+          //           ],
+          //         ),
+          //       ),
+          //       Container(
+          //         padding: const EdgeInsets.all(8),
+          //         decoration: BoxDecoration(
+          //           color: Colors.white.withOpacity(0.2),
+          //           borderRadius: BorderRadius.circular(10),
+          //         ),
+          //         child: const Icon(Icons.phone, color: Colors.white, size: 16),
+          //       ),
+          //     ],
+          //   ),
+          // ),
         ],
       ),
     );
@@ -468,52 +472,55 @@ class PatientHomeScreen extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF667EEA).withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Icon(icon, color: const Color(0xFF667EEA), size: 20),
-                ),
-                const SizedBox(width: 12),
-                Text(
-                  title,
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF1E293B),
-                  ),
-                ),
-              ],
-            ),
-            TextButton(
-              onPressed: onViewMore,
-              child: const Row(
-                mainAxisSize: MainAxisSize.min,
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 10.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
                 children: [
-                  Text(
-                    'View More',
-                    style: TextStyle(
-                      color: Color(0xFF667EEA),
-                      fontWeight: FontWeight.w600,
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF667EEA).withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(8),
                     ),
+                    child: Icon(icon, color: const Color(0xFF667EEA), size: 20),
                   ),
-                  SizedBox(width: 4),
-                  Icon(
-                    Icons.arrow_forward_ios,
-                    size: 14,
-                    color: Color(0xFF667EEA),
+                  const SizedBox(width: 12),
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF1E293B),
+                    ),
                   ),
                 ],
               ),
-            ),
-          ],
+              TextButton(
+                onPressed: onViewMore,
+                child: const Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      'View More',
+                      style: TextStyle(
+                        color: Color(0xFF667EEA),
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    SizedBox(width: 4),
+                    Icon(
+                      Icons.arrow_forward_ios,
+                      size: 14,
+                      color: Color(0xFF667EEA),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
         const SizedBox(height: 16),
         SizedBox(
@@ -900,6 +907,14 @@ class PatientHomeScreen extends StatelessWidget {
       Navigator.of(
         context,
       ).push(MaterialPageRoute(builder: (_) => DoctorsListingScreen()));
+    } else if (type.toLowerCase() == "clinics") {
+      Navigator.of(
+        context,
+      ).push(MaterialPageRoute(builder: (_) => ViewAllOrganizations()));
+    } else {
+      Navigator.of(
+        context,
+      ).push(MaterialPageRoute(builder: (_) => ViewAllPharmacies()));
     }
   }
 }

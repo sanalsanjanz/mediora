@@ -467,11 +467,7 @@ class _MedioraLoginScreenState extends State<MedioraLoginScreen>
         children: [
           Expanded(
             child: GestureDetector(
-              onTap: () {
-                Navigator.of(
-                  context,
-                ).push(MaterialPageRoute(builder: (c) => PatientHomeScreen()));
-              },
+              onTap: () {},
               /* => setState(() => _isLoginMode = true), */
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 300),
@@ -644,10 +640,12 @@ class _MedioraLoginScreenState extends State<MedioraLoginScreen>
           ),
           child: ElevatedButton(
             onPressed: () {
-              if (_formKey.currentState!.validate()) {
-                _handleAuthAction();
-              }
+              /*  if (_formKey.currentState!.validate()) { */
+
+              _handleAuthAction();
+              // }
             },
+
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.transparent,
               foregroundColor: Colors.white,
@@ -785,6 +783,9 @@ class _MedioraLoginScreenState extends State<MedioraLoginScreen>
     print('Email: $email');
     print('Password: $password');
     if (!_isLoginMode) print('Name: $name');
+    Navigator.of(
+      context,
+    ).push(MaterialPageRoute(builder: (c) => PatientHomeScreen()));
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(

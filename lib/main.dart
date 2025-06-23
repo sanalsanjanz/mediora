@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mediora/patients/views/patient_home_screen.dart';
 import 'package:mediora/splash_screen.dart';
 
 void main() {
@@ -32,7 +33,7 @@ class MyApp extends StatelessWidget {
         // tested with just a hot reload.
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: const MedioraSplashScreen(),
+      home: const PatientHomeScreen(),
     );
   }
 }
