@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:mediora/patients/views/patient_home_screen.dart';
 
 class MedioraLoginScreen extends StatefulWidget {
-  const MedioraLoginScreen({Key? key}) : super(key: key);
+  const MedioraLoginScreen({super.key});
 
   @override
   State<MedioraLoginScreen> createState() => _MedioraLoginScreenState();
@@ -49,7 +51,7 @@ class _MedioraLoginScreenState extends State<MedioraLoginScreen>
       title: 'Pharmacy',
       icon: Icons.local_pharmacy_rounded,
       description: 'Medication & supply services',
-      gradient: [Color(0xFFE11D48), Color(0xBE123C)],
+      gradient: [Color(0xFFE11D48), Color(0x00be123c)],
       canSignUp: false,
     ),
   ];
@@ -103,6 +105,16 @@ class _MedioraLoginScreenState extends State<MedioraLoginScreen>
     final isTablet = size.shortestSide >= 600;
 
     return Scaffold(
+      appBar: AppBar(
+        toolbarHeight: 0,
+        systemOverlayStyle: const SystemUiOverlayStyle(
+          statusBarColor: Color(0xFF3CB8B8),
+          statusBarIconBrightness: Brightness.light,
+          statusBarBrightness: Brightness.dark,
+        ),
+        backgroundColor: Color(0xFF3CB8B8),
+        elevation: 0,
+      ),
       body: Container(
         width: double.infinity,
         height: double.infinity,
@@ -127,14 +139,13 @@ class _MedioraLoginScreenState extends State<MedioraLoginScreen>
                   position: _slideAnimation,
                   child: SingleChildScrollView(
                     padding: EdgeInsets.symmetric(
-                      horizontal: isTablet ? 40 : 20,
+                      horizontal: isTablet ? 40 : 10,
                       vertical: 20,
                     ),
                     child: Column(
                       children: [
                         // Header with modern styling
-                        _buildModernHeader(isTablet),
-
+                        // _buildModernHeader(isTablet),
                         SizedBox(height: isTablet ? 40 : 30),
 
                         // Glass morphism card
@@ -250,9 +261,9 @@ class _MedioraLoginScreenState extends State<MedioraLoginScreen>
   }
 
   Widget _buildGlassMorphismCard(bool isTablet) {
-    return Container(
+    return SizedBox(
       width: double.infinity,
-      decoration: BoxDecoration(
+      /* decoration: BoxDecoration(
         color: Colors.white.withOpacity(0.15),
         borderRadius: BorderRadius.circular(24),
         border: Border.all(color: Colors.white.withOpacity(0.2), width: 1),
@@ -263,11 +274,11 @@ class _MedioraLoginScreenState extends State<MedioraLoginScreen>
             offset: const Offset(0, 15),
           ),
         ],
-      ),
+      ), */
       child: ClipRRect(
         borderRadius: BorderRadius.circular(24),
         child: Container(
-          decoration: BoxDecoration(
+          /*  decoration: BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
@@ -276,7 +287,7 @@ class _MedioraLoginScreenState extends State<MedioraLoginScreen>
                 Colors.white.withOpacity(0.1),
               ],
             ),
-          ),
+          ), */
           child: Padding(
             padding: EdgeInsets.all(isTablet ? 32 : 24),
             child: Column(
@@ -333,10 +344,10 @@ class _MedioraLoginScreenState extends State<MedioraLoginScreen>
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
+            crossAxisCount: 3,
             crossAxisSpacing: 16,
             mainAxisSpacing: 16,
-            childAspectRatio: isTablet ? 1.4 : 1.2,
+            mainAxisExtent: isTablet ? 100 : 100,
           ),
           itemCount: _userTypes.length,
           itemBuilder: (context, index) {
@@ -388,7 +399,7 @@ class _MedioraLoginScreenState extends State<MedioraLoginScreen>
                   children: [
                     Icon(
                       userType.icon,
-                      size: isTablet ? 32 : 28,
+                      size: isTablet ? 25 : 20,
                       color: Colors.white,
                     ),
                     SizedBox(height: isTablet ? 12 : 8),
@@ -456,7 +467,12 @@ class _MedioraLoginScreenState extends State<MedioraLoginScreen>
         children: [
           Expanded(
             child: GestureDetector(
-              onTap: () => setState(() => _isLoginMode = true),
+              onTap: () {
+                Navigator.of(
+                  context,
+                ).push(MaterialPageRoute(builder: (c) => PatientHomeScreen()));
+              },
+              /* => setState(() => _isLoginMode = true), */
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 300),
                 padding: EdgeInsets.symmetric(vertical: isTablet ? 16 : 12),
