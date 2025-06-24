@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:mediora/login_screen.dart';
 
@@ -55,10 +57,10 @@ class _MedioraSplashScreenState extends State<MedioraSplashScreen>
     // Start animations with delays
     _startAnimations();
 
-    Future.delayed(Duration(seconds: 3), () {
+    Future.delayed(Duration(seconds: 5), () {
       Navigator.of(
         context,
-      ).push(MaterialPageRoute(builder: (_) => MedioraLoginScreen()));
+      ).push(MaterialPageRoute(builder: (_) => MedicalLoginScreen()));
     });
   }
 
@@ -201,7 +203,7 @@ class _MedioraSplashScreenState extends State<MedioraSplashScreen>
 
 // Alternative version with pulse animation
 class MedioraSplashScreenPulse extends StatefulWidget {
-  const MedioraSplashScreenPulse({Key? key}) : super(key: key);
+  const MedioraSplashScreenPulse({super.key});
 
   @override
   State<MedioraSplashScreenPulse> createState() =>

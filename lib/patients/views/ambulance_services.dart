@@ -22,6 +22,8 @@ class AmbulanceService {
 }
 
 class NearestAmbulanceScreen extends StatefulWidget {
+  const NearestAmbulanceScreen({super.key});
+
   @override
   _NearestAmbulanceScreenState createState() => _NearestAmbulanceScreenState();
 }
@@ -109,17 +111,28 @@ class _NearestAmbulanceScreenState extends State<NearestAmbulanceScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Color(0xFF2E86AB),
+        elevation: 0,
+        /*  expandedHeight: 320, */
+        automaticallyImplyLeading: false,
+        // expandedHeight: 300.0,
+        /*  floating: false, */
+
+        // pinned: true,
+        // flexibleSpace: FlexibleSpaceBar(background: _buildHeader(context)),
+        toolbarHeight: 0,
+      ),
+
       backgroundColor: Color(0xFFF8FAFC),
-      body: SafeArea(
-        child: FadeTransition(
-          opacity: _fadeAnimation,
-          child: Column(
-            children: [
-              _buildHeader(),
-              _buildEmergencyButton(),
-              Expanded(child: _buildAmbulanceList()),
-            ],
-          ),
+      body: FadeTransition(
+        opacity: _fadeAnimation,
+        child: Column(
+          children: [
+            _buildHeader(),
+            _buildEmergencyButton(),
+            Expanded(child: _buildAmbulanceList()),
+          ],
         ),
       ),
     );
@@ -208,7 +221,7 @@ class _NearestAmbulanceScreenState extends State<NearestAmbulanceScreen>
         style: ElevatedButton.styleFrom(
           backgroundColor: Color(0xFFE53E3E),
           foregroundColor: Colors.white,
-          fixedSize: Size(double.maxFinite, 45),
+          fixedSize: Size(double.maxFinite, 50),
           padding: EdgeInsets.symmetric(vertical: 16, horizontal: 20),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),
@@ -219,12 +232,12 @@ class _NearestAmbulanceScreenState extends State<NearestAmbulanceScreen>
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.emergency, size: 24),
+            Icon(Icons.emergency, size: 20),
             SizedBox(width: 12),
             Text(
               'EMERGENCY CALL 108',
               style: TextStyle(
-                fontSize: 18,
+                fontSize: 16,
                 fontWeight: FontWeight.bold,
                 letterSpacing: 1.2,
               ),
@@ -280,7 +293,7 @@ class _NearestAmbulanceScreenState extends State<NearestAmbulanceScreen>
                   topLeft: Radius.circular(20),
                   topRight: Radius.circular(20),
                 ),
-                child: Container(
+                child: SizedBox(
                   height: 150,
                   width: double.infinity,
                   child: Image.network(
