@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class ViewAllPharmacies extends StatefulWidget {
-  const ViewAllPharmacies({Key? key}) : super(key: key);
+  const ViewAllPharmacies({super.key});
 
   @override
   State<ViewAllPharmacies> createState() => _ViewAllPharmaciesState();

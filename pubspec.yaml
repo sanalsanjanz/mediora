@@ -41,6 +41,7 @@ dependencies:
   dot_navigation_bar: ^1.0.2
   awesome_bottom_bar: ^1.2.4
   quickalert: ^1.1.0
+  http: ^1.4.0
 
 dev_dependencies:
   flutter_test:
