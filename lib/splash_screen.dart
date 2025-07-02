@@ -1,7 +1,10 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'package:flutter/material.dart';
+import 'package:mediora/apis/patients/preference_controller.dart';
 import 'package:mediora/login_screen.dart';
+import 'package:mediora/patients/views/patient_home_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class MedioraSplashScreen extends StatefulWidget {
   const MedioraSplashScreen({super.key});
@@ -57,10 +60,19 @@ class _MedioraSplashScreenState extends State<MedioraSplashScreen>
     // Start animations with delays
     _startAnimations();
 
-    Future.delayed(Duration(seconds: 5), () {
-      Navigator.of(
-        context,
-      ).push(MaterialPageRoute(builder: (_) => MedicalLoginScreen()));
+    Future.delayed(Duration(seconds: 5), () async {
+      SharedPreferences preferences = await SharedPreferences.getInstance();
+      bool isLogged = preferences.getBool("logged") ?? false;
+      if (isLogged) {
+        PatientController.getPatientDetails();
+        Navigator.of(
+          context,
+        ).push(MaterialPageRoute(builder: (_) => PatientHomeScreen()));
+      } else {
+        Navigator.of(
+          context,
+        ).push(MaterialPageRoute(builder: (_) => MedicalLoginScreen()));
+      }
     });
   }
 

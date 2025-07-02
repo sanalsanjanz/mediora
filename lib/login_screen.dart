@@ -832,9 +832,10 @@
 //   });
 // }
 import 'package:flutter/material.dart';
-import 'package:mediora/patients/views/patient_home_screen.dart';
+import 'package:mediora/apis/patients/api_helpers.dart';
 import 'package:mediora/patients/views/patient_landing_screen.dart';
 import 'package:mediora/widgets/loading_dialog.dart';
+import 'package:mediora/widgets/location_picker.dart';
 
 class MedicalLoginScreen extends StatefulWidget {
   const MedicalLoginScreen({super.key});
@@ -850,6 +851,11 @@ class _MedicalLoginScreenState extends State<MedicalLoginScreen>
   final _passwordController = TextEditingController();
   final _nameController = TextEditingController();
   final _phoneController = TextEditingController();
+  final _ageController = TextEditingController();
+  final _genderController = TextEditingController();
+  final _location = TextEditingController();
+  final latCtrl = TextEditingController();
+  final longCtrl = TextEditingController();
 
   bool _isLogin = true;
   bool _obscurePassword = true;
@@ -881,6 +887,9 @@ class _MedicalLoginScreenState extends State<MedicalLoginScreen>
     _passwordController.dispose();
     _nameController.dispose();
     _phoneController.dispose();
+    _ageController.dispose();
+    _genderController.dispose();
+    _location.dispose();
     super.dispose();
   }
 
@@ -1117,24 +1126,87 @@ class _MedicalLoginScreenState extends State<MedicalLoginScreen>
               },
             ),
             const SizedBox(height: 16),
+            Row(
+              children: [
+                Expanded(
+                  child: RadioListTile<String>(
+                    title: const Text('Male'),
+                    value: 'Male',
+                    groupValue: _genderController.text,
+                    onChanged: (value) {
+                      setState(() {
+                        _genderController.text = value!;
+                      });
+                    },
+                  ),
+                ),
+                Expanded(
+                  child: RadioListTile<String>(
+                    title: const Text('Female'),
+                    value: 'Female',
+                    groupValue: _genderController.text,
+                    onChanged: (value) {
+                      setState(() {
+                        _genderController.text = value!;
+                      });
+                    },
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
           ],
           _buildTextField(
             controller: _emailController,
-            label: 'Email Address',
+            label: 'Username',
             icon: Icons.email_outlined,
             keyboardType: TextInputType.emailAddress,
             validator: (value) {
               if (value?.isEmpty ?? true) {
-                return 'Please enter your email';
+                return 'Please enter your username';
               }
-              if (!RegExp(
+              /* if (!RegExp(
                 r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
               ).hasMatch(value!)) {
                 return 'Please enter a valid email';
-              }
+              } */
               return null;
             },
           ),
+          const SizedBox(height: 16),
+          if (!_isLogin)
+            _buildTextField(
+              controller: _ageController,
+              label: 'Age',
+              icon: Icons.email_outlined,
+              keyboardType: TextInputType.number,
+              validator: (value) {
+                if (value?.isEmpty ?? true) {
+                  return 'Please enter your age';
+                }
+                /* if (!RegExp(
+                r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
+              ).hasMatch(value!)) {
+                return 'Please enter a valid email';
+              } */
+                return null;
+              },
+            ),
+          if (!_isLogin) const SizedBox(height: 16),
+          if (!_isLogin)
+            _buildTextField(
+              readOnly: true,
+              controller: _location,
+              label: 'Location',
+              icon: Icons.location_on_outlined,
+              keyboardType: TextInputType.emailAddress,
+              validator: (value) {
+                if (value?.isEmpty ?? true) {
+                  return 'Please select your location';
+                }
+                return null;
+              },
+            ),
           const SizedBox(height: 16),
           _buildTextField(
             controller: _passwordController,
@@ -1169,11 +1241,24 @@ class _MedicalLoginScreenState extends State<MedicalLoginScreen>
     required String label,
     required IconData icon,
     bool obscureText = false,
+    bool readOnly = false,
     TextInputType? keyboardType,
     Widget? suffixIcon,
     String? Function(String?)? validator,
   }) {
     return TextFormField(
+      onTap: readOnly
+          ? () async {
+              LocationResult location = await Navigator.of(
+                context,
+              ).push(MaterialPageRoute(builder: (_) => LocationPicker()));
+
+              latCtrl.text = location.latitude.toString();
+              longCtrl.text = location.latitude.toString();
+              _location.text = location.locationName.toString();
+            }
+          : null,
+      readOnly: readOnly,
       controller: controller,
       obscureText: obscureText,
       keyboardType: keyboardType,
@@ -1328,25 +1413,63 @@ class _MedicalLoginScreenState extends State<MedicalLoginScreen>
     );
   }
 
-  void _handleSubmit() {
+  void _handleSubmit() async {
     if (_formKey.currentState?.validate() ?? false) {
       // Handle login/signup
 
-      Navigator.of(
-        context,
-      ).push(MaterialPageRoute(builder: (c) => PatientHomeScreen()));
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            _isLogin ? 'Login successful!' : 'Account created successfully!',
-          ),
-          backgroundColor: medicalBlue,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-        ),
-      );
+      if (_isLogin) {
+        (bool, String) res = await ApiHelpers.loginPatirent(
+          userName: _emailController.text.trim(),
+          password: _passwordController.text.trim(),
+        );
+
+        if (res.$1) {
+          // Navigate to main app
+          Navigator.of(
+            context,
+          ).push(MaterialPageRoute(builder: (c) => PatientLandingScreen()));
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(res.$2),
+              backgroundColor: Colors.red,
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+        }
+      } else {
+        (bool, String) res = await ApiHelpers.signupPatient(
+          details: {
+            "username": _emailController.text,
+            "password": _passwordController.text.trim(),
+            "name": _nameController.text.trim(),
+            "age": _ageController.text.trim(),
+            "gender": _genderController.text.trim(),
+            "mobile": _phoneController.text.trim(),
+            "lat": latCtrl.text.trim(),
+            "lon": longCtrl.text.trim(),
+            "location": _location.text.trim(),
+          },
+
+          /* userName: _emailController.text.trim(),
+          password: _passwordController.text.trim(), */
+        );
+
+        if (res.$1) {
+          // Navigate to main app
+          Navigator.of(
+            context,
+          ).push(MaterialPageRoute(builder: (c) => PatientLandingScreen()));
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(res.$2),
+              backgroundColor: Colors.red,
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+        }
+      }
     }
   }
 

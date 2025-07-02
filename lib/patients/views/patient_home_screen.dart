@@ -1,6 +1,7 @@
 import 'package:custom_clippers/custom_clippers.dart';
 import 'package:flutter/material.dart';
 import 'package:icons_plus/icons_plus.dart';
+import 'package:mediora/apis/patients/preference_controller.dart';
 import 'package:mediora/patients/views/ambulance_services.dart';
 import 'package:mediora/patients/views/doctor_booking_screen.dart';
 import 'package:mediora/patients/views/my_bookings.dart';
@@ -105,51 +106,60 @@ class PatientHomeScreen extends StatelessWidget {
             // User Profile Section
             Row(
               children: [
-                Container(
-                  width: 60,
-                  height: 60,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(color: Colors.white, width: 3),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.15),
-                        blurRadius: 10,
-                        offset: const Offset(0, 4),
+                /* ClipRRect(
+                  borderRadius: BorderRadiusGeometry.circular(100),
+                  child: Container(
+                    width: 60,
+                    height: 60,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(color: Colors.white, width: 3),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.15),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                      /*  image: const DecorationImage(
+                        image: NetworkImage(""),
+                        fit: BoxFit.cover,
+                      ), */
+                    ),
+                    child: Center(
+                      child: Icon(
+                        Icons.person_2_rounded,
+                        size: 80,
+                        color: Colors.white,
                       ),
-                    ],
-                    image: const DecorationImage(
-                      image: NetworkImage(
-                        'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=120&h=120&fit=crop&crop=face',
-                      ),
-                      fit: BoxFit.cover,
                     ),
                   ),
-                ),
+                ), */
                 const SizedBox(width: 16),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
+                      /* const Text(
                         'Good Morning,',
                         style: TextStyle(
                           color: Colors.white70,
                           fontSize: 12,
                           fontWeight: FontWeight.w400,
                         ),
-                      ),
+                      ), */
                       // const SizedBox(height: 2),
-                      const Text(
-                        'Sanal Pk',
+                      Text(
+                        PatientController.patientModel?.name.toString() ??
+                            "Unkown User",
                         style: TextStyle(
                           color: Colors.white,
-                          fontSize: 22,
+                          fontSize: 28,
                           fontWeight: FontWeight.bold,
                           letterSpacing: -0.3,
                         ),
                       ),
-                      // const SizedBox(height: 4),
+                      const SizedBox(height: 4),
                       Row(
                         children: [
                           const Icon(
@@ -158,11 +168,13 @@ class PatientHomeScreen extends StatelessWidget {
                             size: 14,
                           ),
                           const SizedBox(width: 4),
-                          const Text(
-                            'Downtown Medical District',
+                          Text(
+                            PatientController.patientModel?.location
+                                    .toString() ??
+                                "Add Location",
                             style: TextStyle(
                               color: Colors.white70,
-                              fontSize: 12,
+                              fontSize: 16,
                               fontWeight: FontWeight.w500,
                             ),
                           ),
