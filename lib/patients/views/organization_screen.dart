@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:mediora/helper/about_bulder.dart';
+import 'package:mediora/helper/call_navigation_helper.dart';
+import 'package:mediora/models/clinic_model.dart';
 
 class OrganizationScreen extends StatelessWidget {
-  const OrganizationScreen({super.key});
+  final ClinicModel data;
+  const OrganizationScreen({super.key, required this.data});
 
   @override
   Widget build(BuildContext context) {
@@ -32,10 +36,7 @@ class OrganizationScreen extends StatelessWidget {
                 fit: StackFit.expand,
                 children: [
                   // Cover Image
-                  Image.network(
-                    'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=800&h=600&fit=crop',
-                    fit: BoxFit.cover,
-                  ),
+                  Image.network(data.coverImage ?? "", fit: BoxFit.cover),
                   // Gradient Overlay
                   Container(
                     decoration: BoxDecoration(
@@ -75,7 +76,7 @@ class OrganizationScreen extends StatelessWidget {
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(12),
                             child: Image.network(
-                              'https://thumbs.dreamstime.com/z/doctors-hospital-corridor-nurse-pushing-gurney-stretcher-bed-male-senior-female-patient-32154012.jpg?ct=jpeg',
+                              data.image ?? "",
                               fit: BoxFit.cover,
                             ),
                           ),
@@ -87,8 +88,8 @@ class OrganizationScreen extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              const Text(
-                                'St. Mary\'s Medical Center',
+                              Text(
+                                data.name,
                                 style: TextStyle(
                                   color: Colors.white,
                                   fontSize: 22,
@@ -110,14 +111,15 @@ class OrganizationScreen extends StatelessWidget {
                                       borderRadius: BorderRadius.circular(8),
                                     ),
                                     child: const Icon(
-                                      Icons.star,
+                                      Icons.location_city,
                                       color: Colors.white,
                                       size: 14,
                                     ),
                                   ),
                                   const SizedBox(width: 6),
-                                  const Text(
-                                    '4.7 (850+ reviews)',
+                                  Text(
+                                    data.locationName,
+                                    // '4.7 (850+ reviews)',
                                     style: TextStyle(
                                       color: Colors.white70,
                                       fontSize: 14,
@@ -169,7 +171,7 @@ class OrganizationScreen extends StatelessWidget {
                           icon: Icons.call,
                           label: 'Enquiry',
                           color: Colors.green,
-                          onTap: () => _showCallDialog(context),
+                          onTap: () => _showCallDialog(context, data),
                         ),
                       ),
                       const SizedBox(width: 12),
@@ -178,7 +180,7 @@ class OrganizationScreen extends StatelessWidget {
                           icon: Icons.directions,
                           label: 'Navigate',
                           color: Colors.orange,
-                          onTap: () => _showNavigationDialog(context),
+                          onTap: () => _showNavigationDialog(context, data),
                         ),
                       ),
                     ],
@@ -209,16 +211,16 @@ class OrganizationScreen extends StatelessWidget {
                     child: Column(
                       children: [
                         _buildOpeningHour(
-                          'Monday - Friday',
-                          '6:00 AM - 10:00 PM',
+                          "Working Hours",
+                          data.workingHours,
                           true,
                         ),
-                        _buildOpeningHour(
+                        /*  _buildOpeningHour(
                           'Saturday',
                           '8:00 AM - 8:00 PM',
                           false,
                         ),
-                        _buildOpeningHour('Sunday', '9:00 AM - 6:00 PM', false),
+                        _buildOpeningHour('Sunday', '9:00 AM - 6:00 PM', false), */
                       ],
                     ),
                   ),
@@ -235,13 +237,10 @@ class OrganizationScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 12),
-                  const Text(
-                    'St. Mary\'s Medical Center is a leading healthcare facility providing comprehensive medical services for over 30 years. We offer state-of-the-art equipment, experienced medical professionals, and compassionate care to ensure the best possible outcomes for our patients.',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey,
-                      height: 1.6,
-                    ),
+                  Text(
+                    data.about ??
+                        generateHospitalAbout(data.name, data.locationName),
+                    style: TextStyle(fontSize: 14, height: 1.6),
                   ),
 
                   const SizedBox(height: 20),
@@ -256,7 +255,20 @@ class OrganizationScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 12),
-                  Wrap(
+                  if (data.services.isNotEmpty)
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: data.services
+                          .map<Widget>((s) => _buildSpecialtyChip(s))
+                          .toList(),
+                    )
+                  else
+                    const Text(
+                      'No specialties listed.',
+                      style: TextStyle(color: Colors.grey),
+                    ),
+                  /*  Wrap(
                     spacing: 8,
                     runSpacing: 8,
                     children: [
@@ -267,48 +279,49 @@ class OrganizationScreen extends StatelessWidget {
                       _buildSpecialtyChip('Pediatrics'),
                       _buildSpecialtyChip('Radiology'),
                     ],
-                  ),
+                  ), */
                 ],
               ),
             ),
           ),
 
           // Our Doctors Section
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    'Our Doctors',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black87,
-                    ),
-                  ),
-                  TextButton(
-                    onPressed: () {},
-                    child: const Text(
-                      'View All',
+          if (data.doctors.isNotEmpty)
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Our Doctors',
                       style: TextStyle(
-                        color: Colors.blue,
-                        fontWeight: FontWeight.w600,
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87,
                       ),
                     ),
-                  ),
-                ],
+                    TextButton(
+                      onPressed: null,
+                      child: const Text(
+                        '',
+                        style: TextStyle(
+                          color: Colors.blue,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
-          ),
 
           // Doctors List
           SliverList(
             delegate: SliverChildBuilderDelegate(
               (context, index) =>
-                  _buildDoctorCard(context, _getDoctorData()[index]),
-              childCount: _getDoctorData().length,
+                  _buildDoctorCard(context, data.doctors[index]),
+              childCount: data.doctors.length,
             ),
           ),
 
@@ -342,7 +355,7 @@ class OrganizationScreen extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(6),
               decoration: BoxDecoration(
-                color: color.withOpacity(0.2),
+                /*    color: color.withOpacity(0.2), */
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Icon(icon, color: color, size: 20),
@@ -417,7 +430,7 @@ class OrganizationScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildDoctorCard(BuildContext context, Map<String, dynamic> doctor) {
+  Widget _buildDoctorCard(BuildContext context, Doctor doctor) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       padding: const EdgeInsets.all(16),
@@ -452,7 +465,7 @@ class OrganizationScreen extends StatelessWidget {
             ),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(12),
-              child: Image.network(doctor['image'], fit: BoxFit.cover),
+              child: Image.network(doctor.image, fit: BoxFit.cover),
             ),
           ),
           const SizedBox(width: 16),
@@ -466,7 +479,7 @@ class OrganizationScreen extends StatelessWidget {
                   children: [
                     Expanded(
                       child: Text(
-                        doctor['name'],
+                        doctor.name,
                         style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
@@ -474,26 +487,26 @@ class OrganizationScreen extends StatelessWidget {
                         ),
                       ),
                     ),
-                    if (doctor['verified'])
-                      Container(
-                        padding: const EdgeInsets.all(4),
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [Colors.blue[400]!, Colors.blue[600]!],
-                          ),
-                          borderRadius: BorderRadius.circular(20),
+                    // if (doctor['verified'])
+                    Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [Colors.blue[400]!, Colors.blue[600]!],
                         ),
-                        child: const Icon(
-                          Icons.verified,
-                          color: Colors.white,
-                          size: 14,
-                        ),
+                        borderRadius: BorderRadius.circular(20),
                       ),
+                      child: const Icon(
+                        Icons.verified,
+                        color: Colors.white,
+                        size: 14,
+                      ),
+                    ),
                   ],
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  doctor['specialty'],
+                  doctor.specialization,
                   style: const TextStyle(
                     fontSize: 14,
                     color: Colors.grey,
@@ -519,7 +532,7 @@ class OrganizationScreen extends StatelessWidget {
                     ),
                     const SizedBox(width: 4),
                     Text(
-                      doctor['rating'],
+                      doctor.isActive ? "Online" : "Offline",
                       style: const TextStyle(
                         fontSize: 12,
                         color: Colors.grey,
@@ -527,13 +540,27 @@ class OrganizationScreen extends StatelessWidget {
                       ),
                     ),
                     const Spacer(),
-                    Text(
-                      '${doctor['experience']} exp',
-                      style: const TextStyle(
-                        fontSize: 12,
-                        color: Colors.blue,
-                        fontWeight: FontWeight.w600,
-                      ),
+                    Builder(
+                      builder: (_) {
+                        String expText = '';
+                        if (doctor.experience > 0) {
+                          expText += '${doctor.experience} Years';
+                        }
+                        if (doctor.months > 0) {
+                          if (expText.isNotEmpty) expText += ' ';
+                          expText += '${doctor.months} Months';
+                        }
+                        return expText.isNotEmpty
+                            ? Text(
+                                expText,
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.blue,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              )
+                            : const SizedBox.shrink();
+                      },
                     ),
                   ],
                 ),
@@ -638,7 +665,7 @@ class OrganizationScreen extends StatelessWidget {
     ];
   }
 
-  void _showCallDialog(BuildContext context) {
+  void _showCallDialog(BuildContext context, ClinicModel data) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -647,9 +674,7 @@ class OrganizationScreen extends StatelessWidget {
             borderRadius: BorderRadius.circular(16),
           ),
           title: const Text('Call Hospital'),
-          content: const Text(
-            'Would you like to call St. Mary\'s Medical Center?',
-          ),
+          content: Text('Would you like to call ${data.name}'),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
@@ -659,6 +684,8 @@ class OrganizationScreen extends StatelessWidget {
               onPressed: () {
                 Navigator.of(context).pop();
                 // Implement actual call functionality
+                final phone = data.contact ?? '';
+                makeCall(phone: phone, context: context);
               },
               child: const Text('Call Now'),
             ),
@@ -668,7 +695,7 @@ class OrganizationScreen extends StatelessWidget {
     );
   }
 
-  void _showNavigationDialog(BuildContext context) {
+  void _showNavigationDialog(BuildContext context, ClinicModel data) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -686,7 +713,11 @@ class OrganizationScreen extends StatelessWidget {
             ElevatedButton(
               onPressed: () {
                 Navigator.of(context).pop();
-                // Implement actual navigation functionality
+                navigateToLocation(
+                  latitude: data.lat,
+                  longitude: data.lon,
+                  context: context,
+                );
               },
               child: const Text('Navigate'),
             ),

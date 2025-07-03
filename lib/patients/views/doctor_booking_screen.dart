@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:mediora/apis/patients/api_helpers.dart';
+import 'package:mediora/helper/call_navigation_helper.dart';
+import 'package:mediora/models/doctors_model.dart';
 
 class DoctorBookingScreen extends StatelessWidget {
-  const DoctorBookingScreen({super.key});
+  final DoctorsModel doctor;
+  const DoctorBookingScreen({super.key, required this.doctor});
 
   @override
   Widget build(BuildContext context) {
@@ -77,10 +81,7 @@ class DoctorBookingScreen extends StatelessWidget {
                         ), */
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(16),
-                          child: Image.network(
-                            'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=400&h=400&fit=crop&crop=face',
-                            fit: BoxFit.cover,
-                          ),
+                          child: Image.network(doctor.image, fit: BoxFit.cover),
                         ),
                       ),
                       const SizedBox(width: 16),
@@ -91,9 +92,9 @@ class DoctorBookingScreen extends StatelessWidget {
                           children: [
                             Row(
                               children: [
-                                const Expanded(
+                                Expanded(
                                   child: Text(
-                                    'Dr. Sarah Johnson',
+                                    doctor.name,
                                     style: TextStyle(
                                       fontSize: 20,
                                       fontWeight: FontWeight.bold,
@@ -122,8 +123,8 @@ class DoctorBookingScreen extends StatelessWidget {
                               ],
                             ),
                             const SizedBox(height: 4),
-                            const Text(
-                              'Cardiologist',
+                            Text(
+                              doctor.specialization,
                               style: TextStyle(
                                 fontSize: 16,
                                 color: Colors.grey,
@@ -145,14 +146,14 @@ class DoctorBookingScreen extends StatelessWidget {
                                     borderRadius: BorderRadius.circular(12),
                                   ),
                                   child: const Icon(
-                                    Icons.star,
+                                    Icons.my_location_rounded,
                                     color: Colors.white,
                                     size: 16,
                                   ),
                                 ),
-                                const SizedBox(width: 6),
-                                const Text(
-                                  '4.8 (127 reviews)',
+                                const SizedBox(width: 5),
+                                Text(
+                                  doctor.locationName,
                                   style: TextStyle(
                                     fontSize: 14,
                                     color: Colors.grey,
@@ -175,7 +176,7 @@ class DoctorBookingScreen extends StatelessWidget {
                         child: _buildInfoCard(
                           icon: Icons.work_outline,
                           title: 'Experience',
-                          value: '12 Years',
+                          value: "${doctor.experience} year (s)",
                           color: Colors.blue,
                         ),
                       ),
@@ -184,7 +185,10 @@ class DoctorBookingScreen extends StatelessWidget {
                         child: _buildInfoCard(
                           icon: Icons.location_on_outlined,
                           title: 'Distance',
-                          value: '2.5 km',
+                          value: ApiHelpers.calculateDistanceString(
+                            doctor.lat,
+                            doctor.lon,
+                          ),
                           color: Colors.orange,
                         ),
                       ),
@@ -217,7 +221,11 @@ class DoctorBookingScreen extends StatelessWidget {
                       ),
                       child: ElevatedButton.icon(
                         onPressed: () {
-                          _showCallDialog(context);
+                          // _showCallDialog(context);
+                          makeCall(
+                            phone: doctor.contactNumber,
+                            context: context,
+                          );
                         },
                         icon: const Icon(
                           Icons.call,
@@ -264,7 +272,12 @@ class DoctorBookingScreen extends StatelessWidget {
                       ),
                       child: ElevatedButton.icon(
                         onPressed: () {
-                          _showNavigationDialog(context);
+                          // _showNavigationDialog(context);
+                          navigateToLocation(
+                            latitude: doctor.lat,
+                            longitude: doctor.lon,
+                            context: context,
+                          );
                         },
                         icon: const Icon(
                           Icons.directions,
@@ -321,9 +334,16 @@ class DoctorBookingScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 12),
-                  _buildWorkingHour('Monday - Friday', '9:00 AM - 6:00 PM'),
+
+                  Column(
+                    children: doctor.workingHours
+                        .map((e) => _buildWorkingHour("Available", e))
+                        .toList(),
+                  ),
+
+                  /* _buildWorkingHour('Monday - Friday', '9:00 AM - 6:00 PM'),
                   _buildWorkingHour('Saturday', '9:00 AM - 2:00 PM'),
-                  _buildWorkingHour('Sunday', 'Closed'),
+                  _buildWorkingHour('Sunday', 'Closed'), */
                 ],
               ),
             ),
@@ -372,6 +392,7 @@ class DoctorBookingScreen extends StatelessWidget {
             // About Doctor
             Container(
               margin: const EdgeInsets.symmetric(horizontal: 16),
+              width: double.maxFinite,
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
                 color: Colors.white,
@@ -387,6 +408,7 @@ class DoctorBookingScreen extends StatelessWidget {
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
+
                 children: [
                   const Text(
                     'About Doctor',
@@ -397,8 +419,8 @@ class DoctorBookingScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 12),
-                  const Text(
-                    'Dr. Sarah Johnson is a highly experienced cardiologist with over 12 years of practice. She specializes in preventive cardiology, heart disease treatment, and cardiac rehabilitation. Dr. Johnson completed her medical degree from Harvard Medical School and her residency at Johns Hopkins Hospital.',
+                  Text(
+                    doctor.about,
                     style: TextStyle(
                       fontSize: 14,
                       color: Colors.grey,
@@ -407,7 +429,7 @@ class DoctorBookingScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 12),
                   const Text(
-                    'Specializations:',
+                    'Qualification:',
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
@@ -418,12 +440,36 @@ class DoctorBookingScreen extends StatelessWidget {
                   Wrap(
                     spacing: 8,
                     runSpacing: 8,
-                    children: [
-                      _buildSpecializationChip('Heart Disease'),
-                      _buildSpecializationChip('Hypertension'),
-                      _buildSpecializationChip('Cardiac Surgery'),
-                      _buildSpecializationChip('ECG'),
-                    ],
+                    children: doctor.qualifications
+                        .map((e) => _buildSpecializationChip(e))
+                        .toList() /* [
+                      
+                      // _buildSpecializationChip('Hypertension'),
+                      // _buildSpecializationChip('Cardiac Surgery'),
+                      // _buildSpecializationChip('ECG'),
+                    ], */,
+                  ),
+                  const SizedBox(height: 16),
+                  const Text(
+                    'Languages:',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black87,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: doctor.languagesSpoken
+                        .map((e) => _buildSpecializationChip(e))
+                        .toList() /* [
+                      
+                      // _buildSpecializationChip('Hypertension'),
+                      // _buildSpecializationChip('Cardiac Surgery'),
+                      // _buildSpecializationChip('ECG'),
+                    ], */,
                   ),
                 ],
               ),

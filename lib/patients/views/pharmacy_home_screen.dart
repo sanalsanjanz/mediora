@@ -2,9 +2,14 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:mediora/apis/patients/preference_controller.dart';
+import 'package:mediora/helper/call_navigation_helper.dart';
+import 'package:mediora/models/pharmacy_model.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class PharmacyHomeScreen extends StatefulWidget {
-  const PharmacyHomeScreen({super.key});
+  final PharmacyModel items;
+  const PharmacyHomeScreen({super.key, required this.items});
 
   @override
   _PharmacyHomeScreenState createState() => _PharmacyHomeScreenState();
@@ -19,7 +24,7 @@ class _PharmacyHomeScreenState extends State<PharmacyHomeScreen>
   late Animation<double> _scaleAnimation;
 
   // Sample pharmacy data
-  final Map<String, dynamic> pharmacyData = {
+  /*  final Map<String, dynamic> pharmacyData = {
     'name': 'MediCare Plus Pharmacy',
     'rating': 4.8,
     'reviews': 324,
@@ -38,7 +43,7 @@ class _PharmacyHomeScreenState extends State<PharmacyHomeScreen>
       'image':
           'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=200&h=200&fit=crop&crop=face',
     },
-  };
+  }; */
 
   final List<Map<String, dynamic>> offers = [
     {
@@ -206,7 +211,7 @@ class _PharmacyHomeScreenState extends State<PharmacyHomeScreen>
                     ),
                     child: ClipOval(
                       child: Image.network(
-                        'https://images.unsplash.com/photo-1582750433449-648ed127bb54?w=200&h=200&fit=crop',
+                        widget.items.image,
                         fit: BoxFit.cover,
                       ),
                     ),
@@ -217,7 +222,7 @@ class _PharmacyHomeScreenState extends State<PharmacyHomeScreen>
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        pharmacyData['name'],
+                        widget.items.pharmacyName,
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 24,
@@ -229,13 +234,14 @@ class _PharmacyHomeScreenState extends State<PharmacyHomeScreen>
                           Icon(Icons.star, color: Colors.amber, size: 20),
                           SizedBox(width: 5),
                           Text(
-                            '${pharmacyData['rating']} (${pharmacyData['reviews']} reviews)',
+                            // '${pharmacyData['rating']} (${pharmacyData['reviews']} reviews)',
+                            widget.items.locationName,
                             style: TextStyle(
                               color: Colors.white70,
                               fontSize: 14,
                             ),
                           ),
-                          if (pharmacyData['verified']) ...[
+                          if (widget.items.licenseNumber.isNotEmpty) ...[
                             SizedBox(width: 10),
                             Container(
                               padding: EdgeInsets.symmetric(
@@ -286,7 +292,7 @@ class _PharmacyHomeScreenState extends State<PharmacyHomeScreen>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            pharmacyData['description'],
+            widget.items.about,
             style: TextStyle(fontSize: 16, color: Colors.grey[600]),
           ),
           SizedBox(height: 15),
@@ -296,7 +302,7 @@ class _PharmacyHomeScreenState extends State<PharmacyHomeScreen>
               SizedBox(width: 10),
               Expanded(
                 child: Text(
-                  pharmacyData['address'],
+                  widget.items.locationName,
                   style: TextStyle(fontSize: 14, color: Colors.grey[700]),
                 ),
               ),
@@ -315,7 +321,7 @@ class _PharmacyHomeScreenState extends State<PharmacyHomeScreen>
           Expanded(
             child: ElevatedButton.icon(
               onPressed: () {
-                // Call functionality
+                makeCall(phone: widget.items.contactNumber, context: context);
               },
               icon: Icon(Icons.phone),
               label: Text('Call'),
@@ -332,8 +338,25 @@ class _PharmacyHomeScreenState extends State<PharmacyHomeScreen>
           SizedBox(width: 10),
           Expanded(
             child: ElevatedButton.icon(
-              onPressed: () {
-                // Message functionality
+              onPressed: () async {
+                final name = PatientController
+                    .patientModel
+                    ?.name; // Replace with actual user name if available
+                final phone = widget.items.contactNumber.replaceAll(
+                  RegExp(r'\D'),
+                  '',
+                );
+                final url = Uri.parse(
+                  "https://wa.me/$phone?text=${Uri.encodeComponent('Hii Im $name From Mediora')}",
+                );
+                await Clipboard.setData(ClipboardData(text: phone));
+                if (await canLaunchUrl(url)) {
+                  await launchUrl(url, mode: LaunchMode.externalApplication);
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Could not open WhatsApp')),
+                  );
+                }
               },
               icon: Icon(Icons.message),
               label: Text('Message'),
@@ -351,7 +374,11 @@ class _PharmacyHomeScreenState extends State<PharmacyHomeScreen>
           Expanded(
             child: ElevatedButton.icon(
               onPressed: () {
-                // Navigation functionality
+                navigateToLocation(
+                  latitude: widget.items.lat,
+                  longitude: widget.items.lon,
+                  context: context,
+                );
               },
               icon: Icon(Icons.navigation),
               label: Text('Navigate'),
@@ -392,25 +419,25 @@ class _PharmacyHomeScreenState extends State<PharmacyHomeScreen>
               Icon(Icons.access_time, color: Colors.orange),
               SizedBox(width: 10),
               Text(
-                '${pharmacyData['openTime']} - ${pharmacyData['closeTime']}',
+                widget.items.workingHours,
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
               ),
               Spacer(),
-              Container(
+              /* Container(
                 padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
-                  color: pharmacyData['isOpen'] ? Colors.green : Colors.red,
+                  color:  widget.items.status ? Colors.green : Colors.red,
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
                   pharmacyData['isOpen'] ? 'Open Now' : 'Closed',
                   style: TextStyle(color: Colors.white, fontSize: 12),
                 ),
-              ),
+              ), */
             ],
           ),
           SizedBox(height: 15),
-          Row(
+          /*  Row(
             children: [
               Icon(
                 Icons.local_shipping,
@@ -431,14 +458,14 @@ class _PharmacyHomeScreenState extends State<PharmacyHomeScreen>
                 ),
               ),
             ],
-          ),
+          ), */
         ],
       ),
     );
   }
 
   Widget _buildLeadingPharmacist() {
-    final pharmacist = pharmacyData['leadingPharmacist'];
+    // final pharmacist =  widget.items.pharmacistName;
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 20),
       padding: EdgeInsets.all(20),
@@ -484,10 +511,7 @@ class _PharmacyHomeScreenState extends State<PharmacyHomeScreen>
                     border: Border.all(color: Colors.white, width: 2),
                   ),
                   child: ClipOval(
-                    child: Image.network(
-                      pharmacist['image'],
-                      fit: BoxFit.cover,
-                    ),
+                    child: Image.network(widget.items.image, fit: BoxFit.cover),
                   ),
                 ),
               ),
@@ -497,7 +521,7 @@ class _PharmacyHomeScreenState extends State<PharmacyHomeScreen>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      pharmacist['name'],
+                      widget.items.pharmacistName,
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -506,7 +530,7 @@ class _PharmacyHomeScreenState extends State<PharmacyHomeScreen>
                     ),
                     SizedBox(height: 5),
                     Text(
-                      pharmacist['qualification'],
+                      widget.items.experience.toString(),
                       style: TextStyle(fontSize: 14, color: Colors.grey[600]),
                     ),
                   ],
@@ -665,26 +689,4 @@ class _PharmacyHomeScreenState extends State<PharmacyHomeScreen>
       ],
     );
   }
-}
-
-// Usage example:
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Pharmacy App',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
-      ),
-      home: PharmacyHomeScreen(),
-      debugShowCheckedModeBanner: false,
-    );
-  }
-}
-
-void main() {
-  runApp(MyApp());
 }

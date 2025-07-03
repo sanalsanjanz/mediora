@@ -1,15 +1,11 @@
 import 'package:custom_clippers/custom_clippers.dart';
 import 'package:flutter/material.dart';
-import 'package:icons_plus/icons_plus.dart';
 import 'package:mediora/apis/patients/preference_controller.dart';
 import 'package:mediora/patients/views/ambulance_services.dart';
-import 'package:mediora/patients/views/doctor_booking_screen.dart';
+import 'package:mediora/patients/views/clinic_list.dart';
+import 'package:mediora/patients/views/doctors_list.dart';
 import 'package:mediora/patients/views/my_bookings.dart';
-import 'package:mediora/patients/views/organization_screen.dart';
-import 'package:mediora/patients/views/pharmacy_home_screen.dart';
-import 'package:mediora/patients/views/view_all_doctors_screen.dart';
-import 'package:mediora/patients/views/view_all_organizations.dart';
-import 'package:mediora/patients/views/view_all_pharmacies.dart';
+import 'package:mediora/patients/views/pharmacy_list.dart';
 
 class PatientHomeScreen extends StatelessWidget {
   const PatientHomeScreen({super.key});
@@ -37,32 +33,27 @@ class PatientHomeScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const SizedBox(height: 24),
-                _buildSection(
+                /*  _buildSection(
                   type: "doctor",
                   count: 2,
                   title: "Top Doctors Near You",
                   icon: FontAwesome.stethoscope_solid,
                   items: _getDoctors(),
                   onViewMore: () => _navigateToViewMore('doctors', context),
-                ),
+                ), */
+                doctorsGrid(),
                 const SizedBox(height: 24),
-                _buildSection(
+                /*  _buildSection(
                   type: "hospital",
                   count: 1,
                   title: "Nearest Clinics/Hospitals",
                   icon: FontAwesome.hospital_solid,
                   items: _getClinics(),
                   onViewMore: () => _navigateToViewMore('clinics', context),
-                ),
+                ), */
+                clinicGrid(),
                 const SizedBox(height: 24),
-                _buildSection(
-                  type: "pharmacy",
-                  count: 2,
-                  title: "Nearest Pharmacies",
-                  icon: FontAwesome.suitcase_medical_solid,
-                  items: _getPharmacies(),
-                  onViewMore: () => _navigateToViewMore('pharmacies', context),
-                ),
+                pharmacyGrid(),
                 const SizedBox(height: 20),
               ],
             ),
@@ -478,7 +469,7 @@ class PatientHomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSection({
+  /* Widget _buildSection({
     required String title,
     required String type,
     required int count,
@@ -560,7 +551,7 @@ class PatientHomeScreen extends StatelessWidget {
                   } else if (type == "hospital") {
                     Navigator.of(context).push(
                       MaterialPageRoute(
-                        builder: (context) => OrganizationScreen(),
+                        builder: (context) => OrganizationScreen(data: ,),
                       ),
                     );
                   } else {
@@ -584,9 +575,9 @@ class PatientHomeScreen extends StatelessWidget {
         ),
       ],
     );
-  }
+  } */
 
-  Widget _buildCard(Map<String, dynamic> item) {
+  /*  Widget _buildCard(Map<String, dynamic> item) {
     return Container(
       // width: 280,
       // margin: const EdgeInsets.only(right: 16),
@@ -732,9 +723,9 @@ class PatientHomeScreen extends StatelessWidget {
         ],
       ),
     );
-  }
+  } */
 
-  List<Map<String, dynamic>> _getClinics() {
+  /*  L ist<Map<String, dynamic>> _getClinics() {
     return [
       {
         'name': 'Seattle Medical Center',
@@ -791,9 +782,9 @@ class PatientHomeScreen extends StatelessWidget {
         'rating': 4.8,
       },
     ];
-  }
+  } */
 
-  List<Map<String, dynamic>> _getDoctors() {
+  /* List<Map<String, dynamic>> _getDoctors() {
     return [
       {
         'name': 'Dr. Emily Rodriguez',
@@ -856,68 +847,9 @@ class PatientHomeScreen extends StatelessWidget {
         'specialization': 'Psychiatrist',
       },
     ];
-  }
+  } */
 
-  List<Map<String, dynamic>> _getPharmacies() {
-    return [
-      {
-        'name': 'HealthPlus Pharmacy',
-        'image':
-            'https://images.unsplash.com/photo-1550572017-edd951aa8ca3?w=300&h=200&fit=crop',
-        'distance': '0.3 km',
-        'openTime': '08:00 AM',
-        'closeTime': '10:00 PM',
-        'rating': 4.7,
-      },
-      {
-        'name': 'MediCare Drug Store',
-        'image':
-            'https://images.unsplash.com/photo-1576671081837-49000212a370?w=300&h=200&fit=crop',
-        'distance': '0.7 km',
-        'openTime': '09:00 AM',
-        'closeTime': '09:00 PM',
-        'rating': 4.5,
-      },
-      {
-        'name': 'Quick Pharmacy',
-        'image':
-            'https://images.unsplash.com/photo-1583947215259-38e31be8751f?w=300&h=200&fit=crop',
-        'distance': '1.2 km',
-        'openTime': '24/7',
-        'closeTime': 'Open',
-        'rating': 4.6,
-      },
-      {
-        'name': 'Downtown Chemist',
-        'image':
-            'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=300&h=200&fit=crop',
-        'distance': '1.8 km',
-        'openTime': '07:00 AM',
-        'closeTime': '11:00 PM',
-        'rating': 4.8,
-      },
-      {
-        'name': 'City Medical Supplies',
-        'image':
-            'https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=300&h=200&fit=crop',
-        'distance': '2.1 km',
-        'openTime': '08:30 AM',
-        'closeTime': '08:30 PM',
-        'rating': 4.4,
-      },
-      {
-        'name': 'Northwest Pharmacy',
-        'image':
-            'https://images.unsplash.com/photo-1586015555751-63bb77f4322a?w=300&h=200&fit=crop',
-        'distance': '2.5 km',
-        'openTime': '09:00 AM',
-        'closeTime': '10:00 PM',
-        'rating': 4.7,
-      },
-    ];
-  }
-
-  void _navigateToViewMore(String type, BuildContext context) {
+  /* void _navigateToViewMore(String type, BuildContext context) {
     // Navigate to respective view more pages
     print('Navigate to view more $type');
     if (type.toLowerCase() == "doctors") {
@@ -933,5 +865,5 @@ class PatientHomeScreen extends StatelessWidget {
         context,
       ).push(MaterialPageRoute(builder: (_) => ViewAllPharmacies()));
     }
-  }
+  } */
 }
