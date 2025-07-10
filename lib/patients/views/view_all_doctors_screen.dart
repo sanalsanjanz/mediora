@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:mediora/apis/patients/api_helpers.dart';
+import 'package:mediora/models/doctors_model.dart';
+import 'package:mediora/patients/views/doctor_booking_screen.dart';
 
 class DoctorsListingScreen extends StatefulWidget {
   const DoctorsListingScreen({super.key});
@@ -30,115 +33,16 @@ class _DoctorsListingScreenState extends State<DoctorsListingScreen>
     'General Medicine',
   ];
 
-  final List<Map<String, dynamic>> doctors = [
-    {
-      'name': 'Dr. Sarah Johnson',
-      'specialty': 'Cardiology',
-      'image':
-          'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=300&h=300&fit=crop&crop=face',
-      'rating': 4.9,
-      'reviews': 234,
-      'experience': '15 years',
-      'availableTime': '9:00 AM - 6:00 PM',
-      'distance': '2.5 km',
-      'nextAvailable': 'Today 3:00 PM',
-      'consultationFee': '₹800',
-      'isOnline': true,
-    },
-    {
-      'name': 'Dr. Michael Chen',
-      'specialty': 'Neurology',
-      'image':
-          'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=300&h=300&fit=crop&crop=face',
-      'rating': 4.8,
-      'reviews': 189,
-      'experience': '12 years',
-      'availableTime': '10:00 AM - 8:00 PM',
-      'distance': '1.2 km',
-      'nextAvailable': 'Tomorrow 10:00 AM',
-      'consultationFee': '₹1200',
-      'isOnline': false,
-    },
-    {
-      'name': 'Dr. Emily Rodriguez',
-      'specialty': 'Dermatology',
-      'image':
-          'https://images.unsplash.com/photo-1594824506871-a4dbc0c3e942?w=300&h=300&fit=crop&crop=face',
-      'rating': 4.7,
-      'reviews': 156,
-      'experience': '8 years',
-      'availableTime': '11:00 AM - 7:00 PM',
-      'distance': '3.8 km',
-      'nextAvailable': 'Today 5:30 PM',
-      'consultationFee': '₹600',
-      'isOnline': true,
-    },
-    {
-      'name': 'Dr. James Wilson',
-      'specialty': 'Orthopedics',
-      'image':
-          'https://images.unsplash.com/photo-1582750433449-648ed127bb54?w=300&h=300&fit=crop&crop=face',
-      'rating': 4.9,
-      'reviews': 298,
-      'experience': '20 years',
-      'availableTime': '8:00 AM - 5:00 PM',
-      'distance': '4.2 km',
-      'nextAvailable': 'Tomorrow 2:00 PM',
-      'consultationFee': '₹1000',
-      'isOnline': false,
-    },
-    {
-      'name': 'Dr. Priya Sharma',
-      'specialty': 'Pediatrics',
-      'image':
-          'https://images.unsplash.com/photo-1551884831-bbf3cdc6469e?w=300&h=300&fit=crop&crop=face',
-      'rating': 4.8,
-      'reviews': 167,
-      'experience': '10 years',
-      'availableTime': '9:00 AM - 6:00 PM',
-      'distance': '2.1 km',
-      'nextAvailable': 'Today 4:15 PM',
-      'consultationFee': '₹700',
-      'isOnline': true,
-    },
-    {
-      'name': 'Dr. Robert Kim',
-      'specialty': 'Psychiatry',
-      'image':
-          'https://images.unsplash.com/photo-1607990281513-2c110a25bd8c?w=300&h=300&fit=crop&crop=face',
-      'rating': 4.6,
-      'reviews': 134,
-      'experience': '14 years',
-      'availableTime': '12:00 PM - 9:00 PM',
-      'distance': '5.5 km',
-      'nextAvailable': 'Tomorrow 1:00 PM',
-      'consultationFee': '₹1500',
-      'isOnline': true,
-    },
-    {
-      'name': 'Dr. Lisa Thompson',
-      'specialty': 'Gynecology',
-      'image':
-          'https://images.unsplash.com/photo-1638202993928-7267aad84c31?w=300&h=300&fit=crop&crop=face',
-      'rating': 4.9,
-      'reviews': 203,
-      'experience': '16 years',
-      'availableTime': '10:00 AM - 6:00 PM',
-      'distance': '3.2 km',
-      'nextAvailable': 'Today 6:00 PM',
-      'consultationFee': '₹900',
-      'isOnline': false,
-    },
-  ];
-
-  List<Map<String, dynamic>> get filteredDoctors {
-    List<Map<String, dynamic>> filtered = doctors;
+  List<DoctorsModel> doctors = [];
+  late Future<List<DoctorsModel>> _myFuture;
+  List<DoctorsModel> get filteredDoctors {
+    List<DoctorsModel> filtered = doctors;
 
     // Filter by category
     if (_selectedCategory != 'All') {
       filtered = filtered
           .where(
-            (doctor) => doctor['specialty'].toLowerCase().contains(
+            (doctor) => doctor.specialization.toLowerCase().contains(
               _selectedCategory.toLowerCase(),
             ),
           )
@@ -149,11 +53,11 @@ class _DoctorsListingScreenState extends State<DoctorsListingScreen>
     if (_searchQuery.isNotEmpty) {
       filtered = filtered
           .where(
-            (doctor) =>
-                doctor['name'].toLowerCase().contains(
+            (doctora) =>
+                doctora.name.toLowerCase().contains(
                   _searchQuery.toLowerCase(),
                 ) ||
-                doctor['specialty'].toLowerCase().contains(
+                doctora.specialization.toLowerCase().contains(
                   _searchQuery.toLowerCase(),
                 ),
           )
@@ -174,6 +78,8 @@ class _DoctorsListingScreenState extends State<DoctorsListingScreen>
       CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
     );
     _animationController.forward();
+
+    _myFuture = ApiHelpers.getAllDoctors(lat: 0, lon: 0);
   }
 
   @override
@@ -240,21 +146,37 @@ class _DoctorsListingScreenState extends State<DoctorsListingScreen>
         ),
       ),
       backgroundColor: Colors.grey[50],
-      body: Column(
-        children: [
-          _buildMedicalBanner(),
-          Expanded(
-            child: SingleChildScrollView(
-              child: Column(
-                children: [
-                  _buildSearchBar(),
-                  _buildCategoryFilter(), _buildDoctorsList(),
-                  // Expanded(child: ),
-                ],
-              ),
+      body: FutureBuilder<List<DoctorsModel>>(
+        future: _myFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          }
+          if (snapshot.hasError) {
+            return Center(child: Text('Failed to load doctors.'));
+          }
+          if (snapshot.hasData) {
+            doctors = snapshot.data!;
+          }
+          return SizedBox(
+            child: Column(
+              children: [
+                _buildMedicalBanner(),
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        _buildSearchBar(),
+                        _buildCategoryFilter(),
+                        _buildDoctorsList(),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ),
-        ],
+          );
+        },
       ),
     );
   }
@@ -584,7 +506,7 @@ class _DoctorsListingScreenState extends State<DoctorsListingScreen>
     );
   }
 
-  Widget _buildDoctorCard(Map<String, dynamic> doctor, int index) {
+  Widget _buildDoctorCard(DoctorsModel doctor, int index) {
     return AnimatedContainer(
       duration: Duration(milliseconds: 300),
       margin: EdgeInsets.only(bottom: 20),
@@ -606,7 +528,12 @@ class _DoctorsListingScreenState extends State<DoctorsListingScreen>
             borderRadius: BorderRadius.circular(20),
             onTap: () {
               HapticFeedback.lightImpact();
-              // Navigate to doctor details
+
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => DoctorBookingScreen(doctor: doctor),
+                ),
+              );
             },
             child: Padding(
               padding: EdgeInsets.all(20),
@@ -615,7 +542,7 @@ class _DoctorsListingScreenState extends State<DoctorsListingScreen>
                   Row(
                     children: [
                       Hero(
-                        tag: 'doctor_${doctor['name']}',
+                        tag: 'doctor_${doctor.name}',
                         child: Container(
                           width: 80,
                           height: 80,
@@ -640,7 +567,7 @@ class _DoctorsListingScreenState extends State<DoctorsListingScreen>
                             ),
                             child: ClipOval(
                               child: Image.network(
-                                doctor['image'],
+                                doctor.image,
                                 fit: BoxFit.cover,
                               ),
                             ),
@@ -656,7 +583,7 @@ class _DoctorsListingScreenState extends State<DoctorsListingScreen>
                               children: [
                                 Expanded(
                                   child: Text(
-                                    doctor['name'],
+                                    doctor.name,
                                     style: TextStyle(
                                       fontSize: 18,
                                       fontWeight: FontWeight.bold,
@@ -664,7 +591,7 @@ class _DoctorsListingScreenState extends State<DoctorsListingScreen>
                                     ),
                                   ),
                                 ),
-                                if (doctor['isOnline'])
+                                if (doctor.isActive)
                                   Container(
                                     width: 12,
                                     height: 12,
@@ -684,7 +611,7 @@ class _DoctorsListingScreenState extends State<DoctorsListingScreen>
                             ),
                             SizedBox(height: 5),
                             Text(
-                              doctor['specialty'],
+                              doctor.specialization,
                               style: TextStyle(
                                 fontSize: 14,
                                 color: Colors.blue[600],
@@ -697,7 +624,7 @@ class _DoctorsListingScreenState extends State<DoctorsListingScreen>
                                 Icon(Icons.star, color: Colors.amber, size: 16),
                                 SizedBox(width: 4),
                                 Text(
-                                  '${doctor['rating']} (${doctor['reviews']})',
+                                  doctor.locationName,
                                   style: TextStyle(
                                     fontSize: 12,
                                     color: Colors.grey[600],
@@ -705,7 +632,7 @@ class _DoctorsListingScreenState extends State<DoctorsListingScreen>
                                 ),
                                 SizedBox(width: 10),
                                 Text(
-                                  '${doctor['experience']} exp',
+                                  '${doctor.experience} exp',
                                   style: TextStyle(
                                     fontSize: 12,
                                     color: Colors.grey[600],
@@ -779,6 +706,8 @@ class _DoctorsListingScreenState extends State<DoctorsListingScreen>
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
+          SizedBox(height: 50),
+
           Container(
             width: 120,
             height: 120,

@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:mediora/apis/patients/api_helpers.dart';
+import 'package:mediora/apis/patients/preference_controller.dart';
+import 'package:mediora/models/ambulance_model.dart';
 
 class AmbulanceService {
   final String name;
@@ -32,49 +35,6 @@ class _NearestAmbulanceScreenState extends State<NearestAmbulanceScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
-
-  final List<AmbulanceService> ambulanceServices = [
-    AmbulanceService(
-      name: "City Medical Emergency",
-      imageUrl:
-          "https://images.unsplash.com/photo-1571772996211-2f02c9727629?w=300&h=200&fit=crop",
-      phoneNumber: "+1-555-0123",
-      distance: 0.8,
-      address: "123 Main St, Downtown",
-      isAvailable: true,
-      rating: 4.8,
-    ),
-    AmbulanceService(
-      name: "QuickCare Ambulance",
-      imageUrl:
-          "https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=300&h=200&fit=crop",
-      phoneNumber: "+1-555-0456",
-      distance: 1.2,
-      address: "456 Oak Ave, Midtown",
-      isAvailable: true,
-      rating: 4.6,
-    ),
-    AmbulanceService(
-      name: "Metro Health Services",
-      imageUrl:
-          "https://images.unsplash.com/photo-1582750433449-648ed127bb54?w=300&h=200&fit=crop",
-      phoneNumber: "+1-555-0789",
-      distance: 1.5,
-      address: "789 Pine Rd, Uptown",
-      isAvailable: false,
-      rating: 4.4,
-    ),
-    AmbulanceService(
-      name: "Rapid Response EMS",
-      imageUrl:
-          "https://images.unsplash.com/photo-1516549655169-df83a0774514?w=300&h=200&fit=crop",
-      phoneNumber: "+1-555-0321",
-      distance: 2.1,
-      address: "321 Elm St, Eastside",
-      isAvailable: true,
-      rating: 4.7,
-    ),
-  ];
 
   @override
   void initState() {
@@ -125,15 +85,26 @@ class _NearestAmbulanceScreenState extends State<NearestAmbulanceScreen>
       ),
 
       backgroundColor: Color(0xFFF8FAFC),
-      body: FadeTransition(
-        opacity: _fadeAnimation,
-        child: Column(
-          children: [
-            _buildHeader(),
-            _buildEmergencyButton(),
-            Expanded(child: _buildAmbulanceList()),
-          ],
+      body: FutureBuilder(
+        future: ApiHelpers.getAllAmbulance(
+          lat: PatientController.patientModel?.lat ?? 0,
+          lon: PatientController.patientModel?.lon ?? 0,
         ),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasData & snapshot.data!.isNotEmpty) {
+            return Column(
+              children: [
+                _buildHeader(),
+                _buildEmergencyButton(),
+                Expanded(child: _buildAmbulanceList(snapshot.data!)),
+              ],
+            );
+          } else {
+            return Center(child: Text("Empty"));
+          }
+        },
       ),
     );
   }
@@ -248,8 +219,9 @@ class _NearestAmbulanceScreenState extends State<NearestAmbulanceScreen>
     );
   }
 
-  Widget _buildAmbulanceList() {
+  Widget _buildAmbulanceList(List<AmbulanceModel> ambulanceServices) {
     return ListView.builder(
+      physics: NeverScrollableScrollPhysics(),
       padding: EdgeInsets.symmetric(horizontal: 20),
       itemCount: ambulanceServices.length,
       itemBuilder: (context, index) {
@@ -270,7 +242,7 @@ class _NearestAmbulanceScreenState extends State<NearestAmbulanceScreen>
     );
   }
 
-  Widget _buildAmbulanceCard(AmbulanceService service) {
+  Widget _buildAmbulanceCard(AmbulanceModel service) {
     return Container(
       margin: EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
@@ -288,7 +260,7 @@ class _NearestAmbulanceScreenState extends State<NearestAmbulanceScreen>
         children: [
           Stack(
             children: [
-              ClipRRect(
+              /* ClipRRect(
                 borderRadius: BorderRadius.only(
                   topLeft: Radius.circular(20),
                   topRight: Radius.circular(20),
@@ -311,14 +283,14 @@ class _NearestAmbulanceScreenState extends State<NearestAmbulanceScreen>
                     },
                   ),
                 ),
-              ),
-              Positioned(
+              ), */
+              /* Positioned(
                 top: 12,
                 right: 12,
                 child: Container(
                   padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
-                    color: service.isAvailable ? Colors.green : Colors.red,
+                    color: service.driverName ? Colors.green : Colors.red,
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
@@ -330,7 +302,7 @@ class _NearestAmbulanceScreenState extends State<NearestAmbulanceScreen>
                     ),
                   ),
                 ),
-              ),
+              ), */
               Positioned(
                 top: 12,
                 left: 12,
@@ -346,7 +318,10 @@ class _NearestAmbulanceScreenState extends State<NearestAmbulanceScreen>
                       Icon(Icons.location_on, color: Colors.white, size: 14),
                       SizedBox(width: 4),
                       Text(
-                        '${service.distance} km',
+                        ApiHelpers.calculateDistanceString(
+                          service.latitude,
+                          service.longitude,
+                        ),
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 12,
@@ -368,7 +343,7 @@ class _NearestAmbulanceScreenState extends State<NearestAmbulanceScreen>
                   children: [
                     Expanded(
                       child: Text(
-                        service.name,
+                        service.driverName,
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
@@ -376,7 +351,7 @@ class _NearestAmbulanceScreenState extends State<NearestAmbulanceScreen>
                         ),
                       ),
                     ),
-                    Row(
+                    /* Row(
                       children: [
                         Icon(Icons.star, color: Colors.amber, size: 16),
                         SizedBox(width: 4),
@@ -389,7 +364,7 @@ class _NearestAmbulanceScreenState extends State<NearestAmbulanceScreen>
                           ),
                         ),
                       ],
-                    ),
+                    ), */
                   ],
                 ),
                 SizedBox(height: 8),
@@ -403,7 +378,7 @@ class _NearestAmbulanceScreenState extends State<NearestAmbulanceScreen>
                     SizedBox(width: 4),
                     Expanded(
                       child: Text(
-                        service.address,
+                        service.location,
                         style: TextStyle(
                           fontSize: 14,
                           color: Color(0xFF718096),
@@ -417,7 +392,7 @@ class _NearestAmbulanceScreenState extends State<NearestAmbulanceScreen>
                   children: [
                     Expanded(
                       child: OutlinedButton.icon(
-                        onPressed: () => _makePhoneCall(service.phoneNumber),
+                        onPressed: () => _makePhoneCall(service.primaryContact),
                         icon: Icon(Icons.phone, size: 18),
                         label: Text('Call Now'),
                         style: OutlinedButton.styleFrom(
@@ -431,9 +406,9 @@ class _NearestAmbulanceScreenState extends State<NearestAmbulanceScreen>
                       ),
                     ),
                     SizedBox(width: 12),
-                    Expanded(
+                    /*  Expanded(
                       child: ElevatedButton.icon(
-                        onPressed: service.isAvailable
+                        onPressed: service.o
                             ? () {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
@@ -461,7 +436,7 @@ class _NearestAmbulanceScreenState extends State<NearestAmbulanceScreen>
                           elevation: 0,
                         ),
                       ),
-                    ),
+                    ), */
                   ],
                 ),
               ],

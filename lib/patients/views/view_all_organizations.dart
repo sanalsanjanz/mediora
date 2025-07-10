@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:mediora/apis/patients/api_helpers.dart';
+import 'package:mediora/models/clinic_model.dart';
 
 class ViewAllOrganizations extends StatefulWidget {
-  const ViewAllOrganizations({Key? key}) : super(key: key);
+  const ViewAllOrganizations({super.key});
 
   @override
   State<ViewAllOrganizations> createState() => _ViewAllOrganizationsState();
@@ -9,73 +11,28 @@ class ViewAllOrganizations extends StatefulWidget {
 
 class _ViewAllOrganizationsState extends State<ViewAllOrganizations> {
   final TextEditingController _searchController = TextEditingController();
-  List<Clinic> _filteredClinics = [];
 
   // Sample clinic data
-  final List<Clinic> _allClinics = [
-    Clinic(
-      id: '1',
-      name: 'City Medical Center',
-      location: 'Downtown, NY',
-      imageUrl:
-          'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=400',
-      rating: 4.8,
-      distance: '2.5 km',
-    ),
-    Clinic(
-      id: '2',
-      name: 'Sunrise Health Clinic',
-      location: 'Brooklyn Heights, NY',
-      imageUrl:
-          'https://images.unsplash.com/photo-1576091160399-112ba8d25d1f?w=400',
-      rating: 4.6,
-      distance: '3.1 km',
-    ),
-    Clinic(
-      id: '3',
-      name: 'Green Valley Medical',
-      location: 'Queens, NY',
-      imageUrl:
-          'https://images.unsplash.com/photo-1586773860418-d37222d8ebc8?w=400',
-      rating: 4.9,
-      distance: '1.8 km',
-    ),
-    Clinic(
-      id: '4',
-      name: 'Metropolitan Health Hub',
-      location: 'Manhattan, NY',
-      imageUrl:
-          'https://images.unsplash.com/photo-1551190822-a9333d879b1f?w=400',
-      rating: 4.7,
-      distance: '4.2 km',
-    ),
-    Clinic(
-      id: '5',
-      name: 'Harmony Wellness Center',
-      location: 'Staten Island, NY',
-      imageUrl:
-          'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=400',
-      rating: 4.5,
-      distance: '5.7 km',
-    ),
-  ];
-
+  // final List<ClinicModel> _allClinics = [];
+  late Future<List<ClinicModel>> getAllClinics;
   @override
   void initState() {
     super.initState();
-    _filteredClinics = _allClinics;
-    _searchController.addListener(_filterClinics);
+
+    getAllClinics = ApiHelpers.getAllClinics(lat: 0, lon: 0);
   }
 
-  void _filterClinics() {
+  /*   _filteredClinics = _allClinics;
+    _searchController.addListener(_filterClinics); */
+  /*   void _filterClinics() {
     final query = _searchController.text.toLowerCase();
     setState(() {
       _filteredClinics = _allClinics.where((clinic) {
         return clinic.name.toLowerCase().contains(query) ||
-            clinic.location.toLowerCase().contains(query);
+            clinic.locationName.toLowerCase().contains(query);
       }).toList();
     });
-  }
+  } */
 
   @override
   void dispose() {
@@ -108,7 +65,6 @@ class _ViewAllOrganizationsState extends State<ViewAllOrganizations> {
       ),
       body: Column(
         children: [
-          // Search Section
           Container(
             color: Colors.white,
             padding: const EdgeInsets.all(20),
@@ -121,6 +77,14 @@ class _ViewAllOrganizationsState extends State<ViewAllOrganizations> {
                     border: Border.all(color: const Color(0xFFE2E8F0)),
                   ),
                   child: TextField(
+                    onSubmitted: (value) {
+                      getAllClinics = ApiHelpers.getAllClinics(
+                        lat: 0,
+                        lon: 0,
+                        query: _searchController.text,
+                      );
+                      setState(() {});
+                    },
                     controller: _searchController,
                     decoration: InputDecoration(
                       hintText: 'Search clinics or locations...',
@@ -155,61 +119,86 @@ class _ViewAllOrganizationsState extends State<ViewAllOrganizations> {
               ],
             ),
           ),
-
-          // Results Header
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  '${_filteredClinics.length} clinics found',
-                  style: const TextStyle(
-                    color: Color(0xFF64748B),
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                Row(
-                  children: [
-                    const Icon(
-                      Icons.location_on,
-                      color: Color(0xFF3B82F6),
-                      size: 16,
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      'Near you',
-                      style: const TextStyle(
-                        color: Color(0xFF3B82F6),
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-
-          // Clinics List
           Expanded(
-            child: _filteredClinics.isEmpty
-                ? _buildEmptyState()
-                : ListView.builder(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    itemCount: _filteredClinics.length,
-                    itemBuilder: (context, index) {
-                      return _buildClinicCard(_filteredClinics[index]);
-                    },
-                  ),
+            child: FutureBuilder(
+              future: getAllClinics,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Center(child: CircularProgressIndicator());
+                } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+                  return Column(
+                    children: [
+                      // Search Section
+
+                      // Results Header
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 16,
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              '${snapshot.data?.length ?? 0} clinics found',
+                              style: const TextStyle(
+                                color: Color(0xFF64748B),
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            Row(
+                              children: [
+                                const Icon(
+                                  Icons.location_on,
+                                  color: Color(0xFF3B82F6),
+                                  size: 16,
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  'Near you',
+                                  style: const TextStyle(
+                                    color: Color(0xFF3B82F6),
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      // Clinics List
+                      Expanded(
+                        child: snapshot.data!.isEmpty
+                            ? _buildEmptyState()
+                            : ListView.builder(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 20,
+                                ),
+                                itemCount: snapshot.data!.length,
+                                itemBuilder: (context, index) {
+                                  return _buildClinicCard(
+                                    snapshot.data![index],
+                                  );
+                                },
+                              ),
+                      ),
+                    ],
+                  );
+                } else {
+                  return Center(child: Text("Error"));
+                }
+              },
+            ),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildClinicCard(Clinic clinic) {
+  Widget _buildClinicCard(ClinicModel clinic) {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
@@ -241,7 +230,7 @@ class _ViewAllOrganizationsState extends State<ViewAllOrganizations> {
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(16),
                     image: DecorationImage(
-                      image: NetworkImage(clinic.imageUrl),
+                      image: NetworkImage(clinic.image ?? ""),
                       fit: BoxFit.cover,
                     ),
                   ),
@@ -272,7 +261,7 @@ class _ViewAllOrganizationsState extends State<ViewAllOrganizations> {
                           const SizedBox(width: 4),
                           Expanded(
                             child: Text(
-                              clinic.location,
+                              clinic.locationName,
                               style: const TextStyle(
                                 fontSize: 14,
                                 color: Color(0xFF64748B),
@@ -285,7 +274,7 @@ class _ViewAllOrganizationsState extends State<ViewAllOrganizations> {
                       Row(
                         children: [
                           // Rating
-                          Container(
+                          /* Container(
                             padding: const EdgeInsets.symmetric(
                               horizontal: 8,
                               vertical: 4,
@@ -304,7 +293,7 @@ class _ViewAllOrganizationsState extends State<ViewAllOrganizations> {
                                 ),
                                 const SizedBox(width: 4),
                                 Text(
-                                  clinic.rating.toString(),
+                                  clinic..toString(),
                                   style: const TextStyle(
                                     fontSize: 12,
                                     fontWeight: FontWeight.w600,
@@ -313,7 +302,7 @@ class _ViewAllOrganizationsState extends State<ViewAllOrganizations> {
                                 ),
                               ],
                             ),
-                          ),
+                          ), */
                           const SizedBox(width: 12),
 
                           // Distance
@@ -327,7 +316,10 @@ class _ViewAllOrganizationsState extends State<ViewAllOrganizations> {
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Text(
-                              clinic.distance,
+                              ApiHelpers.calculateDistanceString(
+                                clinic.lat,
+                                clinic.lon,
+                              ),
                               style: const TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w600,
@@ -391,22 +383,4 @@ class _ViewAllOrganizationsState extends State<ViewAllOrganizations> {
       ),
     );
   }
-}
-
-class Clinic {
-  final String id;
-  final String name;
-  final String location;
-  final String imageUrl;
-  final double rating;
-  final String distance;
-
-  Clinic({
-    required this.id,
-    required this.name,
-    required this.location,
-    required this.imageUrl,
-    required this.rating,
-    required this.distance,
-  });
 }

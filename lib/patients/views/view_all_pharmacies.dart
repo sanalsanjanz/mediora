@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:mediora/apis/patients/api_helpers.dart';
+import 'package:mediora/apis/patients/preference_controller.dart';
+import 'package:mediora/models/pharmacy_model.dart';
+import 'package:mediora/patients/views/pharmacy_home_screen.dart';
 
 class ViewAllPharmacies extends StatefulWidget {
   const ViewAllPharmacies({super.key});
@@ -9,10 +13,10 @@ class ViewAllPharmacies extends StatefulWidget {
 
 class _ViewAllPharmaciesState extends State<ViewAllPharmacies> {
   final TextEditingController _searchController = TextEditingController();
-  List<Pharmacy> _filteredPharmacies = [];
+  late Future<List<PharmacyModel>> _filteredPharmacies;
 
   // Sample pharmacy data
-  final List<Pharmacy> _allPharmacies = [
+  /*  final List<Pharmacy> _allPharmacies = [
     Pharmacy(
       id: '1',
       name: 'HealthPlus Pharmacy',
@@ -79,16 +83,19 @@ class _ViewAllPharmaciesState extends State<ViewAllPharmacies> {
       isOpen: false,
       deliveryAvailable: true,
     ),
-  ];
+  ]; */
 
   @override
   void initState() {
     super.initState();
-    _filteredPharmacies = _allPharmacies;
-    _searchController.addListener(_filterPharmacies);
+    _filteredPharmacies = ApiHelpers.getALlPharmacies(
+      lat: PatientController.patientModel?.lat ?? 0,
+      lon: PatientController.patientModel?.lon ?? 0,
+    );
+    // _searchController.addListener(_filterPharmacies);
   }
 
-  void _filterPharmacies() {
+  /* void _filterPharmacies() {
     final query = _searchController.text.toLowerCase();
     setState(() {
       _filteredPharmacies = _allPharmacies.where((pharmacy) {
@@ -96,7 +103,7 @@ class _ViewAllPharmaciesState extends State<ViewAllPharmacies> {
             pharmacy.location.toLowerCase().contains(query);
       }).toList();
     });
-  }
+  } */
 
   @override
   void dispose() {
@@ -120,7 +127,7 @@ class _ViewAllPharmaciesState extends State<ViewAllPharmacies> {
           ),
         ),
         centerTitle: false,
-        actions: [
+        /*  actions: [
           IconButton(
             icon: const Icon(Icons.filter_list, color: Color(0xFF64748B)),
             onPressed: () {},
@@ -129,7 +136,7 @@ class _ViewAllPharmaciesState extends State<ViewAllPharmacies> {
             icon: const Icon(Icons.map, color: Color(0xFF64748B)),
             onPressed: () {},
           ),
-        ],
+        ], */
       ),
       body: Column(
         children: [
@@ -146,6 +153,14 @@ class _ViewAllPharmaciesState extends State<ViewAllPharmacies> {
                     border: Border.all(color: const Color(0xFFE2E8F0)),
                   ),
                   child: TextField(
+                    onSubmitted: (value) {
+                      _filteredPharmacies = ApiHelpers.getALlPharmacies(
+                        lat: 0,
+                        lon: 0,
+                        query: value,
+                      );
+                      setState(() {});
+                    },
                     controller: _searchController,
                     decoration: InputDecoration(
                       hintText: 'Search pharmacies or locations...',
@@ -182,7 +197,7 @@ class _ViewAllPharmaciesState extends State<ViewAllPharmacies> {
           ),
 
           // Filter Chips
-          Container(
+          /* Container(
             color: Colors.white,
             padding: const EdgeInsets.only(left: 20, right: 20, bottom: 20),
             child: SingleChildScrollView(
@@ -199,55 +214,79 @@ class _ViewAllPharmaciesState extends State<ViewAllPharmacies> {
                 ],
               ),
             ),
-          ),
+          ), */
 
           // Results Header
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  '${_filteredPharmacies.length} pharmacies found',
-                  style: const TextStyle(
-                    color: Color(0xFF64748B),
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                Row(
-                  children: [
-                    const Icon(
-                      Icons.location_on,
-                      color: Color(0xFF10B981),
-                      size: 16,
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      'Near you',
-                      style: const TextStyle(
-                        color: Color(0xFF10B981),
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-
-          // Pharmacies List
           Expanded(
-            child: _filteredPharmacies.isEmpty
-                ? _buildEmptyState()
-                : ListView.builder(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    itemCount: _filteredPharmacies.length,
-                    itemBuilder: (context, index) {
-                      return _buildPharmacyCard(_filteredPharmacies[index]);
-                    },
-                  ),
+            child: FutureBuilder(
+              future: _filteredPharmacies,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Center(child: CircularProgressIndicator());
+                } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+                  return Column(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 16,
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              '${snapshot.data!.length} pharmacies found',
+                              style: const TextStyle(
+                                color: Color(0xFF64748B),
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            Row(
+                              children: [
+                                const Icon(
+                                  Icons.location_on,
+                                  color: Color(0xFF10B981),
+                                  size: 16,
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  'Near you',
+                                  style: const TextStyle(
+                                    color: Color(0xFF10B981),
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      // Pharmacies List
+                      Expanded(
+                        child: snapshot.data!.isEmpty
+                            ? _buildEmptyState()
+                            : ListView.builder(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 20,
+                                ),
+                                itemCount: snapshot.data!.length,
+                                itemBuilder: (context, index) {
+                                  return _buildPharmacyCard(
+                                    snapshot.data![index],
+                                  );
+                                },
+                              ),
+                      ),
+                    ],
+                  );
+                } else {
+                  return _buildEmptyState();
+                }
+              },
+            ),
           ),
         ],
       ),
@@ -286,7 +325,7 @@ class _ViewAllPharmaciesState extends State<ViewAllPharmacies> {
     );
   }
 
-  Widget _buildPharmacyCard(Pharmacy pharmacy) {
+  Widget _buildPharmacyCard(PharmacyModel pharmacy) {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
@@ -305,7 +344,11 @@ class _ViewAllPharmaciesState extends State<ViewAllPharmacies> {
         child: InkWell(
           borderRadius: BorderRadius.circular(20),
           onTap: () {
-            // Handle pharmacy tap
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (_) => PharmacyHomeScreen(items: pharmacy),
+              ),
+            );
           },
           child: Padding(
             padding: const EdgeInsets.all(16),
@@ -318,7 +361,7 @@ class _ViewAllPharmaciesState extends State<ViewAllPharmacies> {
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(16),
                     image: DecorationImage(
-                      image: NetworkImage(pharmacy.imageUrl),
+                      image: NetworkImage(pharmacy.image),
                       fit: BoxFit.cover,
                     ),
                   ),
@@ -335,7 +378,7 @@ class _ViewAllPharmaciesState extends State<ViewAllPharmacies> {
                         children: [
                           Expanded(
                             child: Text(
-                              pharmacy.name,
+                              pharmacy.pharmacyName,
                               style: const TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
@@ -343,13 +386,13 @@ class _ViewAllPharmaciesState extends State<ViewAllPharmacies> {
                               ),
                             ),
                           ),
-                          Container(
+                          /*  Container(
                             padding: const EdgeInsets.symmetric(
                               horizontal: 8,
                               vertical: 4,
                             ),
                             decoration: BoxDecoration(
-                              color: pharmacy.isOpen
+                              color: pharmacy.
                                   ? const Color(0xFFDCFCE7)
                                   : const Color(0xFFFEF2F2),
                               borderRadius: BorderRadius.circular(8),
@@ -364,7 +407,7 @@ class _ViewAllPharmaciesState extends State<ViewAllPharmacies> {
                                     : const Color(0xFF991B1B),
                               ),
                             ),
-                          ),
+                          ), */
                         ],
                       ),
                       const SizedBox(height: 4),
@@ -378,7 +421,7 @@ class _ViewAllPharmaciesState extends State<ViewAllPharmacies> {
                           const SizedBox(width: 4),
                           Expanded(
                             child: Text(
-                              pharmacy.location,
+                              pharmacy.locationName,
                               style: const TextStyle(
                                 fontSize: 14,
                                 color: Color(0xFF64748B),
@@ -391,7 +434,7 @@ class _ViewAllPharmaciesState extends State<ViewAllPharmacies> {
                       Row(
                         children: [
                           // Rating
-                          Container(
+                          /*  Container(
                             padding: const EdgeInsets.symmetric(
                               horizontal: 8,
                               vertical: 4,
@@ -419,8 +462,8 @@ class _ViewAllPharmaciesState extends State<ViewAllPharmacies> {
                                 ),
                               ],
                             ),
-                          ),
-                          const SizedBox(width: 8),
+                          ), */
+                          // const SizedBox(width: 8),
 
                           // Distance
                           Container(
@@ -433,7 +476,10 @@ class _ViewAllPharmaciesState extends State<ViewAllPharmacies> {
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Text(
-                              pharmacy.distance,
+                              ApiHelpers.calculateDistanceString(
+                                pharmacy.lat,
+                                pharmacy.lon,
+                              ),
                               style: const TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w600,
@@ -444,7 +490,7 @@ class _ViewAllPharmaciesState extends State<ViewAllPharmacies> {
                           const SizedBox(width: 8),
 
                           // Delivery Badge
-                          if (pharmacy.deliveryAvailable)
+                          /* if (pharmacy.i)
                             Container(
                               padding: const EdgeInsets.symmetric(
                                 horizontal: 8,
@@ -473,7 +519,7 @@ class _ViewAllPharmaciesState extends State<ViewAllPharmacies> {
                                   ),
                                 ],
                               ),
-                            ),
+                            ), */
                         ],
                       ),
                     ],
@@ -530,26 +576,4 @@ class _ViewAllPharmaciesState extends State<ViewAllPharmacies> {
       ),
     );
   }
-}
-
-class Pharmacy {
-  final String id;
-  final String name;
-  final String location;
-  final String imageUrl;
-  final double rating;
-  final String distance;
-  final bool isOpen;
-  final bool deliveryAvailable;
-
-  Pharmacy({
-    required this.id,
-    required this.name,
-    required this.location,
-    required this.imageUrl,
-    required this.rating,
-    required this.distance,
-    required this.isOpen,
-    required this.deliveryAvailable,
-  });
 }

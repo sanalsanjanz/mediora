@@ -295,11 +295,14 @@ Widget buildCard(DoctorsModel item) {
                     color: Color(0xFF64748B),
                   ),
                   const SizedBox(width: 4),
-                  Text(
-                    item.locationName,
-                    style: const TextStyle(
-                      fontSize: 12,
-                      color: Color(0xFF64748B),
+                  Expanded(
+                    child: Text(
+                      item.locationName,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: Color(0xFF64748B),
+                      ),
+                      maxLines: 1,
                     ),
                   ),
                 ],

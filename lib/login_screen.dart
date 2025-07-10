@@ -1254,7 +1254,7 @@ class _MedicalLoginScreenState extends State<MedicalLoginScreen>
               ).push(MaterialPageRoute(builder: (_) => LocationPicker()));
 
               latCtrl.text = location.latitude.toString();
-              longCtrl.text = location.latitude.toString();
+              longCtrl.text = location.longitude.toString();
               _location.text = location.locationName.toString();
             }
           : null,

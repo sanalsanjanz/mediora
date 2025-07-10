@@ -10,3 +10,4 @@ String deletePharmacies = "${baseUrl}pharmacies/delete";
 
 //Patient Apis
 String patientUrl = "${baseUrl}patients";
+String ambulance = "${baseUrl}ambulance";
