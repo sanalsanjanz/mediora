@@ -1,11 +1,14 @@
 import 'package:custom_clippers/custom_clippers.dart';
 import 'package:flutter/material.dart';
+import 'package:mediora/apis/patients/api_helpers.dart';
 import 'package:mediora/apis/patients/preference_controller.dart';
 import 'package:mediora/patients/views/ambulance_services.dart';
 import 'package:mediora/patients/views/clinic_list.dart';
 import 'package:mediora/patients/views/doctors_list.dart';
 import 'package:mediora/patients/views/my_bookings.dart';
 import 'package:mediora/patients/views/pharmacy_list.dart';
+import 'package:mediora/splash_screen.dart';
+import 'package:mediora/widgets/location_picker.dart';
 
 class PatientHomeScreen extends StatelessWidget {
   const PatientHomeScreen({super.key});
@@ -151,25 +154,51 @@ class PatientHomeScreen extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 4),
-                      Row(
-                        children: [
-                          const Icon(
-                            Icons.location_on_outlined,
-                            color: Colors.white70,
-                            size: 14,
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            PatientController.patientModel?.location
-                                    .toString() ??
-                                "Add Location",
-                            style: TextStyle(
+                      InkWell(
+                        onTap: () async {
+                          LocationResult location = await Navigator.of(context)
+                              .push(
+                                MaterialPageRoute(
+                                  builder: (_) => LocationPicker(),
+                                ),
+                              );
+
+                          (bool, String) re = await ApiHelpers.updateLocation(
+                            details: {
+                              "id": PatientController.patientModel?.id ?? "",
+                              "lat": location.latitude,
+                              "lon": location.longitude,
+                              "location": location.locationName.trim(),
+                            },
+                          );
+                          if (re.$1) {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (_) => MedioraSplashScreen(),
+                              ),
+                            );
+                          }
+                        },
+                        child: Row(
+                          children: [
+                            const Icon(
+                              Icons.location_on_outlined,
                               color: Colors.white70,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
+                              size: 14,
                             ),
-                          ),
-                        ],
+                            const SizedBox(width: 4),
+                            Text(
+                              PatientController.patientModel?.location
+                                      .toString() ??
+                                  "Add Location",
+                              style: TextStyle(
+                                color: Colors.white70,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ],
                   ),

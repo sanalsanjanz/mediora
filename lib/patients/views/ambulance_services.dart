@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:icons_plus/icons_plus.dart';
 import 'package:mediora/apis/patients/api_helpers.dart';
 import 'package:mediora/apis/patients/preference_controller.dart';
+import 'package:mediora/helper/call_navigation_helper.dart';
 import 'package:mediora/models/ambulance_model.dart';
 
 class AmbulanceService {
@@ -65,6 +67,8 @@ class _NearestAmbulanceScreenState extends State<NearestAmbulanceScreen>
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       ),
     );
+
+    makeCall(phone: phoneNumber, context: context);
     HapticFeedback.lightImpact();
   }
 
@@ -85,26 +89,64 @@ class _NearestAmbulanceScreenState extends State<NearestAmbulanceScreen>
       ),
 
       backgroundColor: Color(0xFFF8FAFC),
-      body: FutureBuilder(
-        future: ApiHelpers.getAllAmbulance(
-          lat: PatientController.patientModel?.lat ?? 0,
-          lon: PatientController.patientModel?.lon ?? 0,
-        ),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasData & snapshot.data!.isNotEmpty) {
-            return Column(
-              children: [
-                _buildHeader(),
-                _buildEmergencyButton(),
-                Expanded(child: _buildAmbulanceList(snapshot.data!)),
-              ],
-            );
-          } else {
-            return Center(child: Text("Empty"));
-          }
-        },
+      body: Column(
+        children: [
+          _buildHeader(),
+          _buildEmergencyButton(),
+          Expanded(
+            child: FutureBuilder(
+              future: ApiHelpers.getAllAmbulance(
+                lat: PatientController.patientModel?.lat ?? 0,
+                lon: PatientController.patientModel?.lon ?? 0,
+              ),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Center(child: CircularProgressIndicator());
+                } else if (snapshot.hasData &&
+                    snapshot.data != null &&
+                    snapshot.data!.isNotEmpty) {
+                  return ListView.builder(
+                    padding: EdgeInsets.fromLTRB(10, 10, 10, 20),
+                    itemCount: snapshot.data!.length,
+                    itemBuilder: (context, index) {
+                      return _buildAmbulanceCard(snapshot.data![index]);
+                    },
+                  ); /*  ListView.builder(
+                    physics: NeverScrollableScrollPhysics(),
+                    // shrinkWrap: true,
+                    padding: EdgeInsets.symmetric(horizontal: 20),
+                    itemCount: snapshot.data!.length,
+                    itemBuilder: (context, index) {
+                      return TweenAnimationBuilder(
+                        duration: Duration(milliseconds: 600),
+                        tween: Tween<double>(begin: 0, end: 1),
+                        builder: (context, double value, child) {
+                          return Transform.translate(
+                            offset: Offset(0, 50 * (1 - value)),
+                            child: Opacity(
+                              opacity: value,
+                              child: _buildAmbulanceCard(snapshot.data![index]),
+                            ),
+                          );
+                        },
+                      );
+                    },
+                  ); */ /*  Column(
+                    children: [
+                      _buildHeader(),
+                      _buildEmergencyButton(),
+                      Expanded(
+                        child:/* _buildAmbulanceList(snapshot.data!) */,
+                      ),
+                    ],
+                  ); */
+                } else {
+                  return Center(child: Text("Empty"));
+                }
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -222,6 +264,7 @@ class _NearestAmbulanceScreenState extends State<NearestAmbulanceScreen>
   Widget _buildAmbulanceList(List<AmbulanceModel> ambulanceServices) {
     return ListView.builder(
       physics: NeverScrollableScrollPhysics(),
+      // shrinkWrap: true,
       padding: EdgeInsets.symmetric(horizontal: 20),
       itemCount: ambulanceServices.length,
       itemBuilder: (context, index) {
@@ -258,7 +301,7 @@ class _NearestAmbulanceScreenState extends State<NearestAmbulanceScreen>
       ),
       child: Column(
         children: [
-          Stack(
+          /*  Stack(
             children: [
               /* ClipRRect(
                 borderRadius: BorderRadius.only(
@@ -303,37 +346,9 @@ class _NearestAmbulanceScreenState extends State<NearestAmbulanceScreen>
                   ),
                 ),
               ), */
-              Positioned(
-                top: 12,
-                left: 12,
-                child: Container(
-                  padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.7),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(Icons.location_on, color: Colors.white, size: 14),
-                      SizedBox(width: 4),
-                      Text(
-                        ApiHelpers.calculateDistanceString(
-                          service.latitude,
-                          service.longitude,
-                        ),
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
+              
             ],
-          ),
+          ), */
           Padding(
             padding: EdgeInsets.all(16),
             child: Column(
@@ -385,9 +400,47 @@ class _NearestAmbulanceScreenState extends State<NearestAmbulanceScreen>
                         ),
                       ),
                     ),
+                    Container(
+                      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: Colors.black.withOpacity(0.7),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.location_on,
+                            color: Colors.white,
+                            size: 14,
+                          ),
+                          SizedBox(width: 4),
+                          Text(
+                            ApiHelpers.calculateDistanceString(
+                              service.latitude,
+                              service.longitude,
+                            ),
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ],
                 ),
-                SizedBox(height: 16),
+                Row(
+                  children: [
+                    Spacer(),
+                    IconButton.outlined(
+                      onPressed: () => _makePhoneCall(service.primaryContact),
+                      icon: Icon(BoxIcons.bx_phone_outgoing),
+                    ),
+                  ],
+                ),
+                /*   SizedBox(height: 16),
                 Row(
                   children: [
                     Expanded(
@@ -438,7 +491,7 @@ class _NearestAmbulanceScreenState extends State<NearestAmbulanceScreen>
                       ),
                     ), */
                   ],
-                ),
+                ), */
               ],
             ),
           ),

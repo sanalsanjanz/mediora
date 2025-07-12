@@ -236,4 +236,39 @@ class ApiHelpers {
       throw Exception('Error loading cities: $e');
     }
   }
+
+  static Future<(bool, String)> updateLocation({
+    required Map<String, dynamic> details,
+  }) async {
+    try {
+      var request = http.MultipartRequest('POST', Uri.parse(patientUrl));
+
+      request.fields['payload'] = jsonEncode(details);
+      request.fields['action'] = 'update';
+      request.headers['Accept'] = 'application/json';
+
+      final response = await request.send();
+      final responseBody = await response.stream.bytesToString();
+      log('Response body: $responseBody');
+
+      if (response.statusCode == 200) {
+        // final Map<String, dynamic> jsonResponse = jsonDecode(responseBody);
+
+        SharedPreferences pre = await SharedPreferences.getInstance();
+        var data = jsonDecode(responseBody);
+        await pre.setString("patientData", jsonEncode(data["data"]));
+        await pre.setBool("logged", true);
+        PatientController.getPatientDetails();
+
+        return (true, "Success");
+      } else {
+        var data = jsonDecode(responseBody);
+        log('failed: ${response.statusCode}, $responseBody');
+        return (false, data["error"].toString());
+      }
+    } catch (e) {
+      print('Error signing up patient: $e');
+      throw Exception('Error signing up patient: $e');
+    }
+  }
 }

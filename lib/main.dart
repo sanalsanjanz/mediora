@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mediora/login_screen.dart';
+import 'package:mediora/splash_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -17,7 +17,8 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: MedicalLoginScreen(), //const MedioraSplashScreen(),
+      // home: MedicalLoginScreen(),
+      home: const MedioraSplashScreen(),
     );
   }
 }
