@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mediora/apis/patients/api_helpers.dart';
+import 'package:mediora/helper/expirence_formatter.dart';
 import 'package:mediora/models/doctors_model.dart';
 import 'package:mediora/patients/views/doctor_booking_screen.dart';
 
@@ -631,11 +632,15 @@ class _DoctorsListingScreenState extends State<DoctorsListingScreen>
                                   ),
                                 ),
                                 SizedBox(width: 10),
-                                Text(
-                                  '${doctor.experience} exp',
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    color: Colors.grey[600],
+                                Expanded(
+                                  child: Text(
+                                    formatExperience(doctor.experience),
+                                    // '${doctor.experience} exp',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: Colors.grey[600],
+                                    ),
+                                    maxLines: 1,
                                   ),
                                 ),
                               ],

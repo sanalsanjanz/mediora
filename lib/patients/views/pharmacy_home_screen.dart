@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:mediora/apis/patients/preference_controller.dart';
 import 'package:mediora/helper/call_navigation_helper.dart';
 import 'package:mediora/models/pharmacy_model.dart';
+import 'package:mediora/models/working_hours_model.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class PharmacyHomeScreen extends StatefulWidget {
@@ -414,16 +415,45 @@ class _PharmacyHomeScreenState extends State<PharmacyHomeScreen>
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
           SizedBox(height: 15),
-          Row(
-            children: [
-              Icon(Icons.access_time, color: Colors.orange),
-              SizedBox(width: 10),
-              Text(
-                widget.items.workingHours,
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-              ),
-              Spacer(),
-              /* Container(
+
+          ListView.builder(
+            physics: NeverScrollableScrollPhysics(),
+            shrinkWrap: true,
+            itemCount: widget.items.workingHours
+                .where((e) => e.close != null)
+                .length,
+            itemBuilder: (context, index) {
+              WorkingHourModel item = widget.items.workingHours
+                  .where((e) => e.close != null)
+                  .toList()[index];
+
+              return Row(
+                children: [
+                  Icon(Icons.access_time, color: Colors.orange),
+                  SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      item.day,
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+
+                  /*   */
+                  Expanded(
+                    child: Text(
+                      "${item.open!} - ${item.close!}",
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  /* Container(
                 padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
                   color:  widget.items.status ? Colors.green : Colors.red,
@@ -434,7 +464,9 @@ class _PharmacyHomeScreenState extends State<PharmacyHomeScreen>
                   style: TextStyle(color: Colors.white, fontSize: 12),
                 ),
               ), */
-            ],
+                ],
+              );
+            },
           ),
           SizedBox(height: 15),
           /*  Row(

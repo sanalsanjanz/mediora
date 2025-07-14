@@ -4,6 +4,9 @@
 
 import 'dart:convert';
 
+import 'package:mediora/models/doctors_model.dart';
+import 'package:mediora/models/working_hours_model.dart';
+
 List<ClinicModel> clinicModelFromJson(String str) => List<ClinicModel>.from(
   json.decode(str).map((x) => ClinicModel.fromJson(x)),
 );
@@ -16,7 +19,7 @@ class ClinicModel {
   String name;
   String? image;
   dynamic coverImage;
-  String workingHours;
+  List<WorkingHourModel> workingHours;
   String locationName;
   String contact;
   String? about;
@@ -26,7 +29,7 @@ class ClinicModel {
   String username;
   String password;
   DateTime createdAt;
-  List<Doctor> doctors;
+  List<DoctorsModel> doctors;
 
   ClinicModel({
     required this.id,
@@ -51,7 +54,9 @@ class ClinicModel {
     name: json["name"],
     image: json["image"],
     coverImage: json["cover_image"],
-    workingHours: json["working_hours"],
+    workingHours: List<WorkingHourModel>.from(
+      json["working_hours"].map((x) => WorkingHourModel.fromJson(x)),
+    ),
     locationName: json["location_name"],
     lat: json["lat"]?.toDouble(),
     lon: json["lon"]?.toDouble(),
@@ -61,7 +66,9 @@ class ClinicModel {
     about: json["about"],
     contact: json["contact"] ?? "",
     createdAt: DateTime.parse(json["created_at"]),
-    doctors: List<Doctor>.from(json["doctors"].map((x) => Doctor.fromJson(x))),
+    doctors: List<DoctorsModel>.from(
+      json["doctors"].map((x) => DoctorsModel.fromJson(x)),
+    ),
   );
 
   Map<String, dynamic> toJson() => {
@@ -69,7 +76,7 @@ class ClinicModel {
     "name": name,
     "image": image,
     "cover_image": coverImage,
-    "working_hours": workingHours,
+    "working_hours": List<dynamic>.from(workingHours.map((x) => x)),
     "location_name": locationName,
     "lat": lat,
     "lon": lon,
@@ -82,7 +89,7 @@ class ClinicModel {
     "doctors": List<dynamic>.from(doctors.map((x) => x.toJson())),
   };
 }
-
+/* 
 class Doctor {
   String id;
   String name;
@@ -209,3 +216,4 @@ class Doctor {
     "clinic_name": clinicName,
   };
 }
+ */

@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:mediora/helper/about_bulder.dart';
 import 'package:mediora/helper/call_navigation_helper.dart';
+import 'package:mediora/helper/expirence_formatter.dart';
 import 'package:mediora/models/clinic_model.dart';
+import 'package:mediora/models/doctors_model.dart';
+import 'package:mediora/widgets/working_hours_widget.dart';
 
 class OrganizationScreen extends StatelessWidget {
   final ClinicModel data;
@@ -199,28 +202,49 @@ class OrganizationScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 16),
                   Container(
-                    padding: const EdgeInsets.all(16),
+                    // margin: const EdgeInsets.symmetric(horizontal: 16),
+                    padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
-                      color: Colors.grey[50],
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: Colors.grey.withOpacity(0.2),
-                        width: 1,
-                      ),
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.08),
+                          spreadRadius: 0,
+                          blurRadius: 10,
+                          offset: const Offset(0, 3),
+                        ),
+                      ],
                     ),
                     child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _buildOpeningHour(
-                          "Working Hours",
-                          data.workingHours,
-                          true,
+                        const Text(
+                          'Working Hours',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black87,
+                          ),
                         ),
-                        /*  _buildOpeningHour(
-                          'Saturday',
-                          '8:00 AM - 8:00 PM',
-                          false,
+                        const SizedBox(height: 12),
+
+                        Column(
+                          children: data.workingHours
+                              .map(
+                                (e) => buildWorkingHour(
+                                  e.day,
+                                  (e.open != null && e.close != null)
+                                      ? "${e.open} - ${e.close}"
+                                      : "Closed",
+                                ),
+                              )
+                              .toList(),
                         ),
-                        _buildOpeningHour('Sunday', '9:00 AM - 6:00 PM', false), */
+
+                        /* _buildWorkingHour('Monday - Friday', '9:00 AM - 6:00 PM'),
+                  _buildWorkingHour('Saturday', '9:00 AM - 2:00 PM'),
+                  _buildWorkingHour('Sunday', 'Closed'), */
                       ],
                     ),
                   ),
@@ -430,7 +454,7 @@ class OrganizationScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildDoctorCard(BuildContext context, Doctor doctor) {
+  Widget _buildDoctorCard(BuildContext context, DoctorsModel doctor) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       padding: const EdgeInsets.all(16),
@@ -540,7 +564,7 @@ class OrganizationScreen extends StatelessWidget {
                       ),
                     ),
                     const Spacer(),
-                    Builder(
+                    /*  Builder(
                       builder: (_) {
                         String expText = '';
                         if (doctor.experience > 0) {
@@ -551,16 +575,17 @@ class OrganizationScreen extends StatelessWidget {
                           expText += '${doctor.months} Months';
                         }
                         return expText.isNotEmpty
-                            ? Text(
-                                expText,
-                                style: const TextStyle(
-                                  fontSize: 12,
-                                  color: Colors.blue,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              )
+                            ? 
                             : const SizedBox.shrink();
                       },
+                    ), */
+                    Text(
+                      formatExperience(doctor.experience),
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: Colors.blue,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ],
                 ),

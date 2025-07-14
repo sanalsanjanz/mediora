@@ -4,6 +4,8 @@
 
 import 'dart:convert';
 
+import 'package:mediora/models/working_hours_model.dart';
+
 List<PharmacyModel> pharmacyModelFromJson(String str) =>
     List<PharmacyModel>.from(
       json.decode(str).map((x) => PharmacyModel.fromJson(x)),
@@ -27,7 +29,7 @@ class PharmacyModel {
   String pharmacyName;
   String contactNumber;
   String email;
-  String workingHours;
+  List<WorkingHourModel> workingHours;
   List<String> services;
   dynamic ratings;
   dynamic reviewsCount;
@@ -74,7 +76,9 @@ class PharmacyModel {
     pharmacyName: json["pharmacy_name"],
     contactNumber: json["contact_number"],
     email: json["email"],
-    workingHours: json["working_hours"],
+    workingHours: List<WorkingHourModel>.from(
+      json["working_hours"].map((x) => WorkingHourModel.fromJson(x)),
+    ),
     services: List<String>.from(json["services"].map((x) => x)),
     ratings: json["ratings"],
     reviewsCount: json["reviews_count"],
@@ -98,7 +102,7 @@ class PharmacyModel {
     "pharmacy_name": pharmacyName,
     "contact_number": contactNumber,
     "email": email,
-    "working_hours": workingHours,
+    "working_hours": List<dynamic>.from(workingHours.map((x) => x)),
     "services": List<dynamic>.from(services.map((x) => x)),
     "ratings": ratings,
     "reviews_count": reviewsCount,

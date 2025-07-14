@@ -352,9 +352,9 @@ Widget buildCard(PharmacyModel item) {
                     color: Color(0xFF64748B),
                   ),
                   const SizedBox(width: 4),
-                  Expanded(
+                  /* Expanded(
                     child: Text(
-                      item.workingHours,
+                      item.workingHours.,
                       style: const TextStyle(
                         fontSize: 12,
                         color: Color(0xFF64748B),
@@ -362,7 +362,7 @@ Widget buildCard(PharmacyModel item) {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
-                  ),
+                  ), */
                 ],
               ),
             ],

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:mediora/apis/patients/api_helpers.dart';
 import 'package:mediora/helper/call_navigation_helper.dart';
+import 'package:mediora/helper/expirence_formatter.dart';
 import 'package:mediora/models/doctors_model.dart';
+import 'package:mediora/widgets/working_hours_widget.dart';
 
 class DoctorBookingScreen extends StatelessWidget {
   final DoctorsModel doctor;
@@ -176,7 +178,7 @@ class DoctorBookingScreen extends StatelessWidget {
                         child: _buildInfoCard(
                           icon: Icons.work_outline,
                           title: 'Experience',
-                          value: "${doctor.experience} year (s)",
+                          value: formatExperience(doctor.experience),
                           color: Colors.blue,
                         ),
                       ),
@@ -337,7 +339,14 @@ class DoctorBookingScreen extends StatelessWidget {
 
                   Column(
                     children: doctor.workingHours
-                        .map((e) => _buildWorkingHour("Available", e))
+                        .map(
+                          (e) => buildWorkingHour(
+                            e.day,
+                            (e.open != null && e.close != null)
+                                ? "${e.open} - ${e.close}"
+                                : "Closed",
+                          ),
+                        )
                         .toList(),
                   ),
 
@@ -682,29 +691,6 @@ class DoctorBookingScreen extends StatelessWidget {
                   ),
                 ),
               ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildWorkingHour(String day, String time) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            day,
-            style: const TextStyle(fontSize: 14, color: Colors.black87),
-          ),
-          Text(
-            time,
-            style: TextStyle(
-              fontSize: 14,
-              color: time == 'Closed' ? Colors.red : Colors.grey,
-              fontWeight: FontWeight.w500,
             ),
           ),
         ],

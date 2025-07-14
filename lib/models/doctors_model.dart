@@ -4,6 +4,8 @@
 
 import 'dart:convert';
 
+import 'package:mediora/models/working_hours_model.dart';
+
 List<DoctorsModel> doctorsModelFromJson(String str) => List<DoctorsModel>.from(
   json.decode(str).map((x) => DoctorsModel.fromJson(x)),
 );
@@ -15,7 +17,7 @@ class DoctorsModel {
   String id;
   String name;
   dynamic image;
-  int experience;
+  String experience;
   String about;
   String? organizationId;
   String locationName;
@@ -38,7 +40,7 @@ class DoctorsModel {
   int maxPatientsPerSlot;
   dynamic clinicId;
   bool isActive;
-  List<String> workingHours;
+  List<WorkingHourModel> workingHours;
   String clinicName;
 
   DoctorsModel({
@@ -94,12 +96,15 @@ class DoctorsModel {
     profileImageUrl: json["profile_image_url"],
     availableOnlineBooking: json["available_online_booking"],
     address: json["address"],
-    availableDays: List<String>.from(json["available_days"].map((x) => x)),
+    availableDays:
+        [] /* List<String>.from(json["available_days"].map((x) => x)) */,
     gender: json["gender"],
     maxPatientsPerSlot: json["max_patients_per_slot"],
     clinicId: json["clinic_id"],
     isActive: json["is_active"],
-    workingHours: List<String>.from(json["working_hours"].map((x) => x)),
+    workingHours: List<WorkingHourModel>.from(
+      json["working_hours"].map((x) => WorkingHourModel.fromJson(x)),
+    ),
     clinicName: json["clinic_name"],
   );
 
