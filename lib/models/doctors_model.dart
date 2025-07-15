@@ -2,6 +2,8 @@
 //
 //     final doctorsModel = doctorsModelFromJson(jsonString);
 
+// ignore_for_file: prefer_interpolation_to_compose_strings
+
 import 'dart:convert';
 
 import 'package:mediora/models/working_hours_model.dart';
@@ -76,7 +78,7 @@ class DoctorsModel {
 
   factory DoctorsModel.fromJson(Map<String, dynamic> json) => DoctorsModel(
     id: json["id"],
-    name: json["name"],
+    name: "Dr. " + json["name"],
     image: json["image"],
     experience: json["experience"],
     about: json["about"],

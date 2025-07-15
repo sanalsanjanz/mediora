@@ -3,6 +3,7 @@ import 'package:mediora/apis/patients/api_helpers.dart';
 import 'package:mediora/helper/call_navigation_helper.dart';
 import 'package:mediora/helper/expirence_formatter.dart';
 import 'package:mediora/models/doctors_model.dart';
+import 'package:mediora/patients/views/book_appointment.dart';
 import 'package:mediora/widgets/working_hours_widget.dart';
 
 class DoctorBookingScreen extends StatelessWidget {
@@ -789,9 +790,14 @@ class DoctorBookingScreen extends StatelessWidget {
               onPressed: () {
                 Navigator.of(context).pop();
                 // Navigate to booking screen or implement booking logic
-                ScaffoldMessenger.of(context).showSnackBar(
+                /*  ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
                     content: Text('Redirecting to booking page...'),
+                  ),
+                ); */
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => BookingScreen(doctorsModel: doctor),
                   ),
                 );
               },

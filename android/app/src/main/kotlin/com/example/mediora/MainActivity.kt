@@ -1,4 +1,4 @@
-package com.connect.mediora
+package com.legozia.mediora
 
 import io.flutter.embedding.android.FlutterActivity
 

@@ -37,8 +37,14 @@ class ApiHelpers {
     double endLatitude,
     double endLongitude,
   ) {
-    final startLat = PatientController.patientModel?.lat ?? 0;
-    final startLon = PatientController.patientModel?.lon ?? 0;
+    final patient = PatientController.patientModel;
+
+    if (patient == null) {
+      return 'Location unknown';
+    }
+
+    final startLat = patient.lat;
+    final startLon = patient.lon;
 
     final distanceMeters = Geolocator.distanceBetween(
       startLat,
@@ -46,6 +52,10 @@ class ApiHelpers {
       endLatitude,
       endLongitude,
     );
+    print('📍 Start Latitude: $startLat');
+    print('📍 Start Longitude: $startLon');
+    print('🏁 End Latitude: $endLatitude');
+    print('🏁 End Longitude: $endLongitude');
 
     if (distanceMeters <= 100) {
       return 'Near';
@@ -54,6 +64,47 @@ class ApiHelpers {
     } else {
       final distanceKm = distanceMeters / 1000;
       return '${distanceKm.toStringAsFixed(1)} km';
+    }
+  }
+
+  static String apiKey =
+      "eyJvcmciOiI1YjNjZTM1OTc4NTExMTAwMDFjZjYyNDgiLCJpZCI6IjAxODhlMGE5MWJlYjQzMzNhZjUzODdhY2ZiYmNmZDJlIiwiaCI6Im11cm11cjY0In0=";
+  Future<String> getRoadDistanceString(double endLat, double endLon) async {
+    final patient = PatientController.patientModel;
+
+    if (patient == null) {
+      return 'Location unknown';
+    }
+
+    final startLat = patient.lat;
+    final startLon = patient.lon;
+
+    final url = Uri.parse(
+      'https://api.openrouteservice.org/v2/directions/driving-car?'
+      'api_key=$apiKey&start=$startLon,$startLat&end=$endLon,$endLat',
+    );
+
+    try {
+      final response = await http.get(url);
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        final distanceMeters =
+            data['features'][0]['properties']['segments'][0]['distance'];
+
+        if (distanceMeters < 1000) {
+          return '${distanceMeters.toStringAsFixed(0)} m';
+        } else {
+          final distanceKm = distanceMeters / 1000;
+          return '${distanceKm.toStringAsFixed(1)} km';
+        }
+      } else {
+        print('❌ API error: ${response.statusCode} ${response.body}');
+        return 'Distance unavailable';
+      }
+    } catch (e) {
+      print('❌ Exception: $e');
+      return 'Distance error';
     }
   }
 
@@ -141,6 +192,7 @@ class ApiHelpers {
   static Future<(bool, String)> loginPatirent({
     required String userName,
     required String password,
+    required String fcm,
   }) async {
     try {
       var request = http.MultipartRequest(
@@ -151,6 +203,7 @@ class ApiHelpers {
       request.fields['payload'] = jsonEncode({
         'username': userName,
         "password": password,
+        "fcm": fcm,
       });
       request.fields['action'] = 'login';
       // request.headers['Accept'] = 'application/json';

@@ -838,8 +838,8 @@ import 'package:mediora/widgets/loading_dialog.dart';
 import 'package:mediora/widgets/location_picker.dart';
 
 class MedicalLoginScreen extends StatefulWidget {
-  const MedicalLoginScreen({super.key});
-
+  const MedicalLoginScreen({super.key, required this.fcmTocken});
+  final String fcmTocken;
   @override
   State<MedicalLoginScreen> createState() => _MedicalLoginScreenState();
 }
@@ -1421,6 +1421,7 @@ class _MedicalLoginScreenState extends State<MedicalLoginScreen>
         (bool, String) res = await ApiHelpers.loginPatirent(
           userName: _emailController.text.trim(),
           password: _passwordController.text.trim(),
+          fcm: widget.fcmTocken.trim(),
         );
 
         if (res.$1) {
@@ -1449,6 +1450,7 @@ class _MedicalLoginScreenState extends State<MedicalLoginScreen>
             "lat": latCtrl.text.trim(),
             "lon": longCtrl.text.trim(),
             "location": _location.text.trim(),
+            "fcm_token": widget.fcmTocken.trim(),
           },
 
           /* userName: _emailController.text.trim(),

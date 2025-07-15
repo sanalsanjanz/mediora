@@ -7,8 +7,8 @@ import 'package:mediora/patients/views/patient_home_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class MedioraSplashScreen extends StatefulWidget {
-  const MedioraSplashScreen({super.key});
-
+  const MedioraSplashScreen({super.key, this.fcm});
+  final String? fcm;
   @override
   State<MedioraSplashScreen> createState() => _MedioraSplashScreenState();
 }
@@ -64,14 +64,16 @@ class _MedioraSplashScreenState extends State<MedioraSplashScreen>
       SharedPreferences preferences = await SharedPreferences.getInstance();
       bool isLogged = preferences.getBool("logged") ?? false;
       if (isLogged) {
-        PatientController.getPatientDetails();
+        await PatientController.getPatientDetails();
         Navigator.of(
           context,
         ).push(MaterialPageRoute(builder: (_) => PatientHomeScreen()));
       } else {
-        Navigator.of(
-          context,
-        ).push(MaterialPageRoute(builder: (_) => MedicalLoginScreen()));
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (_) => MedicalLoginScreen(fcmTocken: widget.fcm ?? ""),
+          ),
+        );
       }
     });
   }
