@@ -1,15 +1,26 @@
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:mediora/models/doctors_model.dart';
+import 'package:mediora/models/org_models/doctor_auth_model.dart';
 import 'package:mediora/models/patient_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class PatientController {
   static PatientModel? patientModel;
+  static DoctorAuthModel? doctorModel;
   static getPatientDetails() async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     String? response = preferences.getString("patientData");
     if (response != null) {
       patientModel = patientModelFromJson(response);
+    }
+  }
+
+  static getDoctorDetails() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    String? response = preferences.getString("organizationData");
+    if (response != null) {
+      doctorModel = doctorAuthModelFromJson(response);
     }
   }
 
