@@ -41,7 +41,7 @@ class NotificationService {
         ?.createNotificationChannel(androidChannel);
 
     const initSettings = InitializationSettings(
-      android: AndroidInitializationSettings('ic_stat_notification'),
+      android: AndroidInitializationSettings('ic_stat_ic_notification'),
       iOS: DarwinInitializationSettings(),
     );
 
@@ -83,7 +83,7 @@ class NotificationService {
           'booking',
           'Booking updates',
           icon:
-              'ic_stat_notification', // ✅ required for background notifications
+              'ic_stat_ic_notification', // ✅ required for background notifications
         ),
         iOS: DarwinNotificationDetails(),
       ),

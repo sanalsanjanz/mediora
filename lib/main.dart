@@ -5,10 +5,10 @@ import 'package:mediora/splash_screen.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await NotificationService.init();
-  final fcmToken = await NotificationService.getFcmToken();
-  print('FCM Token: $fcmToken');
+  // final fcmToken = await NotificationService.getFcmToken();
+  // print('FCM Token: $fcmToken');
 
-  runApp(MyApp(fcm: fcmToken ?? ''));
+  runApp(MyApp(fcm: ''));
 }
 
 class MyApp extends StatelessWidget {
