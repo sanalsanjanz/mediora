@@ -203,17 +203,49 @@ class PatientHomeScreen extends StatelessWidget {
                     ],
                   ),
                 ),
-                Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
-                    borderRadius: BorderRadius.circular(14),
-                    border: Border.all(color: Colors.white.withOpacity(0.3)),
-                  ),
-                  child: const Icon(
-                    Icons.notifications_outlined,
-                    color: Colors.white,
-                    size: 22,
+                GestureDetector(
+                  onTap: () {
+                    showDialog(
+                      context: context,
+                      builder: (context) => AlertDialog(
+                        title: const Text('Logout'),
+                        content: const Text('Are you sure you want to logout?'),
+                        actions: [
+                          TextButton(
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                            child: const Text('Cancel'),
+                          ),
+                          TextButton(
+                            onPressed: () async {
+                              await PatientController.clearPreferences();
+                              Navigator.pushAndRemoveUntil(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => MedioraSplashScreen(),
+                                ),
+                                (_) => false,
+                              );
+                            },
+                            child: const Text('Logout'),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(color: Colors.white.withOpacity(0.3)),
+                    ),
+                    child: const Icon(
+                      Icons.logout,
+                      color: Colors.white,
+                      size: 22,
+                    ),
                   ),
                 ),
               ],

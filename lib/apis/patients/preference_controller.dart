@@ -47,4 +47,11 @@ class PatientController {
       return null;
     }
   }
+
+  static Future<void> clearPreferences() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    await preferences.clear();
+    patientModel = null;
+    return;
+  }
 }

@@ -58,8 +58,11 @@ class BookingDetailsModel {
         patientId: json["patient_id"],
         status: json["status"],
         createdAt: json.containsKey("created_at")
-            ? DateTime.tryParse(json["created_at"] ?? "") ?? DateTime.now()
-            : DateTime.now(),
+            ? (DateTime.tryParse(json["created_at"] ?? "") ??
+                      DateTime.now().toUtc())
+                  .add(const Duration(hours: 5, minutes: 30))
+            : DateTime.now().toUtc().add(const Duration(hours: 5, minutes: 30)),
+
         patientName: json["patient_name"],
         patientGender: json["patient_gender"],
         patientAge: json["patient_age"],

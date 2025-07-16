@@ -45,9 +45,11 @@ class BookingApi {
   static Future<List<BookingDetailsModel>> getBookings({
     String? doctorId,
     String? clinicId,
+    String? bookingId,
   }) async {
     final uri = Uri.parse(bookingUrl).replace(
       queryParameters: {
+        if (bookingId != null) 'id': bookingId,
         if (doctorId != null) 'doctor': doctorId,
         if (clinicId != null) 'clinic': clinicId,
         if (PatientController.patientModel?.id != null)

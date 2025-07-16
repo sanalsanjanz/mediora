@@ -553,7 +553,7 @@ class _MyBookingsPageState extends State<MyBookingsPage>
                   color: Color(0xFF1E293B),
                   fontWeight: FontWeight.w700,
                 ),
-                maxLines: 2,
+                maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
             ],

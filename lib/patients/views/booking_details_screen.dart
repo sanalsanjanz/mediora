@@ -8,10 +8,11 @@ import 'package:mediora/patients/views/patient_home_screen.dart';
 class BookingDetailsPage extends StatefulWidget {
   final BookingDetailsModel booking;
   final Function(BookingDetailsModel) onBookingUpdated;
-
+  final bool isFromNotification;
   const BookingDetailsPage({
     super.key,
     required this.booking,
+    this.isFromNotification = false,
     required this.onBookingUpdated,
   });
 
@@ -181,7 +182,16 @@ class _BookingDetailsPageState extends State<BookingDetailsPage>
               ),
               child: IconButton(
                 icon: Icon(Icons.arrow_back_rounded, color: Color(0xFF1E293B)),
-                onPressed: () => Navigator.pop(context),
+                onPressed: () {
+                  if (widget.isFromNotification) {
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (_) => PatientHomeScreen()),
+                    );
+                  } else {
+                    Navigator.pop(context);
+                  }
+                },
               ),
             ),
             flexibleSpace: FlexibleSpaceBar(

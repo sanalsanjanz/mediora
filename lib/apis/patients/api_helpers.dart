@@ -9,6 +9,7 @@ import 'package:mediora/models/ambulance_model.dart';
 import 'package:mediora/models/clinic_model.dart';
 import 'package:mediora/models/doctors_model.dart';
 import 'package:mediora/models/pharmacy_model.dart';
+import 'package:mediora/services/notification_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiHelpers {
@@ -194,6 +195,8 @@ class ApiHelpers {
     required String password,
     required String fcm,
   }) async {
+    final fcmnew = await NotificationService.getFcmToken();
+
     try {
       var request = http.MultipartRequest(
         'POST',
@@ -203,7 +206,7 @@ class ApiHelpers {
       request.fields['payload'] = jsonEncode({
         'username': userName,
         "password": password,
-        "fcm": fcm,
+        "fcm": fcmnew,
       });
       request.fields['action'] = 'login';
       // request.headers['Accept'] = 'application/json';

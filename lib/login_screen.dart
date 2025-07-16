@@ -834,6 +834,7 @@
 import 'package:flutter/material.dart';
 import 'package:mediora/apis/patients/api_helpers.dart';
 import 'package:mediora/patients/views/patient_landing_screen.dart';
+import 'package:mediora/services/notification_service.dart';
 import 'package:mediora/widgets/loading_dialog.dart';
 import 'package:mediora/widgets/location_picker.dart';
 
@@ -1439,6 +1440,7 @@ class _MedicalLoginScreenState extends State<MedicalLoginScreen>
           );
         }
       } else {
+        final fcmnew = await NotificationService.getFcmToken();
         (bool, String) res = await ApiHelpers.signupPatient(
           details: {
             "username": _emailController.text,
@@ -1450,7 +1452,7 @@ class _MedicalLoginScreenState extends State<MedicalLoginScreen>
             "lat": latCtrl.text.trim(),
             "lon": longCtrl.text.trim(),
             "location": _location.text.trim(),
-            "fcm_token": widget.fcmTocken.trim(),
+            "fcm_token": fcmnew ?? "".trim(),
           },
 
           /* userName: _emailController.text.trim(),
