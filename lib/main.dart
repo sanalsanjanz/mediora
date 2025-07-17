@@ -8,7 +8,7 @@ Future<void> main() async {
   // final fcmToken = await NotificationService.getFcmToken();
   // print('FCM Token: $fcmToken');
 
-  runApp(MyApp(fcm: ""));
+  runApp(MyApp(fcm: ''));
 }
 
 class MyApp extends StatelessWidget {
@@ -20,7 +20,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       navigatorKey: NotificationService.navigatorKey,
       debugShowCheckedModeBanner: false,
-      title: 'Mediora-Connect',
+      title: 'Mediora-Doctor',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
