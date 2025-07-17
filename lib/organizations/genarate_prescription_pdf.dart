@@ -15,12 +15,6 @@ Future<void> generatePrescriptionPdf({
   required BookingDetailsModel booking,
   required List<String> selectedMedicines,
   required String notesController,
-  // String? doctorName,
-  // String? doctorPhone,
-  // String? doctorEmail,
-  // String? clinicAddress,
-  // String? qualifications,
-  // String? registrationNumber,
 }) async {
   try {
     final pdf = pw.Document();
@@ -31,7 +25,7 @@ Future<void> generatePrescriptionPdf({
       try {
         final signatureBytes = base64Decode(base64Signature);
         final signatureImage = pw.MemoryImage(signatureBytes);
-        signatureWidget = pw.Image(signatureImage, height: 50, width: 120);
+        signatureWidget = pw.Image(signatureImage, height: 40, width: 100);
       } catch (e) {
         print('Error loading signature: $e');
       }
@@ -39,6 +33,7 @@ Future<void> generatePrescriptionPdf({
 
     pdf.addPage(
       pw.Page(
+        margin: pw.EdgeInsets.all(0),
         pageFormat: PdfPageFormat.a4,
         build: (pw.Context context) {
           return pw.Stack(
@@ -60,297 +55,465 @@ Future<void> generatePrescriptionPdf({
                 ),
               ),
 
-              // Main content with border
-              pw.Container(
-                width: double.infinity,
-                height: double.infinity,
-                // padding: const pw.EdgeInsets.all(5),
-                decoration: pw.BoxDecoration(
-                  border: pw.Border.all(color: PdfColors.grey500, width: 1),
-                ),
-                child: pw.Column(
-                  crossAxisAlignment: pw.CrossAxisAlignment.start,
-                  children: [
-                    // Doctor Header
-                    pw.Container(
-                      width: double.infinity,
-                      padding: const pw.EdgeInsets.all(12),
-                      decoration: pw.BoxDecoration(
-                        border: pw.Border.all(
-                          color: PdfColors.grey400,
-                          width: 0.5,
-                        ),
+              // Main content
+              pw.Column(
+                crossAxisAlignment: pw.CrossAxisAlignment.start,
+                children: [
+                  // Header with doctor info and stethoscope icon area
+                  pw.Container(
+                    width: double.infinity,
+                    height: 100,
+                    decoration: pw.BoxDecoration(
+                      gradient: pw.LinearGradient(
+                        colors: [
+                          PdfColor.fromHex('#4ECDC4'), // Teal color
+                          PdfColor.fromHex('#7ED8D1'),
+                        ],
+                        begin: pw.Alignment.centerLeft,
+                        end: pw.Alignment.centerRight,
                       ),
-                      child: pw.Column(
-                        crossAxisAlignment: pw.CrossAxisAlignment.center,
-                        children: [
-                          pw.Text(
-                            booking.doctor.name,
-                            style: pw.TextStyle(
-                              fontSize: 22,
-                              fontWeight: pw.FontWeight.bold,
+                      borderRadius: pw.BorderRadius.only(
+                        bottomLeft: pw.Radius.circular(20),
+                        bottomRight: pw.Radius.circular(20),
+                      ),
+                    ),
+                    child: pw.Stack(
+                      children: [
+                        // Doctor info
+                        pw.Positioned(
+                          left: 20,
+                          top: 20,
+                          child: pw.Column(
+                            crossAxisAlignment: pw.CrossAxisAlignment.start,
+                            children: [
+                              pw.Text(
+                                '${booking.doctor.name}',
+                                style: pw.TextStyle(
+                                  fontSize: 24,
+                                  fontWeight: pw.FontWeight.bold,
+                                  color: PdfColors.white,
+                                ),
+                              ),
+                              pw.SizedBox(height: 4),
+                              pw.Text(
+                                booking.doctor.qualifications.join(", "),
+                                style: pw.TextStyle(
+                                  fontSize: 14,
+                                  color: PdfColors.white,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        // Stethoscope icon placeholder (circular background)
+                        pw.Positioned(
+                          right: 20,
+                          top: 20,
+                          child: pw.Container(
+                            width: 60,
+                            height: 60,
+                            decoration: pw.BoxDecoration(
+                              color: PdfColors.white,
+                              shape: pw.BoxShape.circle,
+                            ),
+                            child: pw.Center(
+                              child: pw.Text(
+                                '🩺',
+                                style: pw.TextStyle(
+                                  fontSize: 30,
+                                  color: PdfColors.grey,
+                                ),
+                              ),
                             ),
                           ),
-                          pw.SizedBox(height: 4),
-                          pw.Text(
-                            booking.doctor.qualifications.join(","),
-                            style: pw.TextStyle(fontSize: 13),
-                          ),
-                          /*   if ( booking.doctor.l != null &&
-                              registrationNumber.isNotEmpty) ...[
-                            pw.SizedBox(height: 2),
-                            pw.Text(
-                              'Reg. No: $registrationNumber',
-                              style: pw.TextStyle(fontSize: 11),
-                            ), 
-                          ], */
-                          pw.SizedBox(height: 8),
-                          pw.Row(
-                            mainAxisAlignment: pw.MainAxisAlignment.center,
-                            children: [
-                              pw.Text(
-                                'Phone: ${booking.doctor.contactNumber}',
-                                style: pw.TextStyle(fontSize: 11),
-                              ),
-                              pw.SizedBox(width: 10),
-                              pw.Text(
-                                'Email: ${booking.doctor.email}',
-                                style: pw.TextStyle(fontSize: 11),
-                              ),
-                            ],
-                          ),
-                          pw.SizedBox(height: 4),
-                          pw.Text(
-                            booking.doctor.locationName,
-                            style: pw.TextStyle(fontSize: 11),
-                            textAlign: pw.TextAlign.center,
-                          ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
+                  ),
 
-                    pw.SizedBox(height: 15),
+                  pw.SizedBox(height: 30),
 
-                    // Prescription Title
-                    pw.Center(
-                      child: pw.Text(
-                        'PRESCRIPTION',
-                        style: pw.TextStyle(
-                          fontSize: 18,
-                          fontWeight: pw.FontWeight.bold,
-                          decoration: pw.TextDecoration.underline,
-                        ),
-                      ),
-                    ),
-
-                    pw.SizedBox(height: 15),
-
-                    // Patient and Booking Information
-                    pw.Container(
-                      padding: const pw.EdgeInsets.all(10),
-                      decoration: pw.BoxDecoration(
-                        border: pw.Border.all(
-                          color: PdfColors.grey400,
-                          width: 0.5,
-                        ),
-                      ),
-                      child: pw.Column(
-                        crossAxisAlignment: pw.CrossAxisAlignment.start,
-                        children: [
-                          pw.Row(
-                            mainAxisAlignment:
-                                pw.MainAxisAlignment.spaceBetween,
-                            children: [
-                              pw.Expanded(
-                                child: pw.Column(
-                                  crossAxisAlignment:
-                                      pw.CrossAxisAlignment.start,
-                                  children: [
-                                    pw.Text(
-                                      'Patient Name: ${booking.patientName}',
-                                      style: pw.TextStyle(
-                                        fontWeight: pw.FontWeight.bold,
-                                      ),
-                                    ),
-                                    pw.SizedBox(height: 4),
-                                    pw.Text('Age: ${booking.patientAge}'),
-                                    pw.SizedBox(height: 4),
-                                    pw.Text('Gender: ${booking.patientGender}'),
-                                  ],
-                                ),
-                              ),
-                              pw.Expanded(
-                                child: pw.Column(
-                                  crossAxisAlignment: pw.CrossAxisAlignment.end,
-                                  children: [
-                                    pw.Text(
-                                      'Booking ID: ${booking.id.split("-")[0]}',
-                                      style: pw.TextStyle(
-                                        fontWeight: pw.FontWeight.bold,
-                                      ),
-                                    ),
-                                    pw.SizedBox(height: 4),
-                                    pw.Text(
-                                      'OP Date: ${DateFormat("dd-MM-yyyy").format(DateTime.now())}',
-                                    ),
-                                    pw.SizedBox(height: 4),
-                                    pw.Text(
-                                      'OP Time: ${DateFormat("hh:mm a").format(DateTime.now())}',
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-
-                    pw.SizedBox(height: 20),
-
-                    // Medicines Section
-                    if (selectedMedicines.isNotEmpty) ...[
-                      pw.Padding(
-                        padding: pw.EdgeInsets.symmetric(horizontal: 10),
-                        child: pw.Text(
-                          'Medicines',
-                          style: pw.TextStyle(
-                            fontSize: 14,
-                            // fontWeight: pw.FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                      pw.SizedBox(height: 10),
-                      pw.Container(
-                        width: double.infinity,
-                        padding: const pw.EdgeInsets.all(12),
-                        decoration: pw.BoxDecoration(
-                          border: pw.Border.all(
-                            color: PdfColors.grey500,
-                            width: 1,
-                          ),
-                        ),
-                        child: pw.Column(
-                          crossAxisAlignment: pw.CrossAxisAlignment.start,
-                          children: selectedMedicines.asMap().entries.map((
-                            entry,
-                          ) {
-                            int index = entry.key;
-                            String medicine = entry.value;
-                            return pw.Padding(
-                              padding: const pw.EdgeInsets.only(bottom: 8),
-                              child: pw.Row(
+                  // Patient information form
+                  pw.Container(
+                    padding: const pw.EdgeInsets.symmetric(horizontal: 20),
+                    child: pw.Column(
+                      children: [
+                        // Patient Name
+                        pw.Row(
+                          children: [
+                            pw.Expanded(
+                              flex: 2,
+                              child: pw.Column(
                                 crossAxisAlignment: pw.CrossAxisAlignment.start,
                                 children: [
                                   pw.Text(
-                                    '${index + 1}. ',
+                                    'Patient Name:',
                                     style: pw.TextStyle(
-                                      fontWeight: pw.FontWeight.bold,
+                                      fontSize: 12,
+                                      color: PdfColors.grey600,
                                     ),
                                   ),
-                                  pw.Expanded(
+                                  pw.SizedBox(height: 2),
+                                  pw.Container(
+                                    width: double.infinity,
+                                    padding: const pw.EdgeInsets.only(
+                                      bottom: 5,
+                                    ),
+                                    decoration: pw.BoxDecoration(
+                                      border: pw.Border(
+                                        bottom: pw.BorderSide(
+                                          color: PdfColors.grey400,
+                                          width: 1,
+                                        ),
+                                      ),
+                                    ),
                                     child: pw.Text(
-                                      medicine,
-
+                                      booking.patientName,
                                       style: pw.TextStyle(
+                                        fontSize: 14,
                                         fontWeight: pw.FontWeight.bold,
                                       ),
                                     ),
                                   ),
                                 ],
                               ),
-                            );
-                          }).toList(),
+                            ),
+                            pw.SizedBox(width: 40),
+                            pw.Expanded(
+                              flex: 1,
+                              child: pw.Column(
+                                crossAxisAlignment: pw.CrossAxisAlignment.start,
+                                children: [
+                                  pw.Text(
+                                    'Date:',
+                                    style: pw.TextStyle(
+                                      fontSize: 12,
+                                      color: PdfColors.grey600,
+                                    ),
+                                  ),
+                                  pw.SizedBox(height: 2),
+                                  pw.Container(
+                                    width: double.infinity,
+                                    padding: const pw.EdgeInsets.only(
+                                      bottom: 5,
+                                    ),
+                                    decoration: pw.BoxDecoration(
+                                      border: pw.Border(
+                                        bottom: pw.BorderSide(
+                                          color: PdfColors.grey400,
+                                          width: 1,
+                                        ),
+                                      ),
+                                    ),
+                                    child: pw.Text(
+                                      DateFormat(
+                                        "dd-MM-yyyy",
+                                      ).format(DateTime.now()),
+                                      style: pw.TextStyle(fontSize: 14),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
                         ),
-                      ),
-                      pw.SizedBox(height: 20),
-                    ],
 
-                    // Additional Notes
-                    if (notesController.isNotEmpty) ...[
-                      pw.Padding(
-                        padding: pw.EdgeInsets.symmetric(horizontal: 10),
-                        child: pw.Text(
-                          'Notes',
-                          style: pw.TextStyle(
-                            fontSize: 14,
-                            // fontWeight: pw.FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                      pw.SizedBox(height: 10),
-                      pw.Container(
-                        width: double.infinity,
-                        padding: const pw.EdgeInsets.all(12),
-                        decoration: pw.BoxDecoration(
-                          border: pw.Border.all(
-                            color: PdfColors.green500,
-                            width: 1,
-                          ),
-                        ),
-                        child: pw.Text(notesController),
-                      ),
-                      pw.SizedBox(height: 20),
-                    ],
+                        pw.SizedBox(height: 20),
 
-                    // Signature Section
-                    pw.Spacer(),
-                    pw.Row(
-                      mainAxisAlignment: pw.MainAxisAlignment.end,
-                      children: [
-                        pw.Column(
-                          crossAxisAlignment: pw.CrossAxisAlignment.center,
+                        // Age and Gender
+                        pw.Row(
                           children: [
-                            if (signatureWidget != null) ...[
-                              signatureWidget,
-                              pw.SizedBox(height: 5),
-                            ] else ...[
-                              pw.SizedBox(height: 55),
-                            ],
+                            pw.Expanded(
+                              flex: 1,
+                              child: pw.Column(
+                                crossAxisAlignment: pw.CrossAxisAlignment.start,
+                                children: [
+                                  pw.Text(
+                                    'Age:',
+                                    style: pw.TextStyle(
+                                      fontSize: 12,
+                                      color: PdfColors.grey600,
+                                    ),
+                                  ),
+                                  pw.SizedBox(height: 2),
+                                  pw.Container(
+                                    width: double.infinity,
+                                    padding: const pw.EdgeInsets.only(
+                                      bottom: 5,
+                                    ),
+                                    decoration: pw.BoxDecoration(
+                                      border: pw.Border(
+                                        bottom: pw.BorderSide(
+                                          color: PdfColors.grey400,
+                                          width: 1,
+                                        ),
+                                      ),
+                                    ),
+                                    child: pw.Text(
+                                      booking.patientAge.toString(),
+                                      style: pw.TextStyle(fontSize: 14),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            pw.SizedBox(width: 40),
+                            pw.Expanded(
+                              flex: 1,
+                              child: pw.Column(
+                                crossAxisAlignment: pw.CrossAxisAlignment.start,
+                                children: [
+                                  pw.Text(
+                                    'Gender:',
+                                    style: pw.TextStyle(
+                                      fontSize: 12,
+                                      color: PdfColors.grey600,
+                                    ),
+                                  ),
+                                  pw.SizedBox(height: 2),
+                                  pw.Container(
+                                    width: double.infinity,
+                                    padding: const pw.EdgeInsets.only(
+                                      bottom: 5,
+                                    ),
+                                    decoration: pw.BoxDecoration(
+                                      border: pw.Border(
+                                        bottom: pw.BorderSide(
+                                          color: PdfColors.grey400,
+                                          width: 1,
+                                        ),
+                                      ),
+                                    ),
+                                    child: pw.Text(
+                                      booking.patientGender,
+                                      style: pw.TextStyle(fontSize: 14),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            pw.Expanded(
+                              flex: 1,
+                              child: pw.Container(),
+                            ), // Empty space
+                          ],
+                        ),
+
+                        pw.SizedBox(height: 20),
+
+                        // Diagnosis section
+                        pw.Column(
+                          crossAxisAlignment: pw.CrossAxisAlignment.start,
+                          children: [
+                            pw.Text(
+                              'Diagnosis:',
+                              style: pw.TextStyle(
+                                fontSize: 12,
+                                color: PdfColors.grey600,
+                              ),
+                            ),
+                            pw.SizedBox(height: 2),
                             pw.Container(
-                              width: 150,
-                              height: 1,
-                              color: PdfColors.black,
-                            ),
-                            pw.SizedBox(height: 5),
-                            pw.Text(
-                              'Doctor\'s Signature',
-                              style: pw.TextStyle(fontSize: 12),
-                            ),
-                            pw.SizedBox(height: 3),
-                            pw.Text(
-                              'Date: ${DateTime.now().toString().split(' ')[0]}',
-                              style: pw.TextStyle(fontSize: 10),
+                              width: double.infinity,
+                              padding: const pw.EdgeInsets.only(bottom: 5),
+                              decoration: pw.BoxDecoration(
+                                border: pw.Border(
+                                  bottom: pw.BorderSide(
+                                    color: PdfColors.grey400,
+                                    width: 1,
+                                  ),
+                                ),
+                              ),
+                              child: pw.Text(
+                                notesController.isNotEmpty
+                                    ? notesController
+                                    : '',
+                                style: pw.TextStyle(fontSize: 14),
+                              ),
                             ),
                           ],
                         ),
                       ],
                     ),
+                  ),
 
-                    pw.SizedBox(height: 10),
+                  pw.SizedBox(height: 40),
 
-                    // Footer
-                    pw.Container(
-                      width: double.infinity,
-                      padding: const pw.EdgeInsets.all(8),
-                      decoration: pw.BoxDecoration(
-                        border: pw.Border(
-                          top: pw.BorderSide(color: PdfColors.black, width: 1),
-                        ),
-                      ),
-                      child: pw.Center(
-                        child: pw.Text(
-                          'This is a digitally generated prescription. No physical signature required.',
-                          style: pw.TextStyle(
-                            fontSize: 10,
-                            color: PdfColors.grey600,
-                            fontStyle: pw.FontStyle.italic,
-                          ),
-                        ),
+                  // Rx Symbol
+                  pw.Container(
+                    padding: const pw.EdgeInsets.symmetric(horizontal: 20),
+                    child: pw.Text(
+                      'Rx',
+                      style: pw.TextStyle(
+                        fontSize: 48,
+                        fontWeight: pw.FontWeight.bold,
+                        color: PdfColor.fromHex('#2E5984'),
                       ),
                     ),
-                  ],
-                ),
+                  ),
+
+                  pw.SizedBox(height: 30),
+
+                  // Medicines prescription area
+                  pw.Expanded(
+                    child: pw.Container(
+                      padding: const pw.EdgeInsets.symmetric(horizontal: 20),
+                      child: pw.Column(
+                        crossAxisAlignment: pw.CrossAxisAlignment.start,
+                        children: [
+                          if (selectedMedicines.isNotEmpty)
+                            ...selectedMedicines
+                                .map(
+                                  (medicine) => pw.Container(
+                                    margin: const pw.EdgeInsets.only(
+                                      bottom: 15,
+                                    ),
+                                    child: pw.Text(
+                                      medicine,
+                                      style: pw.TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: pw.FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                )
+                                .toList(),
+                          // Add empty lines for manual writing
+                          ...List.generate(
+                            6,
+                            (index) => pw.Container(
+                              margin: const pw.EdgeInsets.only(bottom: 15),
+                              decoration: pw.BoxDecoration(
+                                border: pw.Border(
+                                  bottom: pw.BorderSide(
+                                    color: PdfColors.grey300,
+                                    width: 1,
+                                  ),
+                                ),
+                              ),
+                              height: 20,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+
+                  pw.SizedBox(height: 40),
+
+                  // Signature area
+                  pw.Container(
+                    padding: const pw.EdgeInsets.symmetric(horizontal: 20),
+                    child: pw.Row(
+                      mainAxisAlignment: pw.MainAxisAlignment.end,
+                      children: [
+                        pw.Column(
+                          crossAxisAlignment: pw.CrossAxisAlignment.center,
+                          children: [
+                            pw.Container(
+                              width: 150,
+                              height: 60,
+                              child: signatureWidget != null
+                                  ? pw.Center(child: signatureWidget)
+                                  : pw.Container(),
+                            ),
+                            pw.Container(
+                              width: 150,
+                              height: 1,
+                              color: PdfColors.grey400,
+                            ),
+                            pw.SizedBox(height: 5),
+                            pw.Text(
+                              'Signature',
+                              style: pw.TextStyle(
+                                fontSize: 12,
+                                color: PdfColors.grey600,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  pw.SizedBox(height: 20),
+
+                  // Footer with clinic info
+                  pw.Container(
+                    width: double.infinity,
+                    padding: const pw.EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 15,
+                    ),
+                    decoration: pw.BoxDecoration(
+                      border: pw.Border(
+                        top: pw.BorderSide(color: PdfColors.grey300, width: 1),
+                      ),
+                    ),
+                    child: pw.Row(
+                      mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                      children: [
+                        // Clinic name (only if not empty)
+                        pw.Expanded(
+                          child: booking.doctor.locationName.isNotEmpty
+                              ? pw.Text(
+                                  booking.doctor.locationName.toUpperCase(),
+                                  style: pw.TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: pw.FontWeight.bold,
+                                    color: PdfColors.grey700,
+                                  ),
+                                )
+                              : pw.Container(),
+                        ),
+                        // Contact info
+                        pw.Column(
+                          crossAxisAlignment: pw.CrossAxisAlignment.end,
+                          children: [
+                            /*   pw.Row(
+                              mainAxisSize: pw.MainAxisSize.min,
+                              children: [
+                                // pw.Text(
+                                //   '📍 ${booking.doctor.locationName}',
+                                //   style: pw.TextStyle(
+                                //     fontSize: 10,
+                                //     color: PdfColors.grey600,
+                                //   ),
+                                // ),
+                              ],
+                            ),
+                            pw.SizedBox(height: 2), */
+                            pw.Row(
+                              mainAxisSize: pw.MainAxisSize.min,
+                              children: [
+                                pw.Text(
+                                  '☎ ${booking.doctor.contactNumber}',
+                                  style: pw.TextStyle(
+                                    fontSize: 10,
+                                    color: PdfColors.grey600,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            pw.SizedBox(height: 2),
+                            pw.Row(
+                              mainAxisSize: pw.MainAxisSize.min,
+                              children: [
+                                pw.Text(
+                                  '✉ ${booking.doctor.email}',
+                                  style: pw.TextStyle(
+                                    fontSize: 10,
+                                    color: PdfColors.grey600,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
             ],
           );

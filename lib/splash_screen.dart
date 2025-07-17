@@ -179,7 +179,7 @@ class _MedioraSplashScreenState extends State<MedioraSplashScreen>
               child: FadeTransition(
                 opacity: _fadeAnimation,
                 child: Text(
-                  'Mediora',
+                  'Mediora Doctor',
                   style: TextStyle(
                     fontSize: isTablet ? 48 : 36,
                     fontWeight: FontWeight.w700,
