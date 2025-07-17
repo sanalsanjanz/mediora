@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mediora/apis/patients/booking_apis.dart';
 import 'package:mediora/login_screen.dart';
 import 'package:mediora/models/booking_details_model.dart';
+import 'package:mediora/organizations/doctors_landing_screen.dart';
 import 'package:mediora/patients/views/booking_details_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -119,10 +120,10 @@ class _BookingCheckpointState extends State<BookingCheckpoint>
             Navigator.pushAndRemoveUntil(
               context,
               MaterialPageRoute(
-                builder: (_) => BookingDetailsPage(
-                  booking: items.first,
+                builder: (_) => DoctorsLandingScreen(
+                  /*  booking: items.first,
                   isFromNotification: true,
-                  onBookingUpdated: (BookingDetailsModel d) {},
+                  onBookingUpdated: (BookingDetailsModel d) {}, */
                 ),
               ),
               (_) => false,

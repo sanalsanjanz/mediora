@@ -63,6 +63,7 @@ class PatientController {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     await preferences.clear();
     patientModel = null;
+    doctorModel = null;
     return;
   }
 }

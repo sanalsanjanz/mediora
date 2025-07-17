@@ -1,6 +1,7 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:mediora/apis/patients/preference_controller.dart';
 import 'package:mediora/login_screen.dart';
 import 'package:mediora/organizations/doctors_landing_screen.dart';
@@ -67,9 +68,10 @@ class _MedioraSplashScreenState extends State<MedioraSplashScreen>
 
       if (isLogged && type == "doctor") {
         await PatientController.getDoctorDetails();
-        Navigator.of(
-          context,
-        ).push(MaterialPageRoute(builder: (_) => DoctorsLandingScreen()));
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (c) => DoctorsLandingScreen()),
+          (_) => false,
+        );
       } else if (isLogged && type == "clinic") {
       } else {
         Navigator.of(context).push(
@@ -100,12 +102,30 @@ class _MedioraSplashScreenState extends State<MedioraSplashScreen>
     super.dispose();
   }
 
+  static const Color medicalBlue = Color.fromARGB(255, 35, 33, 158);
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     final isTablet = size.shortestSide >= 600;
 
     return Scaffold(
+      appBar: AppBar(
+        scrolledUnderElevation: 0,
+        toolbarHeight: 0.0,
+
+        systemOverlayStyle: SystemUiOverlayStyle(
+          statusBarColor: Color.fromARGB(255, 35, 33, 158),
+        ), // Light status bar
+        backgroundColor: medicalBlue.withOpacity(0.1), // Transparent AppBar
+        elevation: 0, // No shadow
+        automaticallyImplyLeading: false, // Hide back button
+        centerTitle: true, // Center title
+        title: const Text(
+          'Mediora',
+          style: TextStyle(color: Colors.white, fontSize: 20),
+        ),
+      ), // Hide AppBar
+
       body: Container(
         width: double.infinity,
         height: double.infinity,
@@ -113,105 +133,103 @@ class _MedioraSplashScreenState extends State<MedioraSplashScreen>
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [Color(0xFF3CB8B8), Color(0xFF333F48)],
+            colors: [Color.fromARGB(255, 35, 33, 158), Color(0xFF333F48)],
             stops: [0.0, 1.0],
           ),
         ),
-        child: SafeArea(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              // Spacer to push content to center
-              const Spacer(flex: 2),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            // Spacer to push content to center
+            const Spacer(flex: 2),
 
-              // Logo/Icon Section
-              FadeTransition(
-                opacity: _fadeAnimation,
-                child: ScaleTransition(
-                  scale: _scaleAnimation,
-                  child: Container(
-                    width: isTablet ? 140 : 100,
-                    height: isTablet ? 140 : 100,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.2),
-                          blurRadius: 20,
-                          offset: const Offset(0, 10),
-                        ),
-                      ],
-                    ),
-                    child: Icon(
-                      Icons.favorite_rounded,
-                      size: isTablet ? 70 : 50,
-                      color: const Color(0xFF3CB8B8),
-                    ),
-                  ),
-                ),
-              ),
-
-              SizedBox(height: isTablet ? 40 : 30),
-
-              // App Name
-              SlideTransition(
-                position: _slideAnimation,
-                child: FadeTransition(
-                  opacity: _fadeAnimation,
-                  child: Text(
-                    'Mediora',
-                    style: TextStyle(
-                      fontSize: isTablet ? 48 : 36,
-                      fontWeight: FontWeight.w700,
-                      color: Colors.white,
-                      letterSpacing: 2.0,
-                    ),
-                  ),
-                ),
-              ),
-
-              SizedBox(height: isTablet ? 16 : 12),
-
-              // Tagline
-              SlideTransition(
-                position: _slideAnimation,
-                child: FadeTransition(
-                  opacity: _fadeAnimation,
-                  child: Text(
-                    'Care that connects',
-                    style: TextStyle(
-                      fontSize: isTablet ? 20 : 16,
-                      fontWeight: FontWeight.w400,
-                      color: Colors.white.withOpacity(0.9),
-                      letterSpacing: 1.2,
-                    ),
-                  ),
-                ),
-              ),
-
-              // Spacer
-              const Spacer(flex: 2),
-
-              // Loading indicator
-              FadeTransition(
-                opacity: _fadeAnimation,
+            // Logo/Icon Section
+            FadeTransition(
+              opacity: _fadeAnimation,
+              child: ScaleTransition(
+                scale: _scaleAnimation,
                 child: Container(
-                  margin: EdgeInsets.only(bottom: isTablet ? 60 : 40),
-                  child: SizedBox(
-                    width: isTablet ? 40 : 30,
-                    height: isTablet ? 40 : 30,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 3,
-                      valueColor: AlwaysStoppedAnimation<Color>(
-                        Colors.white.withOpacity(0.8),
+                  width: isTablet ? 140 : 100,
+                  height: isTablet ? 140 : 100,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.2),
+                        blurRadius: 20,
+                        offset: const Offset(0, 10),
                       ),
+                    ],
+                  ),
+                  child: Icon(
+                    Icons.favorite_rounded,
+                    size: isTablet ? 70 : 50,
+                    color: const Color(0xFF3CB8B8),
+                  ),
+                ),
+              ),
+            ),
+
+            SizedBox(height: isTablet ? 40 : 30),
+
+            // App Name
+            SlideTransition(
+              position: _slideAnimation,
+              child: FadeTransition(
+                opacity: _fadeAnimation,
+                child: Text(
+                  'Mediora',
+                  style: TextStyle(
+                    fontSize: isTablet ? 48 : 36,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.white,
+                    letterSpacing: 2.0,
+                  ),
+                ),
+              ),
+            ),
+
+            SizedBox(height: isTablet ? 16 : 12),
+
+            // Tagline
+            SlideTransition(
+              position: _slideAnimation,
+              child: FadeTransition(
+                opacity: _fadeAnimation,
+                child: Text(
+                  'Care that connects',
+                  style: TextStyle(
+                    fontSize: isTablet ? 20 : 16,
+                    fontWeight: FontWeight.w400,
+                    color: Colors.white.withOpacity(0.9),
+                    letterSpacing: 1.2,
+                  ),
+                ),
+              ),
+            ),
+
+            // Spacer
+            const Spacer(flex: 2),
+
+            // Loading indicator
+            FadeTransition(
+              opacity: _fadeAnimation,
+              child: Container(
+                margin: EdgeInsets.only(bottom: isTablet ? 60 : 40),
+                child: SizedBox(
+                  width: isTablet ? 40 : 30,
+                  height: isTablet ? 40 : 30,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 3,
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                      Colors.white.withOpacity(0.8),
                     ),
                   ),
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

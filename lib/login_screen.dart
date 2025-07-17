@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:icons_plus/icons_plus.dart';
 import 'package:mediora/apis/patients/organization/organization_helper.dart';
 import 'package:mediora/organizations/doctors_landing_screen.dart';
@@ -32,8 +33,8 @@ class _MedicalLoginScreenState extends State<MedicalLoginScreen>
   late Animation<double> _fadeAnimation;
 
   // Color scheme
-  static const Color medicalBlue = Color(0xFF2E86AB);
-  static const Color calmTeal = Color(0xFF4ECDC4);
+  static const Color medicalBlue = Color.fromARGB(255, 35, 33, 158);
+  static const Color calmTeal = Color.fromARGB(100, 35, 33, 158);
   static const Color lightBlue = Color(0xFF45B7D1);
 
   @override
@@ -65,6 +66,12 @@ class _MedicalLoginScreenState extends State<MedicalLoginScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        toolbarHeight: 0,
+        systemOverlayStyle: SystemUiOverlayStyle(
+          statusBarColor: medicalBlue.withOpacity(0.1),
+        ),
+      ),
       body: Container(
         height: MediaQuery.of(context).size.height,
         decoration: BoxDecoration(
@@ -177,10 +184,10 @@ class _MedicalLoginScreenState extends State<MedicalLoginScreen>
             _buildForm(),
             const SizedBox(height: 24),
             _buildSubmitButton(),
-            if (_isLogin) ...[
-              const SizedBox(height: 16),
-              _buildForgotPassword(),
-            ],
+            /*  if (_isLogin) ...[ */
+            const SizedBox(height: 16),
+            _buildForgotPassword(),
+            /*     ], */
           ],
         ),
       ),
@@ -599,9 +606,10 @@ class _MedicalLoginScreenState extends State<MedicalLoginScreen>
 
       if (res.$1) {
         // Navigate to main app
-        Navigator.of(
-          context,
-        ).push(MaterialPageRoute(builder: (c) => DoctorsLandingScreen()));
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (c) => DoctorsLandingScreen()),
+          (_) => false,
+        );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(

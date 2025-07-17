@@ -30,7 +30,7 @@ class OrganizationHelper {
       request.fields['payload'] = jsonEncode({
         'username': userName,
         "password": password,
-        "fcm": fcmnew,
+        "fcm_token": fcmnew,
       });
       request.fields['action'] = 'login';
       // request.headers['Accept'] = 'application/json';

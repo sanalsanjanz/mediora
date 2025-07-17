@@ -1,17 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-import 'package:mediora/apis/patients/booking_apis.dart';
 import 'package:mediora/apis/patients/preference_controller.dart';
-import 'package:mediora/models/booking_details_model.dart';
+import 'package:mediora/splash_screen.dart';
 
-class DoctorsLandingScreen extends StatefulWidget {
-  const DoctorsLandingScreen({super.key, this.fcm});
+class OrgDocScreen extends StatefulWidget {
+  const OrgDocScreen({super.key, this.fcm});
   final String? fcm;
   @override
-  State<DoctorsLandingScreen> createState() => _DoctorsLandingScreenState();
+  State<OrgDocScreen> createState() => _DoctorsLandingScreenState();
 }
 
-class _DoctorsLandingScreenState extends State<DoctorsLandingScreen> {
+class _DoctorsLandingScreenState extends State<OrgDocScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -24,6 +22,41 @@ class _DoctorsLandingScreenState extends State<DoctorsLandingScreen> {
     return CustomScrollView(
       slivers: [
         SliverAppBar(
+          actions: [
+            IconButton(
+              onPressed: () {
+                showDialog(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    title: const Text('Logout'),
+                    content: const Text('Are you sure you want to logout?'),
+                    actions: [
+                      TextButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                        child: const Text('Cancel'),
+                      ),
+                      TextButton(
+                        onPressed: () async {
+                          await PatientController.clearPreferences();
+                          Navigator.pushAndRemoveUntil(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => MedioraSplashScreen(),
+                            ),
+                            (_) => false,
+                          );
+                        },
+                        child: const Text('Logout'),
+                      ),
+                    ],
+                  ),
+                );
+              },
+              icon: Icon(Icons.logout_outlined, color: Colors.white),
+            ),
+          ],
           expandedHeight: 140,
           pinned: true,
           backgroundColor: Color(0xFF1E40AF),
@@ -36,6 +69,7 @@ class _DoctorsLandingScreenState extends State<DoctorsLandingScreen> {
                 fontWeight: FontWeight.w600,
               ),
             ),
+
             background: Container(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
@@ -97,12 +131,18 @@ class _DoctorsLandingScreenState extends State<DoctorsLandingScreen> {
                 ],
               ),
               borderRadius: BorderRadius.circular(25),
+
+              image: DecorationImage(
+                image: NetworkImage(
+                  PatientController.doctorModel?.user.image ?? "",
+                ),
+              ),
             ),
-            child: Icon(
+            /*  child: Icon(
               Icons.person_rounded,
               size: 50,
               color: Color(0xFF1E40AF),
-            ),
+            ), */
           ),
           SizedBox(height: 20),
           Text(

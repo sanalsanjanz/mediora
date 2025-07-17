@@ -104,6 +104,37 @@ class BookingApi {
     }
   }
 
+  static Future<(String, bool)> updateStatus({
+    required String status,
+    required String id,
+    // required double lon,
+  }) async {
+    try {
+      final response = await http.get(
+        Uri.parse("$updateStatusUrl?id=$id&status=$status"),
+      );
+      if (response.statusCode == 200) {
+        Map data = jsonDecode(response.body);
+
+        // jsonEncode(data["data"])
+
+        if (data["ok"]) {
+          return ("Updated", true);
+        } else {
+          return ("Failed", false);
+        }
+      } else if (response.statusCode == 404) {
+        throw Exception('Not found');
+      } else if (response.statusCode == 500) {
+        throw Exception('Server error while loading cities');
+      } else {
+        throw Exception('Failed to load cities: ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('Error loading cities: $e');
+    }
+  }
+
   static Map<String, dynamic> _decode(http.Response res) =>
       jsonDecode(res.body)[0] as Map<String, dynamic>;
 }
