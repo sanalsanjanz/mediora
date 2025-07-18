@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:icons_plus/icons_plus.dart';
 import 'package:mediora/apis/patients/booking_apis.dart';
 import 'package:mediora/models/booking_details_model.dart';
 import 'package:mediora/organizations/check_patient_screen.dart';
@@ -619,16 +620,17 @@ class _BookingStatusScreenState extends State<BookingStatusScreen>
       return Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
+          border: Border.all(color: Colors.grey.shade300),
           color: Colors.grey.shade100,
           borderRadius: BorderRadius.circular(16),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.info, color: Colors.grey.shade600),
+            Icon(FontAwesome.prescription_solid, color: Colors.grey.shade600),
             const SizedBox(width: 8),
             Text(
-              'No further actions available',
+              'Get Prescription',
               style: TextStyle(color: Colors.grey.shade600, fontSize: 16),
             ),
           ],

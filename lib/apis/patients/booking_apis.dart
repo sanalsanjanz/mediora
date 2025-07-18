@@ -137,4 +137,6 @@ class BookingApi {
 
   static Map<String, dynamic> _decode(http.Response res) =>
       jsonDecode(res.body)[0] as Map<String, dynamic>;
+
+  static Future getPrescription() async {}
 }

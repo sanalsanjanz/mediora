@@ -16,5 +16,5 @@
 -dontwarn kotlinx.coroutines.**
 
 # --- Prevent obfuscation of your model classes if used via reflection ---
--keep class com.legozia.mediora.models.** { *; }
+-keep class com.mediora.doctor.models.** { *; }
 
