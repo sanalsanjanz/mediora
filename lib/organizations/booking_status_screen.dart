@@ -7,6 +7,7 @@ import 'package:mediora/apis/patients/booking_apis.dart';
 import 'package:mediora/models/booking_details_model.dart';
 import 'package:mediora/organizations/check_patient_screen.dart';
 import 'package:mediora/organizations/doctors_landing_screen.dart';
+import 'package:mediora/organizations/pdf_preview.dart';
 import 'package:mediora/widgets/show_loading.dart';
 
 class BookingStatusScreen extends StatefulWidget {
@@ -154,36 +155,229 @@ class _BookingStatusScreenState extends State<BookingStatusScreen>
   void _showRejectionDialog() {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Text('Reject Booking'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Text('Please select a reason for rejection:'),
-            const SizedBox(height: 16),
-            ...rejectionReasons.map(
-              (reason) => ListTile(
-                title: Text(reason),
-                onTap: () {
-                  Navigator.pop(context);
-                  _rejectionReasonController.text = reason;
-                  if (reason == 'Other') {
-                    _showCustomReasonDialog();
-                  } else {
-                    _performStatusUpdate('rejected', reason: reason);
-                  }
-                },
-              ),
+      barrierDismissible: false,
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        elevation: 10,
+        child: Container(
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [Colors.white, Colors.red.shade50],
             ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
           ),
-        ],
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Header with icon
+              Container(
+                width: 60,
+                height: 60,
+                decoration: BoxDecoration(
+                  color: Colors.red.shade100,
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Icons.cancel_outlined,
+                  color: Colors.red.shade600,
+                  size: 30,
+                ),
+              ),
+              const SizedBox(height: 16),
+
+              // Title
+              Text(
+                'Reject Booking',
+                style: TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.grey.shade800,
+                ),
+              ),
+              const SizedBox(height: 8),
+
+              // Subtitle
+              Text(
+                'Please select a reason for rejection:',
+                style: TextStyle(fontSize: 14, color: Colors.grey.shade600),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 24),
+
+              // Rejection reasons
+              Container(
+                constraints: const BoxConstraints(maxHeight: 300),
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: rejectionReasons.map((reason) {
+                      IconData iconData;
+                      Color iconColor;
+
+                      // Assign icons based on reason
+                      switch (reason.toLowerCase()) {
+                        case 'emergency':
+                          iconData = Icons.local_hospital;
+                          iconColor = Colors.red.shade600;
+                          break;
+                        case 'doctor unavailable':
+                          iconData = Icons.person_off;
+                          iconColor = Colors.orange.shade600;
+                          break;
+                        case 'duplicate booking':
+                          iconData = Icons.content_copy;
+                          iconColor = Colors.blue.shade600;
+                          break;
+                        case 'invalid information':
+                          iconData = Icons.error_outline;
+                          iconColor = Colors.amber.shade600;
+                          break;
+                        case 'other':
+                          iconData = Icons.more_horiz;
+                          iconColor = Colors.grey.shade600;
+                          break;
+                        default:
+                          iconData = Icons.info_outline;
+                          iconColor = Colors.grey.shade600;
+                      }
+
+                      return Container(
+                        margin: const EdgeInsets.only(bottom: 8),
+                        child: Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            borderRadius: BorderRadius.circular(12),
+                            onTap: () {
+                              Navigator.pop(context);
+                              _rejectionReasonController.text = reason;
+                              if (reason == 'Other') {
+                                _showCustomReasonDialog();
+                              } else {
+                                _performStatusUpdate(
+                                  'rejected',
+                                  reason: reason,
+                                );
+                              }
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.all(16),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(
+                                  color: Colors.grey.shade200,
+                                  width: 1,
+                                ),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.03),
+                                    blurRadius: 8,
+                                    offset: const Offset(0, 2),
+                                  ),
+                                ],
+                              ),
+                              child: Row(
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.all(8),
+                                    decoration: BoxDecoration(
+                                      color: iconColor.withOpacity(0.1),
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: Icon(
+                                      iconData,
+                                      color: iconColor,
+                                      size: 20,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: Text(
+                                      reason,
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w500,
+                                        color: Colors.grey.shade800,
+                                      ),
+                                    ),
+                                  ),
+                                  Icon(
+                                    Icons.arrow_forward_ios,
+                                    color: Colors.grey.shade400,
+                                    size: 16,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 24),
+
+              // Action buttons
+              Row(
+                children: [
+                  Expanded(
+                    child: TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      style: TextButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          side: BorderSide(color: Colors.grey.shade300),
+                        ),
+                      ),
+                      child: Text(
+                        'Cancel',
+                        style: TextStyle(
+                          color: Colors.grey.shade600,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                        // Show a snackbar or toast that no reason was selected
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text(
+                              'Please select a reason for rejection',
+                            ),
+                            backgroundColor: Colors.orange,
+                          ),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.red.shade600,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        elevation: 0,
+                      ),
+                      child: const Text(
+                        'Reject',
+                        style: TextStyle(fontWeight: FontWeight.w600),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -617,23 +811,35 @@ class _BookingStatusScreenState extends State<BookingStatusScreen>
     final availableStatuses = _getAvailableStatuses();
 
     if (availableStatuses.isEmpty) {
-      return Container(
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          border: Border.all(color: Colors.grey.shade300),
-          color: Colors.grey.shade100,
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(FontAwesome.prescription_solid, color: Colors.grey.shade600),
-            const SizedBox(width: 8),
-            Text(
-              'Get Prescription',
-              style: TextStyle(color: Colors.grey.shade600, fontSize: 16),
+      return InkWell(
+        onTap: () {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (_) => PdfPreviewPage(
+                bookingId: widget.booking.id,
+                detailsModel: widget.booking,
+              ),
             ),
-          ],
+          );
+        },
+        child: Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            border: Border.all(color: Colors.grey.shade300),
+            color: Colors.grey.shade100,
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(FontAwesome.prescription_solid, color: Colors.grey.shade600),
+              const SizedBox(width: 8),
+              Text(
+                'Get Prescription',
+                style: TextStyle(color: Colors.grey.shade600, fontSize: 16),
+              ),
+            ],
+          ),
         ),
       );
     }

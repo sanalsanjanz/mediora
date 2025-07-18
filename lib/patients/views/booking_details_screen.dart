@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mediora/apis/patients/booking_apis.dart';
 import 'package:mediora/models/booking_details_model.dart';
 import 'package:mediora/models/booking_model.dart';
+import 'package:mediora/organizations/pdf_preview.dart';
 import 'package:mediora/patients/views/book_appointment.dart';
 import 'package:mediora/patients/views/patient_home_screen.dart';
 

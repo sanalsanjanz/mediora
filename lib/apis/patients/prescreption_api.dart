@@ -5,7 +5,7 @@ import 'package:mediora/apis/patients/api_links.dart';
 
 class PrescriptionAPI {
   static String baseUrlPath = '${baseUrl}prescription'; // 👈 No trailing slash
-  static String getUrlPath = '${baseUrl}prescription/get';
+  static String getUrlPath = '${baseUrl}prescription?';
 
   /// ➕ Add a prescription
   static Future<Map<String, dynamic>> addPrescription(

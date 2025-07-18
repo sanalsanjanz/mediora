@@ -62,7 +62,7 @@ Future<void> generatePrescriptionPdf({
                   // Header with doctor info and stethoscope icon area
                   pw.Container(
                     width: double.infinity,
-                    height: 100,
+                    height: 150,
                     decoration: pw.BoxDecoration(
                       gradient: pw.LinearGradient(
                         colors: [
@@ -72,10 +72,10 @@ Future<void> generatePrescriptionPdf({
                         begin: pw.Alignment.centerLeft,
                         end: pw.Alignment.centerRight,
                       ),
-                      borderRadius: pw.BorderRadius.only(
+                      /*  borderRadius: pw.BorderRadius.only(
                         bottomLeft: pw.Radius.circular(20),
                         bottomRight: pw.Radius.circular(20),
-                      ),
+                      ), */
                     ),
                     child: pw.Stack(
                       children: [
