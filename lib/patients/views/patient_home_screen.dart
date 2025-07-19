@@ -3,7 +3,9 @@ import 'package:custom_refresh_indicator/custom_refresh_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:mediora/apis/patients/api_helpers.dart';
 import 'package:mediora/apis/patients/preference_controller.dart';
+import 'package:mediora/patients/games/breathin_game.dart';
 import 'package:mediora/patients/views/ambulance_services.dart';
+import 'package:mediora/patients/views/breath_in_banner.dart';
 import 'package:mediora/patients/views/clinic_list.dart';
 import 'package:mediora/patients/views/doctors_list.dart';
 import 'package:mediora/patients/views/my_bookings.dart';
@@ -57,7 +59,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
 
                   doctorsGrid(),
                   const SizedBox(height: 24),
-
+                  BreathingExerciseBanner(),
                   clinicGrid(),
                   const SizedBox(height: 24),
                   pharmacyGrid(),

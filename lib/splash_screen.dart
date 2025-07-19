@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:mediora/apis/patients/preference_controller.dart';
 import 'package:mediora/login_screen.dart';
 import 'package:mediora/patients/views/patient_home_screen.dart';
+import 'package:mediora/patients/views/patient_landing_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class MedioraSplashScreen extends StatefulWidget {
@@ -66,7 +67,7 @@ class _MedioraSplashScreenState extends State<MedioraSplashScreen>
       if (isLogged) {
         await PatientController.getPatientDetails();
         Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(builder: (_) => PatientHomeScreen()),
+          MaterialPageRoute(builder: (_) => PatientLandingScreen()),
           (_) => false,
         );
       } else {

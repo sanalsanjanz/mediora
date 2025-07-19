@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mediora/helper/colors.dart';
 import 'package:mediora/services/notification_service.dart';
 import 'package:mediora/splash_screen.dart';
 
@@ -22,7 +23,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Mediora-Connect',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        colorScheme: ColorScheme.fromSeed(seedColor: colorPrimary),
       ),
       home: MedioraSplashScreen(fcm: fcm),
     );
