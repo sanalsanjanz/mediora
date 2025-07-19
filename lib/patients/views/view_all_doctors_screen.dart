@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:mediora/apis/patients/api_helpers.dart';
 import 'package:mediora/helper/expirence_formatter.dart';
 import 'package:mediora/models/doctors_model.dart';
 import 'package:mediora/patients/views/doctor_booking_screen.dart';
+import 'package:mediora/patients/views/doctors_list.dart';
 
 class DoctorsListingScreen extends StatefulWidget {
   const DoctorsListingScreen({super.key});
@@ -151,7 +153,13 @@ class _DoctorsListingScreenState extends State<DoctorsListingScreen>
         future: _myFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
+            return Center(
+              child: LoadingAnimationWidget.flickr(
+                leftDotColor: Color(0xFF3CB8B8),
+                rightDotColor: Color.fromARGB(255, 175, 235, 235),
+                size: 45,
+              ),
+            );
           }
           if (snapshot.hasError) {
             return Center(child: Text('Failed to load doctors.'));
@@ -495,7 +503,35 @@ class _DoctorsListingScreenState extends State<DoctorsListingScreen>
 
     return FadeTransition(
       opacity: _fadeAnimation,
-      child: ListView.builder(
+      child: SizedBox(
+        // height: 240,
+        child: GridView.builder(
+          padding: EdgeInsets.all(12),
+          physics: NeverScrollableScrollPhysics(),
+          shrinkWrap: true,
+          // scrollDirection: Axis.horizontal,
+          itemCount: filtered.length,
+          itemBuilder: (context, index) {
+            return InkWell(
+              onTap: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        DoctorBookingScreen(doctor: filtered[index]),
+                  ),
+                );
+              },
+              child: buildCard(filtered[index]),
+            );
+          },
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            mainAxisExtent: 250,
+            mainAxisSpacing: 15,
+            crossAxisSpacing: 15,
+          ),
+        ),
+      ) /* ListView.builder(
         physics: NeverScrollableScrollPhysics(),
         shrinkWrap: true,
         padding: EdgeInsets.all(20),
@@ -503,7 +539,7 @@ class _DoctorsListingScreenState extends State<DoctorsListingScreen>
         itemBuilder: (context, index) {
           return _buildDoctorCard(filtered[index], index);
         },
-      ),
+      ), */,
     );
   }
 

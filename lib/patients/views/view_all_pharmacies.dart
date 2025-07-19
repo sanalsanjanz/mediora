@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:mediora/apis/patients/api_helpers.dart';
 import 'package:mediora/apis/patients/preference_controller.dart';
 import 'package:mediora/models/pharmacy_model.dart';
@@ -222,7 +223,13 @@ class _ViewAllPharmaciesState extends State<ViewAllPharmacies> {
               future: _filteredPharmacies,
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(child: CircularProgressIndicator());
+                  return Center(
+                    child: LoadingAnimationWidget.flickr(
+                      leftDotColor: Color(0xFF3CB8B8),
+                      rightDotColor: Color.fromARGB(255, 175, 235, 235),
+                      size: 45,
+                    ),
+                  );
                 } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
                   return Column(
                     children: [

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:mediora/apis/patients/api_helpers.dart';
 import 'package:mediora/models/clinic_model.dart';
 
@@ -124,7 +125,13 @@ class _ViewAllOrganizationsState extends State<ViewAllOrganizations> {
               future: getAllClinics,
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(child: CircularProgressIndicator());
+                  return Center(
+                    child: LoadingAnimationWidget.flickr(
+                      leftDotColor: Color(0xFF3CB8B8),
+                      rightDotColor: Color.fromARGB(255, 175, 235, 235),
+                      size: 45,
+                    ),
+                  );
                 } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
                   return Column(
                     children: [
@@ -188,11 +195,79 @@ class _ViewAllOrganizationsState extends State<ViewAllOrganizations> {
                     ],
                   );
                 } else {
-                  return Center(child: Text("Error"));
+                  return _buildEmptyState();
                 }
               },
             ),
           ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEmptyState() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          SizedBox(height: 50),
+
+          Container(
+            width: 120,
+            height: 120,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Colors.blue[100]!, Colors.blue[50]!],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(Icons.search_off, size: 60, color: Colors.blue[300]),
+          ),
+          SizedBox(height: 24),
+          Text(
+            'No Clinics found',
+            style: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: Colors.grey[800],
+            ),
+          ),
+          SizedBox(height: 12),
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 40),
+            child: Text(
+              'We couldn\'t find any clinics/hospitals matching your criteria. Try adjusting your search or filters.',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.grey[600],
+                height: 1.5,
+              ),
+            ),
+          ),
+          SizedBox(height: 32),
+          /* ElevatedButton.icon(
+            onPressed: () {
+              setState(() {});
+              /*  setState(() {
+                _selectedCategory = 'All';
+                _searchController.clear();
+                _searchQuery = '';
+              }); */
+            },
+            icon: Icon(Icons.refresh),
+            label: Text('Clear Filters'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.blue[600],
+              foregroundColor: Colors.white,
+              padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(25),
+              ),
+            ),
+          ), */
         ],
       ),
     );
@@ -347,7 +422,7 @@ class _ViewAllOrganizationsState extends State<ViewAllOrganizations> {
     );
   }
 
-  Widget _buildEmptyState() {
+  /* Widget _buildEmptyState() {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -382,5 +457,5 @@ class _ViewAllOrganizationsState extends State<ViewAllOrganizations> {
         ],
       ),
     );
-  }
+  } */
 }

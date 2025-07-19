@@ -1,4 +1,5 @@
 import 'package:custom_clippers/custom_clippers.dart';
+import 'package:custom_refresh_indicator/custom_refresh_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:mediora/apis/patients/api_helpers.dart';
 import 'package:mediora/apis/patients/preference_controller.dart';
@@ -8,60 +9,64 @@ import 'package:mediora/patients/views/doctors_list.dart';
 import 'package:mediora/patients/views/my_bookings.dart';
 import 'package:mediora/patients/views/pharmacy_list.dart';
 import 'package:mediora/splash_screen.dart';
+import 'package:mediora/widgets/custom_indicator.dart';
 import 'package:mediora/widgets/location_picker.dart';
 
-class PatientHomeScreen extends StatelessWidget {
+class PatientHomeScreen extends StatefulWidget {
   const PatientHomeScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
-      body: CustomScrollView(
-        slivers: [
-          SliverAppBar(
-            backgroundColor: Colors.transparent,
-            elevation: 0,
-            expandedHeight: 320,
-            automaticallyImplyLeading: false,
-            // expandedHeight: 300.0,
-            floating: false,
+  State<PatientHomeScreen> createState() => _PatientHomeScreenState();
+}
 
-            // pinned: true,
-            flexibleSpace: FlexibleSpaceBar(background: _buildHeader(context)),
-            toolbarHeight: 0,
-          ),
-          SliverToBoxAdapter(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(height: 24),
-                /*  _buildSection(
-                  type: "doctor",
-                  count: 2,
-                  title: "Top Doctors Near You",
-                  icon: FontAwesome.stethoscope_solid,
-                  items: _getDoctors(),
-                  onViewMore: () => _navigateToViewMore('doctors', context),
-                ), */
-                doctorsGrid(),
-                const SizedBox(height: 24),
-                /*  _buildSection(
-                  type: "hospital",
-                  count: 1,
-                  title: "Nearest Clinics/Hospitals",
-                  icon: FontAwesome.hospital_solid,
-                  items: _getClinics(),
-                  onViewMore: () => _navigateToViewMore('clinics', context),
-                ), */
-                clinicGrid(),
-                const SizedBox(height: 24),
-                pharmacyGrid(),
-                const SizedBox(height: 20),
-              ],
+class _PatientHomeScreenState extends State<PatientHomeScreen> {
+  @override
+  Widget build(BuildContext context) {
+    return CustomRefreshIndicator(
+      onRefresh: () async {
+        setState(() {});
+      }, // Your refresh logic
+      builder: (context, child, controller) {
+        // Place your custom indicator here.
+        // Need inspiration? Look at the example app!
+        return MyIndicator(controller: controller, child: child);
+      },
+      child: Scaffold(
+        backgroundColor: const Color(0xFFF8FAFC),
+        body: CustomScrollView(
+          slivers: [
+            SliverAppBar(
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+              expandedHeight: 320,
+              automaticallyImplyLeading: false,
+              // expandedHeight: 300.0,
+              floating: false,
+
+              // pinned: true,
+              flexibleSpace: FlexibleSpaceBar(
+                background: _buildHeader(context),
+              ),
+              toolbarHeight: 0,
             ),
-          ),
-        ],
+            SliverToBoxAdapter(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 24),
+
+                  doctorsGrid(),
+                  const SizedBox(height: 24),
+
+                  clinicGrid(),
+                  const SizedBox(height: 24),
+                  pharmacyGrid(),
+                  const SizedBox(height: 20),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -70,7 +75,7 @@ class PatientHomeScreen extends StatelessWidget {
     return ClipPath(
       clipper: DirectionalWaveClipper(),
       child: Container(
-        padding: const EdgeInsets.fromLTRB(20, 24, 20, 20),
+        padding: const EdgeInsets.fromLTRB(12, 24, 12, 20),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.only(
             bottomLeft: Radius.elliptical(100, 10),
@@ -100,49 +105,11 @@ class PatientHomeScreen extends StatelessWidget {
             // User Profile Section
             Row(
               children: [
-                /* ClipRRect(
-                  borderRadius: BorderRadiusGeometry.circular(100),
-                  child: Container(
-                    width: 60,
-                    height: 60,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(color: Colors.white, width: 3),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.15),
-                          blurRadius: 10,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
-                      /*  image: const DecorationImage(
-                        image: NetworkImage(""),
-                        fit: BoxFit.cover,
-                      ), */
-                    ),
-                    child: Center(
-                      child: Icon(
-                        Icons.person_2_rounded,
-                        size: 80,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                ), */
                 const SizedBox(width: 16),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      /* const Text(
-                        'Good Morning,',
-                        style: TextStyle(
-                          color: Colors.white70,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w400,
-                        ),
-                      ), */
-                      // const SizedBox(height: 2),
                       Text(
                         PatientController.patientModel?.name.toString() ??
                             "Unkown User",
@@ -529,402 +496,4 @@ class PatientHomeScreen extends StatelessWidget {
       ),
     );
   }
-
-  /* Widget _buildSection({
-    required String title,
-    required String type,
-    required int count,
-    required IconData icon,
-    required List<Map<String, dynamic>> items,
-    required VoidCallback onViewMore,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF667EEA).withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Icon(icon, color: const Color(0xFF667EEA), size: 20),
-                  ),
-                  const SizedBox(width: 12),
-                  Text(
-                    title,
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF1E293B),
-                    ),
-                  ),
-                ],
-              ),
-              TextButton(
-                onPressed: onViewMore,
-                child: const Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      'View More',
-                      style: TextStyle(
-                        color: Color(0xFF667EEA),
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    SizedBox(width: 4),
-                    Icon(
-                      Icons.arrow_forward_ios,
-                      size: 14,
-                      color: Color(0xFF667EEA),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 16),
-        SizedBox(
-          // height: 240,
-          child: GridView.builder(
-            padding: EdgeInsets.all(12),
-            physics: NeverScrollableScrollPhysics(),
-            shrinkWrap: true,
-            // scrollDirection: Axis.horizontal,
-            itemCount: items.length,
-            itemBuilder: (context, index) {
-              return InkWell(
-                onTap: () {
-                  if (type == "doctor") {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) => DoctorBookingScreen(),
-                      ),
-                    );
-                  } else if (type == "hospital") {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) => OrganizationScreen(data: ,),
-                      ),
-                    );
-                  } else {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) => PharmacyHomeScreen(),
-                      ),
-                    );
-                  }
-                },
-                child: _buildCard(items[index]),
-              );
-            },
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: count,
-              mainAxisExtent: count == 2 ? 250 : 220,
-              mainAxisSpacing: 15,
-              crossAxisSpacing: 15,
-            ),
-          ),
-        ),
-      ],
-    );
-  } */
-
-  /*  Widget _buildCard(Map<String, dynamic> item) {
-    return Container(
-      // width: 280,
-      // margin: const EdgeInsets.only(right: 16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.08),
-            blurRadius: 20,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Image
-          Container(
-            height: 120,
-            decoration: BoxDecoration(
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(16),
-                topRight: Radius.circular(16),
-              ),
-              image: DecorationImage(
-                image: NetworkImage(item['image']),
-                fit: BoxFit.cover,
-              ),
-            ),
-            child: Container(
-              decoration: BoxDecoration(
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(16),
-                  topRight: Radius.circular(16),
-                ),
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [Colors.transparent, Colors.black.withOpacity(0.3)],
-                ),
-              ),
-            ),
-          ),
-
-          // Content
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  item['name'],
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF1E293B),
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 8),
-
-                Row(
-                  children: [
-                    const Icon(
-                      Icons.location_on,
-                      size: 16,
-                      color: Color(0xFF64748B),
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      item['distance'],
-                      style: const TextStyle(
-                        fontSize: 14,
-                        color: Color(0xFF64748B),
-                      ),
-                    ),
-                    const Spacer(),
-                    if (item['rating'] != null) ...[
-                      const Icon(
-                        Icons.star,
-                        size: 16,
-                        color: Color(0xFFEAB308),
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        item['rating'].toString(),
-                        style: const TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          color: Color(0xFF1E293B),
-                        ),
-                      ),
-                    ],
-                  ],
-                ),
-
-                const SizedBox(height: 8),
-
-                Row(
-                  children: [
-                    const Icon(
-                      Icons.access_time,
-                      size: 16,
-                      color: Color(0xFF64748B),
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      '${item['openTime']} - ${item['closeTime']}',
-                      style: const TextStyle(
-                        fontSize: 12,
-                        color: Color(0xFF64748B),
-                      ),
-                    ),
-                  ],
-                ),
-
-                if (item['specialization'] != null) ...[
-                  const SizedBox(height: 8),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 4,
-                    ),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF667EEA).withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Text(
-                      item['specialization'],
-                      style: const TextStyle(
-                        fontSize: 12,
-                        color: Color(0xFF667EEA),
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
-                ],
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  } */
-
-  /*  L ist<Map<String, dynamic>> _getClinics() {
-    return [
-      {
-        'name': 'Seattle Medical Center',
-        'image':
-            'https://images.unsplash.com/photo-1551601651-2a8555f1a136?w=300&h=200&fit=crop',
-        'distance': '0.5 km',
-        'openTime': '08:00 AM',
-        'closeTime': '10:00 PM',
-        'rating': 4.8,
-      },
-      {
-        'name': 'Downtown Health Clinic',
-        'image':
-            'https://images.unsplash.com/photo-1519494026892-80bbd2d6ede8?w=300&h=200&fit=crop',
-        'distance': '1.2 km',
-        'openTime': '09:00 AM',
-        'closeTime': '09:00 PM',
-        'rating': 4.6,
-      },
-      {
-        'name': 'City General Hospital',
-        'image':
-            'https://images.unsplash.com/photo-1538108149393-fbbd81895907?w=300&h=200&fit=crop',
-        'distance': '2.1 km',
-        'openTime': '24/7',
-        'closeTime': 'Open',
-        'rating': 4.9,
-      },
-      {
-        'name': 'Wellness Medical Center',
-        'image':
-            'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=300&h=200&fit=crop',
-        'distance': '2.8 km',
-        'openTime': '07:00 AM',
-        'closeTime': '11:00 PM',
-        'rating': 4.7,
-      },
-      {
-        'name': 'Harbor View Clinic',
-        'image':
-            'https://images.unsplash.com/photo-1582560475093-ba66accbc424?w=300&h=200&fit=crop',
-        'distance': '3.2 km',
-        'openTime': '08:30 AM',
-        'closeTime': '08:30 PM',
-        'rating': 4.5,
-      },
-      {
-        'name': 'Pacific Health Institute',
-        'image':
-            'https://images.unsplash.com/photo-1504813184591-01572f98c85f?w=300&h=200&fit=crop',
-        'distance': '3.7 km',
-        'openTime': '06:00 AM',
-        'closeTime': '10:00 PM',
-        'rating': 4.8,
-      },
-    ];
-  } */
-
-  /* List<Map<String, dynamic>> _getDoctors() {
-    return [
-      {
-        'name': 'Dr. Emily Rodriguez',
-        'image':
-            'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=300&h=200&fit=crop&crop=face',
-        'distance': '0.8 km',
-        'openTime': '09:00 AM',
-        'closeTime': '05:00 PM',
-        'rating': 4.9,
-        'specialization': 'Cardiologist',
-      },
-      {
-        'name': 'Dr. Michael Chen',
-        'image':
-            'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=300&h=200&fit=crop&crop=face',
-        'distance': '1.1 km',
-        'openTime': '10:00 AM',
-        'closeTime': '06:00 PM',
-        'rating': 4.8,
-        'specialization': 'Neurologist',
-      },
-      {
-        'name': 'Dr. Sarah Williams',
-        'image':
-            'https://images.unsplash.com/photo-1594824242347-d3ca5b0dd295?w=300&h=200&fit=crop&crop=face',
-        'distance': '1.5 km',
-        'openTime': '08:00 AM',
-        'closeTime': '04:00 PM',
-        'rating': 4.7,
-        'specialization': 'Pediatrician',
-      },
-      {
-        'name': 'Dr. James Thompson',
-        'image':
-            'https://images.unsplash.com/photo-1582750433449-648ed127bb54?w=300&h=200&fit=crop&crop=face',
-        'distance': '2.0 km',
-        'openTime': '11:00 AM',
-        'closeTime': '07:00 PM',
-        'rating': 4.6,
-        'specialization': 'Orthopedic',
-      },
-      {
-        'name': 'Dr. Lisa Anderson',
-        'image':
-            'https://images.unsplash.com/photo-1551601651-2a8555f1a136?w=300&h=200&fit=crop&crop=face',
-        'distance': '2.3 km',
-        'openTime': '09:30 AM',
-        'closeTime': '05:30 PM',
-        'rating': 4.8,
-        'specialization': 'Dermatologist',
-      },
-      {
-        'name': 'Dr. Robert Garcia',
-        'image':
-            'https://images.unsplash.com/photo-1612531386530-97286d97c2d2?w=300&h=200&fit=crop&crop=face',
-        'distance': '2.7 km',
-        'openTime': '08:30 AM',
-        'closeTime': '04:30 PM',
-        'rating': 4.9,
-        'specialization': 'Psychiatrist',
-      },
-    ];
-  } */
-
-  /* void _navigateToViewMore(String type, BuildContext context) {
-    // Navigate to respective view more pages
-    print('Navigate to view more $type');
-    if (type.toLowerCase() == "doctors") {
-      Navigator.of(
-        context,
-      ).push(MaterialPageRoute(builder: (_) => DoctorsListingScreen()));
-    } else if (type.toLowerCase() == "clinics") {
-      Navigator.of(
-        context,
-      ).push(MaterialPageRoute(builder: (_) => ViewAllOrganizations()));
-    } else {
-      Navigator.of(
-        context,
-      ).push(MaterialPageRoute(builder: (_) => ViewAllPharmacies()));
-    }
-  } */
 }

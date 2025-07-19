@@ -32,7 +32,7 @@ class DoctorBookingScreen extends StatelessWidget {
         ),
       ),
       body: SingleChildScrollView(
-        physics: BouncingScrollPhysics(),
+        // physics: BouncingScrollPhysics(),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [

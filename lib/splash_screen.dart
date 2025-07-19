@@ -65,14 +65,16 @@ class _MedioraSplashScreenState extends State<MedioraSplashScreen>
       bool isLogged = preferences.getBool("logged") ?? false;
       if (isLogged) {
         await PatientController.getPatientDetails();
-        Navigator.of(
-          context,
-        ).push(MaterialPageRoute(builder: (_) => PatientHomeScreen()));
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (_) => PatientHomeScreen()),
+          (_) => false,
+        );
       } else {
-        Navigator.of(context).push(
+        Navigator.of(context).pushAndRemoveUntil(
           MaterialPageRoute(
             builder: (_) => MedicalLoginScreen(fcmTocken: widget.fcm ?? ""),
           ),
+          (_) => false,
         );
       }
     });

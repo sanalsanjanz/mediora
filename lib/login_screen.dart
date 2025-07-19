@@ -837,6 +837,7 @@ import 'package:mediora/patients/views/patient_landing_screen.dart';
 import 'package:mediora/services/notification_service.dart';
 import 'package:mediora/widgets/loading_dialog.dart';
 import 'package:mediora/widgets/location_picker.dart';
+import 'package:mediora/widgets/new_loading_screen.dart';
 
 class MedicalLoginScreen extends StatefulWidget {
   const MedicalLoginScreen({super.key, required this.fcmTocken});
@@ -898,6 +899,7 @@ class _MedicalLoginScreenState extends State<MedicalLoginScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
+        height: MediaQuery.of(context).size.height,
         decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,
@@ -920,8 +922,8 @@ class _MedicalLoginScreenState extends State<MedicalLoginScreen>
                   _buildHeader(),
                   const SizedBox(height: 40),
                   _buildLoginCard(),
-                  const SizedBox(height: 24),
-                  _buildGuestOption(),
+                  // const SizedBox(height: 24),
+                  // _buildGuestOption(),
                 ],
               ),
             ),
@@ -999,13 +1001,15 @@ class _MedicalLoginScreenState extends State<MedicalLoginScreen>
         ],
       ),
       child: Padding(
-        padding: const EdgeInsets.all(24.0),
+        padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 30),
         child: Column(
           children: [
+            const SizedBox(height: 10),
             _buildTabSwitcher(),
+            const SizedBox(height: 10),
             const SizedBox(height: 24),
             _buildForm(),
-            const SizedBox(height: 24),
+            const SizedBox(height: 30),
             _buildSubmitButton(),
             if (_isLogin) ...[
               const SizedBox(height: 16),
@@ -1293,7 +1297,7 @@ class _MedicalLoginScreenState extends State<MedicalLoginScreen>
   Widget _buildSubmitButton() {
     return Container(
       width: double.infinity,
-      height: 56,
+      height: 50,
       decoration: BoxDecoration(
         gradient: const LinearGradient(
           colors: [medicalBlue, calmTeal],
@@ -1419,12 +1423,14 @@ class _MedicalLoginScreenState extends State<MedicalLoginScreen>
       // Handle login/signup
 
       if (_isLogin) {
+        MedicalLoadingOverlay.show(context);
         (bool, String) res = await ApiHelpers.loginPatirent(
           userName: _emailController.text.trim(),
           password: _passwordController.text.trim(),
           fcm: widget.fcmTocken.trim(),
         );
-
+        // LoadingScreen.hide();
+        MedicalLoadingOverlay.hide();
         if (res.$1) {
           // Navigate to main app
           Navigator.of(
@@ -1440,7 +1446,9 @@ class _MedicalLoginScreenState extends State<MedicalLoginScreen>
           );
         }
       } else {
+        MedicalLoadingOverlay.show(context);
         final fcmnew = await NotificationService.getFcmToken();
+
         (bool, String) res = await ApiHelpers.signupPatient(
           details: {
             "username": _emailController.text,
@@ -1458,7 +1466,7 @@ class _MedicalLoginScreenState extends State<MedicalLoginScreen>
           /* userName: _emailController.text.trim(),
           password: _passwordController.text.trim(), */
         );
-
+        MedicalLoadingOverlay.hide();
         if (res.$1) {
           // Navigate to main app
           Navigator.of(

@@ -3,6 +3,7 @@ import 'package:mediora/apis/patients/booking_apis.dart';
 import 'package:mediora/models/booking_details_model.dart';
 import 'package:mediora/models/booking_model.dart';
 import 'package:mediora/patients/views/book_appointment.dart';
+import 'package:mediora/patients/views/get_prescription_screen.dart';
 import 'package:mediora/patients/views/patient_home_screen.dart';
 
 class BookingDetailsPage extends StatefulWidget {
@@ -884,7 +885,16 @@ class _BookingDetailsPageState extends State<BookingDetailsPage>
     } else if (status == 'completed') {
       return FloatingActionButton.extended(
         heroTag: "prescription",
-        onPressed: () {},
+        onPressed: () {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (_) => PdfPreviewPage(
+                bookingId: widget.booking.id,
+                detailsModel: widget.booking,
+              ),
+            ),
+          );
+        },
         backgroundColor: Color(0xFF3B82F6),
         icon: Icon(Icons.receipt_rounded, color: Colors.white),
         label: Text(

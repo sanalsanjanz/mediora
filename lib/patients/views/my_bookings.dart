@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:icons_plus/icons_plus.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:mediora/apis/patients/booking_apis.dart';
 import 'package:mediora/models/booking_details_model.dart';
 import 'package:mediora/patients/views/booking_details_screen.dart';
@@ -179,7 +180,7 @@ class _MyBookingsPageState extends State<MyBookingsPage>
                 // Navigate to new booking form
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: Color(0xFF3B82F6),
+                backgroundColor: Color(0xFF3CB8B8),
                 foregroundColor: Colors.white,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
@@ -229,7 +230,7 @@ class _MyBookingsPageState extends State<MyBookingsPage>
                   title: Text(
                     'My Bookings',
                     style: TextStyle(
-                      fontSize: 20,
+                      fontSize: 18,
                       fontWeight: FontWeight.w600,
                       color: Colors.white,
                     ),
@@ -239,11 +240,7 @@ class _MyBookingsPageState extends State<MyBookingsPage>
                       gradient: LinearGradient(
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
-                        colors: [
-                          Color(0xFF667EEA),
-                          Color(0xFF764BA2),
-                          Color(0xFF6B73FF),
-                        ],
+                        colors: [Color(0xFF3CB8B8), Color(0xFF333F48)],
                       ),
                     ),
                   ),
@@ -464,7 +461,7 @@ class _MyBookingsPageState extends State<MyBookingsPage>
             title: Text(
               'My Bookings',
               style: TextStyle(
-                fontSize: 20,
+                fontSize: 18,
                 fontWeight: FontWeight.w600,
                 color: Colors.white,
               ),
@@ -474,11 +471,7 @@ class _MyBookingsPageState extends State<MyBookingsPage>
                 gradient: LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
-                  colors: [
-                    Color(0xFF667EEA),
-                    Color(0xFF764BA2),
-                    Color(0xFF6B73FF),
-                  ],
+                  colors: [Color(0xFF3CB8B8), Color(0xFF333F48)],
                 ),
               ),
             ),
@@ -490,11 +483,10 @@ class _MyBookingsPageState extends State<MyBookingsPage>
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Center(
-                  child: CircularProgressIndicator(
-                    valueColor: AlwaysStoppedAnimation<Color>(
-                      Color(0xFF667EEA),
-                    ),
-                    strokeWidth: 3,
+                  child: LoadingAnimationWidget.flickr(
+                    leftDotColor: Color(0xFF3CB8B8),
+                    rightDotColor: Color.fromARGB(255, 175, 235, 235),
+                    size: 45,
                   ),
                 ),
                 SizedBox(height: 24),
@@ -587,11 +579,7 @@ class _MyBookingsPageState extends State<MyBookingsPage>
                 gradient: LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
-                  colors: [
-                    Color(0xFF667EEA),
-                    Color(0xFF764BA2),
-                    Color(0xFF6B73FF),
-                  ],
+                  colors: [Color(0xFF3CB8B8), Color(0xFF333F48)],
                 ),
               ),
             ),
@@ -666,17 +654,14 @@ class _MyBookingsPageState extends State<MyBookingsPage>
               gradient: LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
-                colors: [
-                  Color(0xFF667EEA).withOpacity(0.1),
-                  Color(0xFF764BA2).withOpacity(0.1),
-                ],
+                colors: [Color(0xFF3CB8B8), Color(0xFF333F48)],
               ),
               borderRadius: BorderRadius.circular(60),
             ),
             child: Icon(
               Icons.calendar_today_rounded,
               size: 60,
-              color: Color(0xFF667EEA),
+              color: Color.fromARGB(255, 255, 255, 255),
             ),
           ),
           SizedBox(height: 32),
@@ -687,7 +672,7 @@ class _MyBookingsPageState extends State<MyBookingsPage>
             style: TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.w700,
-              color: Color(0xFF1E293B),
+              color: Colors.white,
             ),
           ),
           SizedBox(height: 12),
@@ -725,7 +710,8 @@ class _MyBookingsPageState extends State<MyBookingsPage>
               ),
             ),
             style: ElevatedButton.styleFrom(
-              backgroundColor: Color(0xFF667EEA),
+              backgroundColor: Color(0xFF3CB8B8),
+
               padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16),
@@ -757,16 +743,16 @@ class _MyBookingsPageState extends State<MyBookingsPage>
         child: Container(
           padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           decoration: BoxDecoration(
-            color: isSelected ? Color(0xFF667EEA) : Colors.white,
+            color: isSelected ? Color(0xFF3CB8B8) : Colors.white,
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
-              color: isSelected ? Color(0xFF667EEA) : Color(0xFFE2E8F0),
+              color: isSelected ? Color(0xFF3CB8B8) : Color(0xFFE2E8F0),
               width: 1.5,
             ),
             boxShadow: isSelected
                 ? [
                     BoxShadow(
-                      color: Color(0xFF667EEA).withOpacity(0.3),
+                      color: Color(0xFF3CB8B8).withOpacity(0.3),
                       blurRadius: 12,
                       offset: Offset(0, 4),
                     ),
@@ -868,7 +854,7 @@ class _MyBookingsPageState extends State<MyBookingsPage>
                         gradient: LinearGradient(
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
-                          colors: [Color(0xFF667EEA), Color(0xFF764BA2)],
+                          colors: [Color(0xFF3CB8B8), Color(0xFF333F48)],
                         ),
                         borderRadius: BorderRadius.circular(16),
                       ),
@@ -954,7 +940,7 @@ class _MyBookingsPageState extends State<MyBookingsPage>
                               Icons.calendar_today_rounded,
                               'Date',
                               formatDate(booking.preferredDate),
-                              Color(0xFF667EEA),
+                              Color(0xFF3CB8B8),
                             ),
                           ),
                           SizedBox(width: 16),
