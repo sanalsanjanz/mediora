@@ -1,6 +1,7 @@
 import 'package:custom_clippers/custom_clippers.dart';
 import 'package:custom_refresh_indicator/custom_refresh_indicator.dart';
 import 'package:flutter/material.dart';
+import 'package:icons_plus/icons_plus.dart';
 import 'package:mediora/apis/patients/api_helpers.dart';
 import 'package:mediora/apis/patients/preference_controller.dart';
 import 'package:mediora/patients/games/breathin_game.dart';
@@ -13,6 +14,8 @@ import 'package:mediora/patients/views/pharmacy_list.dart';
 import 'package:mediora/splash_screen.dart';
 import 'package:mediora/widgets/custom_indicator.dart';
 import 'package:mediora/widgets/location_picker.dart';
+import 'package:quickalert/models/quickalert_type.dart';
+import 'package:quickalert/widgets/quickalert_dialog.dart';
 
 class PatientHomeScreen extends StatefulWidget {
   const PatientHomeScreen({super.key});
@@ -174,33 +177,25 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                 ),
                 GestureDetector(
                   onTap: () {
-                    showDialog(
+                    QuickAlert.show(
                       context: context,
-                      builder: (context) => AlertDialog(
-                        title: const Text('Logout'),
-                        content: const Text('Are you sure you want to logout?'),
-                        actions: [
-                          TextButton(
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                            },
-                            child: const Text('Cancel'),
+                      type: QuickAlertType.confirm,
+                      text: 'Are you sure you want to logout?',
+                      confirmBtnText: 'Logout',
+                      cancelBtnText: 'Cancel',
+                      confirmBtnColor: Colors.grey,
+                      onCancelBtnTap: () => Navigator.of(context).pop(false),
+                      onConfirmBtnTap: () async {
+                        Navigator.of(context).pop(true);
+                        await PatientController.clearPreferences();
+                        Navigator.pushAndRemoveUntil(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => MedioraSplashScreen(),
                           ),
-                          TextButton(
-                            onPressed: () async {
-                              await PatientController.clearPreferences();
-                              Navigator.pushAndRemoveUntil(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => MedioraSplashScreen(),
-                                ),
-                                (_) => false,
-                              );
-                            },
-                            child: const Text('Logout'),
-                          ),
-                        ],
-                      ),
+                          (_) => false,
+                        );
+                      },
                     );
                   },
                   child: Container(
@@ -211,9 +206,9 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                       border: Border.all(color: Colors.white.withOpacity(0.3)),
                     ),
                     child: const Icon(
-                      Icons.logout,
+                      FontAwesome.power_off_solid,
                       color: Colors.white,
-                      size: 22,
+                      size: 18,
                     ),
                   ),
                 ),

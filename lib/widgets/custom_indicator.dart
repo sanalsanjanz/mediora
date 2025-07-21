@@ -2,6 +2,7 @@ import 'dart:math' as math;
 
 import 'package:custom_refresh_indicator/custom_refresh_indicator.dart';
 import 'package:flutter/material.dart';
+import 'package:mediora/helper/colors.dart';
 
 class MyIndicator extends StatelessWidget {
   final Widget child;
@@ -51,7 +52,7 @@ class MyIndicator extends StatelessWidget {
                           ),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.blue.withOpacity(0.3),
+                              color: colorPrimary.withOpacity(0.3),
                               blurRadius: 8,
                               offset: const Offset(0, 2),
                             ),
@@ -64,11 +65,7 @@ class MyIndicator extends StatelessWidget {
                             gradient: LinearGradient(
                               begin: Alignment.topLeft,
                               end: Alignment.bottomRight,
-                              colors: [
-                                Colors.blue.shade400,
-                                Colors.blue.shade600,
-                                Colors.blue.shade800,
-                              ],
+                              colors: [colorPrimary, secondoryColor],
                             ),
                           ),
                           child: Center(
@@ -86,7 +83,7 @@ class MyIndicator extends StatelessWidget {
                                 : Icon(
                                     Icons.refresh_rounded,
                                     color: Colors.white,
-                                    size: 20,
+                                    size: 30,
                                   ),
                           ),
                         ),

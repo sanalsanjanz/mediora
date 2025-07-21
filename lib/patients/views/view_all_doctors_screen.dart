@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:icons_plus/icons_plus.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:mediora/apis/patients/api_helpers.dart';
 import 'package:mediora/helper/expirence_formatter.dart';
 import 'package:mediora/models/doctors_model.dart';
 import 'package:mediora/patients/views/doctor_booking_screen.dart';
 import 'package:mediora/patients/views/doctors_list.dart';
+import 'package:mediora/widgets/empty_widget.dart';
 
 class DoctorsListingScreen extends StatefulWidget {
   const DoctorsListingScreen({super.key});
@@ -194,10 +196,10 @@ class _DoctorsListingScreenState extends State<DoctorsListingScreen>
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.only(
-          bottomLeft: Radius.circular(16),
-          bottomRight: Radius.circular(16),
-        ),
+        // borderRadius: BorderRadius.only(
+        //   bottomLeft: Radius.circular(16),
+        //   bottomRight: Radius.circular(16),
+        // ),
         gradient: LinearGradient(
           /* begin: Alignment.topLeft,
           end: Alignment.bottomRight, */
@@ -314,9 +316,9 @@ class _DoctorsListingScreenState extends State<DoctorsListingScreen>
                         borderRadius: BorderRadius.circular(16),
                       ),
                       child: Icon(
-                        Icons.local_hospital,
+                        FontAwesome.stethoscope_solid,
                         color: Colors.white,
-                        size: 32,
+                        size: 25,
                       ),
                     ),
                     SizedBox(width: 15),
@@ -327,7 +329,7 @@ class _DoctorsListingScreenState extends State<DoctorsListingScreen>
                           Text(
                             'Find Your Doctor',
                             style: TextStyle(
-                              fontSize: 28,
+                              fontSize: 24,
                               fontWeight: FontWeight.bold,
                               color: Colors.white,
                               letterSpacing: -0.5,
@@ -498,7 +500,17 @@ class _DoctorsListingScreenState extends State<DoctorsListingScreen>
     final filtered = filteredDoctors;
 
     if (filtered.isEmpty) {
-      return _buildEmptyState();
+      return buildEmptyState(
+        onPressed: () {
+          setState(() {
+            _selectedCategory = 'All';
+            _searchController.clear();
+            _searchQuery = '';
+          });
+        },
+        message:
+            "We couldn\'t find any doctors matching your criteria. Try adjusting your search or filters.",
+      );
     }
 
     return FadeTransition(
@@ -735,73 +747,6 @@ class _DoctorsListingScreenState extends State<DoctorsListingScreen>
                   ),
                 ),
               ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildEmptyState() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          SizedBox(height: 50),
-
-          Container(
-            width: 120,
-            height: 120,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [Colors.blue[100]!, Colors.blue[50]!],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(Icons.search_off, size: 60, color: Colors.blue[300]),
-          ),
-          SizedBox(height: 24),
-          Text(
-            'No doctors found',
-            style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              color: Colors.grey[800],
-            ),
-          ),
-          SizedBox(height: 12),
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 40),
-            child: Text(
-              'We couldn\'t find any doctors matching your criteria. Try adjusting your search or filters.',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.grey[600],
-                height: 1.5,
-              ),
-            ),
-          ),
-          SizedBox(height: 32),
-          ElevatedButton.icon(
-            onPressed: () {
-              setState(() {
-                _selectedCategory = 'All';
-                _searchController.clear();
-                _searchQuery = '';
-              });
-            },
-            icon: Icon(Icons.refresh),
-            label: Text('Clear Filters'),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.blue[600],
-              foregroundColor: Colors.white,
-              padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(25),
-              ),
             ),
           ),
         ],

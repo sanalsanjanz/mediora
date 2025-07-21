@@ -5,6 +5,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:mediora/apis/patients/preference_controller.dart';
 import 'package:mediora/apis/patients/prescription_api.dart';
+import 'package:mediora/helper/colors.dart';
 import 'package:mediora/models/booking_details_model.dart';
 import 'package:mediora/models/prescription_details_model.dart';
 import 'package:mediora/patients/views/genarate_prescription_pdf.dart';
@@ -59,12 +60,12 @@ class _PdfPreviewPageState extends State<PdfPreviewPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey.shade50,
+      backgroundColor: Colors.white,
       appBar: _buildAppBar(),
       body: loading
-          ? const Center(
+          ? Center(
               child: CircularProgressIndicator(
-                valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
+                valueColor: AlwaysStoppedAnimation<Color>(colorPrimary),
               ),
             )
           : Column(
@@ -73,7 +74,7 @@ class _PdfPreviewPageState extends State<PdfPreviewPage> {
                 Expanded(
                   child: Container(
                     margin: const EdgeInsets.symmetric(horizontal: 16),
-                    decoration: BoxDecoration(
+                    /*   decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(12),
                       boxShadow: [
@@ -83,7 +84,7 @@ class _PdfPreviewPageState extends State<PdfPreviewPage> {
                           offset: const Offset(0, 4),
                         ),
                       ],
-                    ),
+                    ), */
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(12),
                       child: PdfPreview(
@@ -129,12 +130,13 @@ class _PdfPreviewPageState extends State<PdfPreviewPage> {
       elevation: 0,
       backgroundColor: Colors.white,
       surfaceTintColor: Colors.white,
+      scrolledUnderElevation: 0,
       leading: Container(
         margin: const EdgeInsets.all(8),
-        decoration: BoxDecoration(
+        /*  decoration: BoxDecoration(
           color: Colors.grey.shade100,
           borderRadius: BorderRadius.circular(12),
-        ),
+        ), */
         child: IconButton(
           onPressed: () => Navigator.pop(context),
           icon: Icon(
@@ -146,7 +148,7 @@ class _PdfPreviewPageState extends State<PdfPreviewPage> {
       ),
       title: Row(
         children: [
-          Container(
+          /*  Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
               color: Colors.blue.shade50,
@@ -158,7 +160,7 @@ class _PdfPreviewPageState extends State<PdfPreviewPage> {
               size: 20,
             ),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: 12), */
           const Text(
             "Prescription Preview",
             style: TextStyle(
@@ -204,7 +206,7 @@ class _PdfPreviewPageState extends State<PdfPreviewPage> {
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [Colors.blue.shade600, Colors.blue.shade700],
+          colors: [colorPrimary, secondoryColor],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
