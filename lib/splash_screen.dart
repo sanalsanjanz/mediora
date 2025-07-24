@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:mediora/apis/patients/preference_controller.dart';
 import 'package:mediora/login_screen.dart';
 import 'package:mediora/organizations/doctors_landing_screen.dart';
+import 'package:mediora/pharmacy/pharmacy_home.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class MedioraSplashScreen extends StatefulWidget {
@@ -66,10 +67,13 @@ class _MedioraSplashScreenState extends State<MedioraSplashScreen>
       bool isLogged = preferences.getBool("logged") ?? false;
       String type = await preferences.getString("type") ?? "";
 
-      if (isLogged && type == "doctor") {
-        await PatientController.getDoctorDetails();
+      if (isLogged) {
+        await PatientController.getPharmacyDetails();
         Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(builder: (c) => DoctorsLandingScreen()),
+          MaterialPageRoute(
+            builder: (c) =>
+                PharmacyHome(pharmacy: PatientController.pharmacyModel!),
+          ),
           (_) => false,
         );
       } else if (isLogged && type == "clinic") {
@@ -148,7 +152,7 @@ class _MedioraSplashScreenState extends State<MedioraSplashScreen>
               opacity: _fadeAnimation,
               child: ScaleTransition(
                 scale: _scaleAnimation,
-                child: Container(
+                child: Image.asset("assets/pharmacy_logo.png") /*  Container(
                   width: isTablet ? 140 : 100,
                   height: isTablet ? 140 : 100,
                   decoration: BoxDecoration(
@@ -162,12 +166,8 @@ class _MedioraSplashScreenState extends State<MedioraSplashScreen>
                       ),
                     ],
                   ),
-                  child: Icon(
-                    Icons.favorite_rounded,
-                    size: isTablet ? 70 : 50,
-                    color: const Color(0xFF3CB8B8),
-                  ),
-                ),
+                  child:
+                ), */,
               ),
             ),
 
@@ -179,7 +179,7 @@ class _MedioraSplashScreenState extends State<MedioraSplashScreen>
               child: FadeTransition(
                 opacity: _fadeAnimation,
                 child: Text(
-                  'Mediora Doctor',
+                  'Mediora Pharmacy',
                   style: TextStyle(
                     fontSize: isTablet ? 48 : 36,
                     fontWeight: FontWeight.w700,

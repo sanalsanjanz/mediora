@@ -10,7 +10,7 @@ import 'package:mediora/widgets/show_loading.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class OrganizationHelper {
-  static Future<(bool, String)> loginOrganization({
+  static Future<(bool, String)> loginPharmacy({
     required String userName,
     required String password,
     required String fcm,
@@ -18,21 +18,25 @@ class OrganizationHelper {
     required BuildContext context,
   }) async {
     MedioraLoadingScreen.show(context, message: 'Loading data');
-    String url = isDoctor ? doctorsUrl : organizationUrl;
+    String url = pharmacyLogin;
     final fcmnew = await NotificationService.getFcmToken();
 
     try {
       var request = http.MultipartRequest(
         'POST',
-        Uri.parse(url),
+        Uri.parse("${url}/login"),
       ); // ✅ Make sure manageDoctors has trailing slash
 
-      request.fields['payload'] = jsonEncode({
+      request.fields['username'] = userName;
+      request.fields['password'] = password;
+      request.fields['fcm_token'] = fcmnew ?? "";
+
+      /*    jsonEncode({
         'username': userName,
         "password": password,
         "fcm_token": fcmnew,
-      });
-      request.fields['action'] = 'login';
+      }); */
+      // request.fields['action'] = 'login';
       // request.headers['Accept'] = 'application/json';
 
       final response = await request.send();
@@ -41,10 +45,9 @@ class OrganizationHelper {
       if (response.statusCode == 200) {
         SharedPreferences pre = await SharedPreferences.getInstance();
         var data = jsonDecode(responseBody);
-        await pre.setString("organizationData", jsonEncode(data));
+        await pre.setString("pharmacyData", jsonEncode(data));
         await pre.setBool("logged", true);
-        await pre.setString("type", "doctor");
-        await PatientController.getDoctorDetails();
+        await PatientController.getPharmacyDetails();
         MedioraLoadingScreen.hide();
         return (true, "Successfully logged in");
       } else {

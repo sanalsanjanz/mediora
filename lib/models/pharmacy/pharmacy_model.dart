@@ -1,0 +1,118 @@
+// To parse this JSON data, do
+//
+//     final pharmacyAuthModel = pharmacyAuthModelFromJson(jsonString);
+
+import 'dart:convert';
+
+import 'package:mediora/models/working_hours_model.dart';
+
+PharmacyAuthModel pharmacyAuthModelFromJson(String str) =>
+    PharmacyAuthModel.fromJson(json.decode(str));
+
+String pharmacyAuthModelToJson(PharmacyAuthModel data) =>
+    json.encode(data.toJson());
+
+class PharmacyAuthModel {
+  String id;
+  String pharmacistName;
+  int experience;
+  String about;
+  String image;
+  String locationName;
+  double lat;
+  double lon;
+  String username;
+  String password;
+  DateTime createdAt;
+  String pharmacyName;
+  String contactNumber;
+  String email;
+  List<WorkingHourModel> workingHours;
+  List<String> services;
+  dynamic ratings;
+  dynamic reviewsCount;
+  String licenseNumber;
+  List<String> paymentMethods;
+  bool status;
+  String fcmToken;
+
+  PharmacyAuthModel({
+    required this.id,
+    required this.pharmacistName,
+    required this.experience,
+    required this.about,
+    required this.image,
+    required this.locationName,
+    required this.lat,
+    required this.lon,
+    required this.username,
+    required this.password,
+    required this.createdAt,
+    required this.pharmacyName,
+    required this.contactNumber,
+    required this.email,
+    required this.workingHours,
+    required this.services,
+    required this.ratings,
+    required this.reviewsCount,
+    required this.licenseNumber,
+    required this.paymentMethods,
+    required this.status,
+    required this.fcmToken,
+  });
+
+  factory PharmacyAuthModel.fromJson(Map<String, dynamic> json) =>
+      PharmacyAuthModel(
+        id: json["id"],
+        pharmacistName: json["pharmacist_name"],
+        experience: json["experience"],
+        about: json["about"],
+        image: json["image"],
+        locationName: json["location_name"],
+        lat: json["lat"]?.toDouble(),
+        lon: json["lon"]?.toDouble(),
+        username: json["username"],
+        password: json["password"],
+        createdAt: DateTime.parse(json["created_at"]),
+        pharmacyName: json["pharmacy_name"],
+        contactNumber: json["contact_number"],
+        email: json["email"],
+        workingHours: List<WorkingHourModel>.from(
+          json["working_hours"].map((x) => WorkingHourModel.fromJson(x)),
+        ),
+        services: List<String>.from(json["services"].map((x) => x)),
+        ratings: json["ratings"],
+        reviewsCount: json["reviews_count"],
+        licenseNumber: json["license_number"],
+        paymentMethods: List<String>.from(
+          json["payment_methods"].map((x) => x),
+        ),
+        status: json["status"],
+        fcmToken: json["fcm_token"],
+      );
+
+  Map<String, dynamic> toJson() => {
+    "id": id,
+    "pharmacist_name": pharmacistName,
+    "experience": experience,
+    "about": about,
+    "image": image,
+    "location_name": locationName,
+    "lat": lat,
+    "lon": lon,
+    "username": username,
+    "password": password,
+    "created_at": createdAt.toIso8601String(),
+    "pharmacy_name": pharmacyName,
+    "contact_number": contactNumber,
+    "email": email,
+    "working_hours": List<dynamic>.from(workingHours.map((x) => x.toJson())),
+    "services": List<dynamic>.from(services.map((x) => x)),
+    "ratings": ratings,
+    "reviews_count": reviewsCount,
+    "license_number": licenseNumber,
+    "payment_methods": List<dynamic>.from(paymentMethods.map((x) => x)),
+    "status": status,
+    "fcm_token": fcmToken,
+  };
+}

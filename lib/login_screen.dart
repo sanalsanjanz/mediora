@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:icons_plus/icons_plus.dart';
 import 'package:mediora/apis/patients/organization/organization_helper.dart';
+import 'package:mediora/apis/patients/preference_controller.dart';
 import 'package:mediora/organizations/doctors_landing_screen.dart';
 import 'package:mediora/patients/views/patient_landing_screen.dart';
+import 'package:mediora/patients/views/pharmacy_home_screen.dart';
+import 'package:mediora/pharmacy/pharmacy_home.dart';
 import 'package:mediora/widgets/loading_dialog.dart';
 import 'package:mediora/widgets/location_picker.dart';
 
@@ -129,11 +132,7 @@ class _MedicalLoginScreenState extends State<MedicalLoginScreen>
               ),
             ],
           ),
-          child: const Icon(
-            FontAwesome.stethoscope_solid,
-            color: Colors.white,
-            size: 40,
-          ),
+          child: Image.asset("assets/pharmacy_logo.png"),
         ),
         const SizedBox(height: 16),
         ShaderMask(
@@ -141,7 +140,7 @@ class _MedicalLoginScreenState extends State<MedicalLoginScreen>
             colors: [medicalBlue, calmTeal],
           ).createShader(bounds),
           child: const Text(
-            'MediCare+',
+            'MEDIORA',
             style: TextStyle(
               fontSize: 32,
               fontWeight: FontWeight.bold,
@@ -157,6 +156,7 @@ class _MedicalLoginScreenState extends State<MedicalLoginScreen>
             color: Colors.grey[600],
             fontWeight: FontWeight.w500,
           ),
+          textAlign: TextAlign.center,
         ),
       ],
     );
@@ -179,7 +179,7 @@ class _MedicalLoginScreenState extends State<MedicalLoginScreen>
         padding: const EdgeInsets.all(24.0),
         child: Column(
           children: [
-            _buildTabSwitcher(),
+            // _buildTabSwitcher(),
             const SizedBox(height: 24),
             _buildForm(),
             const SizedBox(height: 24),
@@ -596,7 +596,7 @@ class _MedicalLoginScreenState extends State<MedicalLoginScreen>
       // Handle login/signup
 
       /*  if (_isLogin) { */
-      (bool, String) res = await OrganizationHelper.loginOrganization(
+      (bool, String) res = await OrganizationHelper.loginPharmacy(
         userName: _emailController.text.trim(),
         password: _passwordController.text.trim(),
         fcm: widget.fcmTocken.trim(),
@@ -607,7 +607,10 @@ class _MedicalLoginScreenState extends State<MedicalLoginScreen>
       if (res.$1) {
         // Navigate to main app
         Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(builder: (c) => DoctorsLandingScreen()),
+          MaterialPageRoute(
+            builder: (c) =>
+                PharmacyHome(pharmacy: PatientController.pharmacyModel!),
+          ),
           (_) => false,
         );
       } else {
