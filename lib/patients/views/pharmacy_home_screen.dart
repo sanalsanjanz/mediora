@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mediora/apis/patients/preference_controller.dart';
@@ -19,7 +17,7 @@ class PharmacyHomeScreen extends StatefulWidget {
 class _PharmacyHomeScreenState extends State<PharmacyHomeScreen>
     with SingleTickerProviderStateMixin {
   final PageController _pageController = PageController();
-  int _currentOfferIndex = 0;
+  final int _currentOfferIndex = 0;
   bool _isLiked = false;
   late AnimationController _animationController;
   late Animation<double> _scaleAnimation;
@@ -46,7 +44,7 @@ class _PharmacyHomeScreenState extends State<PharmacyHomeScreen>
     },
   }; */
 
-  final List<Map<String, dynamic>> offers = [
+  /*  final List<Map<String, dynamic>> offers = [
     {
       'title': '20% OFF on All Medicines',
       'description': 'Valid on orders above ₹500',
@@ -63,15 +61,15 @@ class _PharmacyHomeScreenState extends State<PharmacyHomeScreen>
       'image':
           'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=200&fit=crop',
     },
-    {
+    /*     {
       'title': 'Health Checkup Package',
       'description': '50% discount on basic health checkup',
       'code': 'HEALTH50',
       'color': Colors.purple,
       'image':
           'https://images.unsplash.com/photo-1576091160399-112ba8d25d1f?w=400&h=200&fit=crop',
-    },
-  ];
+    }, */
+  ]; */
 
   @override
   void initState() {
@@ -85,7 +83,7 @@ class _PharmacyHomeScreenState extends State<PharmacyHomeScreen>
     );
 
     // Auto-scroll offers
-    Timer.periodic(Duration(seconds: 4), (timer) {
+    /* Timer.periodic(Duration(seconds: 4), (timer) {
       if (_pageController.hasClients) {
         int nextPage = (_currentOfferIndex + 1) % offers.length;
         _pageController.animateToPage(
@@ -94,7 +92,7 @@ class _PharmacyHomeScreenState extends State<PharmacyHomeScreen>
           curve: Curves.easeInOut,
         );
       }
-    });
+    }); */
   }
 
   @override
@@ -118,7 +116,7 @@ class _PharmacyHomeScreenState extends State<PharmacyHomeScreen>
                 _buildActionButtons(),
                 _buildOperatingHours(),
                 _buildLeadingPharmacist(),
-                _buildOffersWall(),
+                // _buildOffersWall(),
                 SizedBox(height: 20),
               ],
             ),
@@ -598,7 +596,7 @@ class _PharmacyHomeScreenState extends State<PharmacyHomeScreen>
             ],
           ),
         ),
-        SizedBox(
+        /* SizedBox(
           height: 200,
           child: PageView.builder(
             controller: _pageController,
@@ -717,7 +715,7 @@ class _PharmacyHomeScreenState extends State<PharmacyHomeScreen>
               ),
             );
           }).toList(),
-        ),
+        ), */
       ],
     );
   }

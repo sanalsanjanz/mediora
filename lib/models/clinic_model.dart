@@ -65,7 +65,9 @@ class ClinicModel {
     password: json["password"],
     about: json["about"],
     contact: json["contact"] ?? "",
-    createdAt: DateTime.parse(json["created_at"]),
+    createdAt: json["created_at"] != null
+        ? DateTime.parse(json["created_at"])
+        : DateTime.now(),
     doctors: List<DoctorsModel>.from(
       json["doctors"].map((x) => DoctorsModel.fromJson(x)),
     ),

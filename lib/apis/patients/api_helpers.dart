@@ -116,7 +116,7 @@ class ApiHelpers {
   }) async {
     try {
       final response = await http.get(
-        Uri.parse("$getAllPharmacies?lat=$lat&lon=$lon"),
+        Uri.parse(getAllPharmacies) /* ?lat=$lat&lon=$lon */,
       );
       if (response.statusCode == 200) {
         var data = jsonDecode(response.body);
