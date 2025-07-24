@@ -14,7 +14,7 @@
     </queries>
 
     <application
-        android:label="Mediora Doctor"
+        android:label="Mediora Pharmacy"
         android:icon="@mipmap/ic_launcher">
 
         <meta-data

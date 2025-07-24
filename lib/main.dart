@@ -20,7 +20,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       navigatorKey: NotificationService.navigatorKey,
       debugShowCheckedModeBanner: false,
-      title: 'Mediora-Doctor',
+      title: 'Mediora-Pharmacy',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
