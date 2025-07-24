@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:icons_plus/icons_plus.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:mediora/apis/patients/api_helpers.dart';
 import 'package:mediora/apis/patients/preference_controller.dart';
 import 'package:mediora/helper/call_navigation_helper.dart';
 import 'package:mediora/models/ambulance_model.dart';
+import 'package:mediora/widgets/empty_widget.dart';
 
 class AmbulanceService {
   final String name;
@@ -74,18 +76,19 @@ class _NearestAmbulanceScreenState extends State<NearestAmbulanceScreen>
 
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setSystemUIOverlayStyle(
+      const SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent, // Transparent status bar
+        statusBarIconBrightness: Brightness.light,
+        statusBarBrightness: Brightness.dark,
+      ),
+    );
     return Scaffold(
+      extendBodyBehindAppBar: true, // Allow body to extend behind status bar
       appBar: AppBar(
-        backgroundColor: Color(0xFF2E86AB),
-        elevation: 0,
-        /*  expandedHeight: 320, */
-        automaticallyImplyLeading: false,
-        // expandedHeight: 300.0,
-        /*  floating: false, */
-
-        // pinned: true,
-        // flexibleSpace: FlexibleSpaceBar(background: _buildHeader(context)),
         toolbarHeight: 0,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
       ),
 
       backgroundColor: Color(0xFFF8FAFC),
@@ -94,14 +97,20 @@ class _NearestAmbulanceScreenState extends State<NearestAmbulanceScreen>
           _buildHeader(),
           _buildEmergencyButton(),
           Expanded(
-            child: FutureBuilder(
+            child: FutureBuilder<List<AmbulanceModel>>(
               future: ApiHelpers.getAllAmbulance(
                 lat: PatientController.patientModel?.lat ?? 0,
                 lon: PatientController.patientModel?.lon ?? 0,
               ),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(child: CircularProgressIndicator());
+                  return Center(
+                    child: LoadingAnimationWidget.flickr(
+                      leftDotColor: Color(0xFF3CB8B8),
+                      rightDotColor: Color.fromARGB(255, 175, 235, 235),
+                      size: 45,
+                    ),
+                  );
                 } else if (snapshot.hasData &&
                     snapshot.data != null &&
                     snapshot.data!.isNotEmpty) {
@@ -111,37 +120,15 @@ class _NearestAmbulanceScreenState extends State<NearestAmbulanceScreen>
                     itemBuilder: (context, index) {
                       return _buildAmbulanceCard(snapshot.data![index]);
                     },
-                  ); /*  ListView.builder(
-                    physics: NeverScrollableScrollPhysics(),
-                    // shrinkWrap: true,
-                    padding: EdgeInsets.symmetric(horizontal: 20),
-                    itemCount: snapshot.data!.length,
-                    itemBuilder: (context, index) {
-                      return TweenAnimationBuilder(
-                        duration: Duration(milliseconds: 600),
-                        tween: Tween<double>(begin: 0, end: 1),
-                        builder: (context, double value, child) {
-                          return Transform.translate(
-                            offset: Offset(0, 50 * (1 - value)),
-                            child: Opacity(
-                              opacity: value,
-                              child: _buildAmbulanceCard(snapshot.data![index]),
-                            ),
-                          );
-                        },
-                      );
-                    },
-                  ); */ /*  Column(
-                    children: [
-                      _buildHeader(),
-                      _buildEmergencyButton(),
-                      Expanded(
-                        child:/* _buildAmbulanceList(snapshot.data!) */,
-                      ),
-                    ],
-                  ); */
+                  );
                 } else {
-                  return Center(child: Text("Empty"));
+                  return buildEmptyState(
+                    message:
+                        "We couldn\'t find any emergency services near you.",
+                    onPressed: () {
+                      setState(() {});
+                    },
+                  );
                 }
               },
             ),
@@ -152,8 +139,10 @@ class _NearestAmbulanceScreenState extends State<NearestAmbulanceScreen>
   }
 
   Widget _buildHeader() {
+    final double statusBarHeight = MediaQuery.of(context).padding.top;
+
     return Container(
-      padding: EdgeInsets.all(20),
+      padding: EdgeInsets.fromLTRB(20, statusBarHeight + 20, 20, 20),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
@@ -165,8 +154,8 @@ class _NearestAmbulanceScreenState extends State<NearestAmbulanceScreen>
           ],
         ),
         borderRadius: BorderRadius.only(
-          bottomLeft: Radius.circular(16),
-          bottomRight: Radius.circular(16),
+          // bottomLeft: Radius.circular(16),
+          // bottomRight: Radius.circular(16),
         ),
         boxShadow: [
           BoxShadow(
@@ -181,7 +170,11 @@ class _NearestAmbulanceScreenState extends State<NearestAmbulanceScreen>
         children: [
           Row(
             children: [
-              Icon(Icons.local_hospital, color: Colors.white, size: 32),
+              Icon(
+                FontAwesome.hand_holding_medical_solid,
+                color: Colors.white,
+                size: 32,
+              ),
               SizedBox(width: 12),
               Text(
                 'Emergency Services',
@@ -261,30 +254,6 @@ class _NearestAmbulanceScreenState extends State<NearestAmbulanceScreen>
     );
   }
 
-  Widget _buildAmbulanceList(List<AmbulanceModel> ambulanceServices) {
-    return ListView.builder(
-      physics: NeverScrollableScrollPhysics(),
-      // shrinkWrap: true,
-      padding: EdgeInsets.symmetric(horizontal: 20),
-      itemCount: ambulanceServices.length,
-      itemBuilder: (context, index) {
-        return TweenAnimationBuilder(
-          duration: Duration(milliseconds: 600),
-          tween: Tween<double>(begin: 0, end: 1),
-          builder: (context, double value, child) {
-            return Transform.translate(
-              offset: Offset(0, 50 * (1 - value)),
-              child: Opacity(
-                opacity: value,
-                child: _buildAmbulanceCard(ambulanceServices[index]),
-              ),
-            );
-          },
-        );
-      },
-    );
-  }
-
   Widget _buildAmbulanceCard(AmbulanceModel service) {
     return Container(
       margin: EdgeInsets.only(bottom: 16),
@@ -301,54 +270,6 @@ class _NearestAmbulanceScreenState extends State<NearestAmbulanceScreen>
       ),
       child: Column(
         children: [
-          /*  Stack(
-            children: [
-              /* ClipRRect(
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(20),
-                  topRight: Radius.circular(20),
-                ),
-                child: SizedBox(
-                  height: 150,
-                  width: double.infinity,
-                  child: Image.network(
-                    service.imageUrl,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) {
-                      return Container(
-                        color: Colors.grey[300],
-                        child: Icon(
-                          Icons.local_hospital,
-                          size: 50,
-                          color: Colors.grey[600],
-                        ),
-                      );
-                    },
-                  ),
-                ),
-              ), */
-              /* Positioned(
-                top: 12,
-                right: 12,
-                child: Container(
-                  padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: service.driverName ? Colors.green : Colors.red,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Text(
-                    service.isAvailable ? 'Available' : 'Busy',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-              ), */
-              
-            ],
-          ), */
           Padding(
             padding: EdgeInsets.all(16),
             child: Column(
@@ -366,20 +287,6 @@ class _NearestAmbulanceScreenState extends State<NearestAmbulanceScreen>
                         ),
                       ),
                     ),
-                    /* Row(
-                      children: [
-                        Icon(Icons.star, color: Colors.amber, size: 16),
-                        SizedBox(width: 4),
-                        Text(
-                          service.rating.toString(),
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                            color: Color(0xFF4A5568),
-                          ),
-                        ),
-                      ],
-                    ), */
                   ],
                 ),
                 SizedBox(height: 8),
@@ -440,58 +347,6 @@ class _NearestAmbulanceScreenState extends State<NearestAmbulanceScreen>
                     ),
                   ],
                 ),
-                /*   SizedBox(height: 16),
-                Row(
-                  children: [
-                    Expanded(
-                      child: OutlinedButton.icon(
-                        onPressed: () => _makePhoneCall(service.primaryContact),
-                        icon: Icon(Icons.phone, size: 18),
-                        label: Text('Call Now'),
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor: Color(0xFF667EEA),
-                          side: BorderSide(color: Color(0xFF667EEA)),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          padding: EdgeInsets.symmetric(vertical: 12),
-                        ),
-                      ),
-                    ),
-                    SizedBox(width: 12),
-                    /*  Expanded(
-                      child: ElevatedButton.icon(
-                        onPressed: service.o
-                            ? () {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text(
-                                      'Requesting ${service.name}...',
-                                    ),
-                                    backgroundColor: Colors.green,
-                                    behavior: SnackBarBehavior.floating,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                  ),
-                                );
-                              }
-                            : null,
-                        icon: Icon(Icons.send, size: 18),
-                        label: Text('Request'),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Color(0xFF667EEA),
-                          foregroundColor: Colors.white,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          padding: EdgeInsets.symmetric(vertical: 12),
-                          elevation: 0,
-                        ),
-                      ),
-                    ), */
-                  ],
-                ), */
               ],
             ),
           ),

@@ -23,6 +23,9 @@ Future<Uint8List> generatePrescriptionPdf(
   PatientModel doctorModel,
 ) async {
   final pdf = pw.Document();
+  final materialIconsFont = pw.Font.ttf(
+    await rootBundle.load('assets/MaterialIcons-Regular.ttf'),
+  );
 
   final prescription = prescriptionModel.prescriptions.first;
   final doctorName = doctorModel.name;
@@ -69,11 +72,12 @@ Future<Uint8List> generatePrescriptionPdf(
                   formattedDate,
                   formattedTime,
                   booking.doctor,
+                  materialIconsFont,
                 ),
               pw.SizedBox(height: 25),
               if (page == 0) buildPatientInformation(prescription, booking),
               if (page == 0) pw.SizedBox(height: 10),
-              buildPrescriptionTitle(),
+              buildPrescriptionTitle(materialIconsFont),
               pw.SizedBox(height: 10),
               buildProfessionalMedicineTable(medicinesOnPage, 15),
               pw.Spacer(),
@@ -115,12 +119,16 @@ pw.Widget buildProfessionalHeader(
   String date,
   String time,
   DoctorsModel doctorModel,
+  pw.Font? materialIconsFont,
 ) {
   return pw.Container(
-    padding: const pw.EdgeInsets.all(20),
+    padding: const pw.EdgeInsets.symmetric(vertical: 20),
     decoration: pw.BoxDecoration(
-      border: pw.Border.all(color: PdfColors.blue800, width: 2),
-      borderRadius: pw.BorderRadius.circular(10),
+      // border: pw.Border.all(color: PdfColors.grey400, width: 2),
+      // borderRadius: pw.BorderRadius.circular(10),
+      border: pw.Border(
+        bottom: pw.BorderSide(color: PdfColors.grey400, width: 2),
+      ),
     ),
     child: pw.Column(
       crossAxisAlignment: pw.CrossAxisAlignment.start,
@@ -138,7 +146,7 @@ pw.Widget buildProfessionalHeader(
                     style: pw.TextStyle(
                       fontSize: titleText,
                       fontWeight: pw.FontWeight.bold,
-                      color: PdfColors.blue800,
+                      color: PdfColors.black,
                     ),
                   ),
                   pw.SizedBox(height: 5),
@@ -187,7 +195,7 @@ pw.Widget buildProfessionalHeader(
         pw.Container(
           padding: const pw.EdgeInsets.all(12),
           decoration: pw.BoxDecoration(
-            color: PdfColors.blue50,
+            color: PdfColors.grey100,
             borderRadius: pw.BorderRadius.circular(8),
           ),
           child: pw.Column(
@@ -198,16 +206,19 @@ pw.Widget buildProfessionalHeader(
                 style: pw.TextStyle(
                   fontSize: headerText,
                   fontWeight: pw.FontWeight.bold,
-                  color: PdfColors.blue800,
+                  color: PdfColors.black,
                 ),
               ),
               pw.SizedBox(height: 8),
               pw.Row(
                 children: [
-                  pw.Icon(
-                    pw.IconData(0xe0cd), // phone icon
-                    size: 12,
-                    color: PdfColors.grey600,
+                  pw.Text(
+                    String.fromCharCode(0xe0cd), // phone icon
+                    style: pw.TextStyle(
+                      font: materialIconsFont,
+                      fontSize: 12,
+                      color: PdfColors.grey600,
+                    ),
                   ),
                   pw.SizedBox(width: 5),
                   pw.Text(
@@ -215,10 +226,13 @@ pw.Widget buildProfessionalHeader(
                     style: pw.TextStyle(fontSize: smallText),
                   ),
                   pw.SizedBox(width: 20),
-                  pw.Icon(
-                    pw.IconData(0xe0be), // email icon
-                    size: 12,
-                    color: PdfColors.grey600,
+                  pw.Text(
+                    String.fromCharCode(0xe0be), // email icon
+                    style: pw.TextStyle(
+                      font: materialIconsFont,
+                      fontSize: 12,
+                      color: PdfColors.grey600,
+                    ),
                   ),
                   pw.SizedBox(width: 5),
                   pw.Text(
@@ -227,20 +241,22 @@ pw.Widget buildProfessionalHeader(
                   ),
                 ],
               ),
+
               pw.SizedBox(height: 5),
               pw.Row(
                 children: [
-                  pw.Icon(
-                    pw.IconData(0xe0c8), // location icon
-                    size: 12,
-                    color: PdfColors.grey600,
+                  pw.Text(
+                    String.fromCharCode(0xe0c8), // location icon
+                    style: pw.TextStyle(
+                      font: materialIconsFont,
+                      fontSize: 12,
+                      color: PdfColors.grey600,
+                    ),
                   ),
                   pw.SizedBox(width: 5),
-                  pw.Expanded(
-                    child: pw.Text(
-                      doctorModel.locationName,
-                      style: pw.TextStyle(fontSize: smallText),
-                    ),
+                  pw.Text(
+                    doctorModel.locationName,
+                    style: pw.TextStyle(fontSize: smallText),
                   ),
                 ],
               ),
@@ -271,7 +287,7 @@ pw.Widget buildPatientInformation(
           style: pw.TextStyle(
             fontSize: mediumText,
             fontWeight: pw.FontWeight.bold,
-            color: PdfColors.blue800,
+            color: PdfColors.black,
           ),
         ),
         pw.SizedBox(height: 10),
@@ -311,31 +327,31 @@ pw.Widget buildPatientInformation(
   );
 }
 
-pw.Widget buildPrescriptionTitle() {
+pw.Widget buildPrescriptionTitle(pw.Font font) {
   return pw.Container(
     padding: const pw.EdgeInsets.symmetric(vertical: 10),
     decoration: pw.BoxDecoration(
       border: pw.Border(
-        bottom: pw.BorderSide(color: PdfColors.blue800, width: 2),
+        bottom: pw.BorderSide(color: PdfColors.grey300, width: 2),
       ),
     ),
     child: pw.Row(
       children: [
-        pw.Text(
-          "℞",
+        /* pw.Text(
+          String.fromCharCode(0xe3c9), // email icon
           style: pw.TextStyle(
-            fontSize: 28,
-            fontWeight: pw.FontWeight.bold,
-            color: PdfColors.blue800,
+            font: font,
+            fontSize: 12,
+            color: PdfColors.grey600,
           ),
         ),
-        pw.SizedBox(width: 15),
+        pw.SizedBox(width: 15), */
         pw.Text(
           "PRESCRIPTION",
           style: pw.TextStyle(
             fontSize: headerText,
             fontWeight: pw.FontWeight.bold,
-            color: PdfColors.blue800,
+            color: PdfColors.black,
             letterSpacing: 1.2,
           ),
         ),
@@ -350,8 +366,8 @@ pw.Widget buildProfessionalMedicineTable(
 ) {
   return pw.Container(
     decoration: pw.BoxDecoration(
-      border: pw.Border.all(color: PdfColors.blue800, width: 1.5),
-      borderRadius: pw.BorderRadius.circular(8),
+      border: pw.Border.all(color: PdfColors.grey400, width: 1.5),
+      // borderRadius: pw.BorderRadius.circular(8),
     ),
     child: pw.Table(
       columnWidths: {0: pw.FixedColumnWidth(60), 1: pw.FlexColumnWidth(5)},
@@ -359,7 +375,7 @@ pw.Widget buildProfessionalMedicineTable(
       children: [
         // Header row
         pw.TableRow(
-          decoration: pw.BoxDecoration(color: PdfColors.blue800),
+          decoration: pw.BoxDecoration(color: PdfColors.grey500),
           children: [
             pw.Container(
               padding: const pw.EdgeInsets.all(12),
@@ -446,19 +462,19 @@ pw.Widget buildNotesSection(Prescription prescription) {
   return pw.Container(
     padding: const pw.EdgeInsets.all(15),
     decoration: pw.BoxDecoration(
-      color: PdfColors.amber50,
-      border: pw.Border.all(color: PdfColors.amber300),
+      color: PdfColors.grey100,
+      border: pw.Border.all(color: PdfColors.grey100),
       borderRadius: pw.BorderRadius.circular(8),
     ),
     child: pw.Column(
-      crossAxisAlignment: pw.CrossAxisAlignment.start,
+      crossAxisAlignment: pw.CrossAxisAlignment.stretch,
       children: [
         pw.Text(
           "DOCTOR'S NOTES & INSTRUCTIONS",
           style: pw.TextStyle(
             fontSize: mediumText,
             fontWeight: pw.FontWeight.bold,
-            color: PdfColors.amber800,
+            color: PdfColors.black,
           ),
         ),
         pw.SizedBox(height: 8),
@@ -480,8 +496,8 @@ pw.Widget buildProfessionalFooter(
   return pw.Container(
     padding: const pw.EdgeInsets.all(15),
     decoration: pw.BoxDecoration(
-      border: pw.Border.all(color: PdfColors.grey300),
-      borderRadius: pw.BorderRadius.circular(8),
+      // border: pw.Border.all(color: PdfColors.grey300),
+      // borderRadius: pw.BorderRadius.circular(8),
     ),
     child: pw.Row(
       mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,

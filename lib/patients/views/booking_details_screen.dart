@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mediora/apis/patients/booking_apis.dart';
+import 'package:mediora/helper/colors.dart';
 import 'package:mediora/models/booking_details_model.dart';
 import 'package:mediora/models/booking_model.dart';
 import 'package:mediora/patients/views/book_appointment.dart';
@@ -76,6 +77,23 @@ class _BookingDetailsPageState extends State<BookingDetailsPage>
         return Color(0xFFEF4444);
       default:
         return Color(0xFF6B7280);
+    }
+  }
+
+  Color getStatusGradientColor(String status) {
+    switch (status.toLowerCase()) {
+      case 'confirmed':
+      case 'accepted':
+        return Color(0xFF34D399);
+      case 'pending':
+        return Color(0xFFFBBF24);
+      case 'completed':
+        return Color(0xFF10B981);
+      case 'cancelled':
+      case 'rejected':
+        return Color(0xFFF87171);
+      default:
+        return Color(0xFF9CA3AF);
     }
   }
 
@@ -165,24 +183,30 @@ class _BookingDetailsPageState extends State<BookingDetailsPage>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      floatingActionButton: _buildFloatingActionButtons(),
       backgroundColor: Color(0xFFF8FAFC),
       body: CustomScrollView(
         slivers: [
           // Enhanced App Bar
           SliverAppBar(
-            expandedHeight: 200,
+            expandedHeight: 240,
             floating: false,
             pinned: true,
             elevation: 0,
             backgroundColor: Colors.transparent,
             leading: Container(
-              margin: EdgeInsets.all(8),
+              margin: EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.9),
-                borderRadius: BorderRadius.circular(12),
+                color: Colors.white.withOpacity(0.15),
+                borderRadius: BorderRadius.circular(14),
+                // backdrop: BoxDecoration(color: Colors.white.withOpacity(0.1)),
               ),
               child: IconButton(
-                icon: Icon(Icons.arrow_back_rounded, color: Color(0xFF1E293B)),
+                icon: Icon(
+                  Icons.arrow_back_ios_rounded,
+                  color: Colors.white,
+                  size: 20,
+                ),
                 onPressed: () {
                   if (widget.isFromNotification) {
                     Navigator.pushReplacement(
@@ -202,97 +226,139 @@ class _BookingDetailsPageState extends State<BookingDetailsPage>
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                     colors: [
-                      Color(0xFF667EEA),
-                      Color(0xFF764BA2),
-                      Color(0xFF6B73FF),
+                      getStatusColor(currentBooking.status),
+                      getStatusGradientColor(currentBooking.status),
                     ],
+                    stops: [0.0, 1.0],
                   ),
                 ),
                 child: Stack(
                   children: [
-                    // Background pattern
+                    // Geometric background pattern
                     Positioned.fill(
-                      child: Opacity(
-                        opacity: 0.1,
-                        child: Container(
-                          decoration: BoxDecoration(
-                            image: DecorationImage(
-                              image: AssetImage('assets/medical_pattern.png'),
-                              repeat: ImageRepeat.repeat,
-                            ),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            colors: [
+                              Colors.white.withOpacity(0.05),
+                              Colors.transparent,
+                              Colors.black.withOpacity(0.05),
+                            ],
                           ),
+                        ),
+                      ),
+                    ),
+                    // Modern circles decoration
+                    Positioned(
+                      top: -50,
+                      right: -30,
+                      child: Container(
+                        width: 120,
+                        height: 120,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.white.withOpacity(0.1),
+                        ),
+                      ),
+                    ),
+                    Positioned(
+                      bottom: -20,
+                      left: -40,
+                      child: Container(
+                        width: 80,
+                        height: 80,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.white.withOpacity(0.08),
                         ),
                       ),
                     ),
                     // Content
                     Positioned(
-                      bottom: 20,
-                      left: 20,
-                      right: 20,
+                      bottom: 30,
+                      left: 24,
+                      right: 24,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          Row(
+                            children: [
+                              Container(
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: 8,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withOpacity(0.2),
+                                  borderRadius: BorderRadius.circular(25),
+                                  border: Border.all(
+                                    color: Colors.white.withOpacity(0.3),
+                                    width: 1,
+                                  ),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(
+                                      getStatusIcon(currentBooking.status),
+                                      size: 18,
+                                      color: Colors.white,
+                                    ),
+                                    SizedBox(width: 8),
+                                    Text(
+                                      currentBooking.status.toUpperCase(),
+                                      style: TextStyle(
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.w700,
+                                        color: Colors.white,
+                                        letterSpacing: 0.5,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Spacer(),
+                              if (widget.booking.status.toLowerCase() ==
+                                  "pending")
+                                Container(
+                                  decoration: BoxDecoration(
+                                    color: Colors.white.withOpacity(0.15),
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: IconButton(
+                                    onPressed: () {
+                                      _showDeleteConfirmationDialog(context);
+                                    },
+                                    icon: Icon(
+                                      Icons.delete_outline_rounded,
+                                      color: Colors.white,
+                                      size: 22,
+                                    ),
+                                  ),
+                                ),
+                            ],
+                          ),
+                          SizedBox(height: 20),
                           Text(
-                            'Booking Details',
+                            'Appointment Details',
                             style: TextStyle(
-                              fontSize: 28,
+                              fontSize: 32,
                               fontWeight: FontWeight.w800,
                               color: Colors.white,
-                              letterSpacing: -0.5,
+                              letterSpacing: -1,
+                              height: 1.1,
                             ),
                           ),
                           SizedBox(height: 8),
-                          Row(
-                            children: [
-                              Expanded(
-                                child: Container(
-                                  padding: EdgeInsets.symmetric(
-                                    horizontal: 12,
-                                    vertical: 6,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: Colors.white.withOpacity(0.2),
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Icon(
-                                        getStatusIcon(currentBooking.status),
-                                        size: 16,
-                                        color: Colors.white,
-                                      ),
-                                      SizedBox(width: 6),
-                                      Text(
-                                        currentBooking.status.toUpperCase(),
-                                        style: TextStyle(
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.w700,
-                                          color: Colors.white,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                              SizedBox(width: 12),
-                              if (widget.booking.status.toLowerCase() ==
-                                  "pending")
-                                IconButton(
-                                  onPressed: () {
-                                    _showDeleteConfirmationDialog(context);
-                                  },
-                                  icon: Icon(Icons.delete, color: Colors.white),
-                                ),
-                              /* Text(
-                                'ID: ${currentBooking.id}',
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: Colors.white.withOpacity(0.8),
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ), */
-                            ],
+                          Text(
+                            'ID: ${currentBooking.id}',
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: Colors.white.withOpacity(0.85),
+                              fontWeight: FontWeight.w500,
+                            ),
                           ),
                         ],
                       ),
@@ -310,10 +376,14 @@ class _BookingDetailsPageState extends State<BookingDetailsPage>
               child: SlideTransition(
                 position: _slideAnimation,
                 child: Padding(
-                  padding: EdgeInsets.all(20),
+                  padding: EdgeInsets.fromLTRB(20, 20, 20, 100),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      // Quick Info Cards Row
+                      _buildQuickInfoCards(),
+                      SizedBox(height: 24),
+
                       // Doctor Information Card
                       _buildDoctorInfoCard(),
                       SizedBox(height: 20),
@@ -329,11 +399,6 @@ class _BookingDetailsPageState extends State<BookingDetailsPage>
                       // Status-specific Information
                       if (currentBooking.status.toLowerCase() == 'cancelled')
                         _buildCancelReasonCard(),
-                      SizedBox(height: 20),
-                      _buildFloatingActionButtons(),
-                      SizedBox(height: 20),
-
-                      // Space for floating buttons
                     ],
                   ),
                 ),
@@ -356,37 +421,44 @@ class _BookingDetailsPageState extends State<BookingDetailsPage>
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.08),
+            color: Colors.black.withOpacity(0.04),
             blurRadius: 20,
             offset: Offset(0, 8),
           ),
         ],
       ),
       child: Padding(
-        padding: EdgeInsets.all(24),
+        padding: EdgeInsets.all(28),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               children: [
                 Container(
-                  width: 80,
-                  height: 80,
+                  width: 85,
+                  height: 85,
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
-                      colors: [Color(0xFF667EEA), Color(0xFF764BA2)],
+                      colors: [colorPrimary, colorPrimary.withOpacity(0.8)],
                     ),
-                    borderRadius: BorderRadius.circular(20),
+                    borderRadius: BorderRadius.circular(22),
+                    boxShadow: [
+                      BoxShadow(
+                        color: colorPrimary.withOpacity(0.3),
+                        blurRadius: 15,
+                        offset: Offset(0, 6),
+                      ),
+                    ],
                   ),
                   child: Icon(
-                    Icons.person_rounded,
+                    Icons.medical_services_rounded,
                     color: Colors.white,
                     size: 36,
                   ),
                 ),
-                SizedBox(width: 16),
+                SizedBox(width: 20),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -394,68 +466,53 @@ class _BookingDetailsPageState extends State<BookingDetailsPage>
                       Text(
                         'Dr. ${currentBooking.doctor.name}',
                         style: TextStyle(
-                          fontSize: 22,
+                          fontSize: 24,
                           fontWeight: FontWeight.w800,
-                          color: Color(0xFF1E293B),
+                          color: secondoryColor,
                           letterSpacing: -0.5,
+                          height: 1.2,
                         ),
                       ),
-                      SizedBox(height: 4),
+                      SizedBox(height: 6),
                       Text(
                         currentBooking.doctor.specialization,
                         style: TextStyle(
                           fontSize: 16,
-                          color: Color(0xFF64748B),
+                          color: colorPrimary,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
-                      SizedBox(height: 8),
-                      /* Row(
-                        children: [
-                          Icon(
-                            Icons.star_rounded,
-                            color: Color(0xFFF59E0B),
-                            size: 20,
-                          ),
-                          SizedBox(width: 4),
-                          Text(
-                            '4.8', // You can add rating to your model
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                              color: Color(0xFF1E293B),
-                            ),
-                          ),
-                          SizedBox(width: 8),
-                          Text(
-                            '(120 reviews)',
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Color(0xFF64748B),
-                            ),
-                          ),
-                        ],
-                      ), */
                     ],
                   ),
                 ),
               ],
             ),
-            SizedBox(height: 20),
+            SizedBox(height: 24),
             Container(
-              padding: EdgeInsets.all(16),
+              padding: EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: Color(0xFFF8FAFC),
-                borderRadius: BorderRadius.circular(16),
+                color: colorPrimary.withOpacity(0.05),
+                borderRadius: BorderRadius.circular(18),
+                border: Border.all(
+                  color: colorPrimary.withOpacity(0.1),
+                  width: 1,
+                ),
               ),
               child: Row(
                 children: [
-                  Icon(
-                    Icons.location_on_rounded,
-                    color: Color(0xFF667EEA),
-                    size: 20,
+                  Container(
+                    padding: EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: colorPrimary.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Icon(
+                      Icons.location_on_rounded,
+                      color: colorPrimary,
+                      size: 20,
+                    ),
                   ),
-                  SizedBox(width: 12),
+                  SizedBox(width: 16),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -463,8 +520,8 @@ class _BookingDetailsPageState extends State<BookingDetailsPage>
                         Text(
                           'Clinic Location',
                           style: TextStyle(
-                            fontSize: 12,
-                            color: Color(0xFF94A3B8),
+                            fontSize: 13,
+                            color: secondoryColor.withOpacity(0.7),
                             fontWeight: FontWeight.w600,
                           ),
                         ),
@@ -473,8 +530,8 @@ class _BookingDetailsPageState extends State<BookingDetailsPage>
                           currentBooking.doctor.locationName ??
                               'Medical Center',
                           style: TextStyle(
-                            fontSize: 14,
-                            color: Color(0xFF1E293B),
+                            fontSize: 15,
+                            color: secondoryColor,
                             fontWeight: FontWeight.w700,
                           ),
                         ),
@@ -497,63 +554,64 @@ class _BookingDetailsPageState extends State<BookingDetailsPage>
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.08),
+            color: Colors.black.withOpacity(0.04),
             blurRadius: 20,
             offset: Offset(0, 8),
           ),
         ],
       ),
       child: Padding(
-        padding: EdgeInsets.all(24),
+        padding: EdgeInsets.all(28),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               children: [
                 Container(
-                  padding: EdgeInsets.all(12),
+                  padding: EdgeInsets.all(14),
                   decoration: BoxDecoration(
-                    color: Color(0xFF10B981).withOpacity(0.1),
+                    color: secondoryColor.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(16),
                   ),
                   child: Icon(
                     Icons.person_outline_rounded,
-                    color: Color(0xFF10B981),
-                    size: 24,
+                    color: secondoryColor,
+                    size: 26,
                   ),
                 ),
                 SizedBox(width: 16),
                 Text(
                   'Patient Information',
                   style: TextStyle(
-                    fontSize: 20,
+                    fontSize: 22,
                     fontWeight: FontWeight.w800,
-                    color: Color(0xFF1E293B),
+                    color: secondoryColor,
+                    letterSpacing: -0.5,
                   ),
                 ),
               ],
             ),
-            SizedBox(height: 20),
+            SizedBox(height: 24),
             _buildPatientInfoRow(
-              'Name',
+              'Full Name',
               currentBooking.patientName,
-              Icons.person_rounded,
+              Icons.badge_rounded,
             ),
-            SizedBox(height: 16),
+            SizedBox(height: 18),
             _buildPatientInfoRow(
               'Age',
-              '${currentBooking.patientAge} years',
+              '${currentBooking.patientAge} years old',
               Icons.cake_rounded,
             ),
-            SizedBox(height: 16),
+            SizedBox(height: 18),
             _buildPatientInfoRow(
               'Gender',
               currentBooking.patientGender,
               Icons.wc_rounded,
             ),
-            SizedBox(height: 16),
+            SizedBox(height: 18),
             _buildPatientInfoRow(
-              'Contact',
+              'Phone Number',
               currentBooking.patientContact,
               Icons.phone_rounded,
             ),
@@ -563,7 +621,7 @@ class _BookingDetailsPageState extends State<BookingDetailsPage>
     );
   }
 
-  Widget _buildPatientInfoRow(String label, String value, IconData icon) {
+  /*  Widget _buildPatientInfoRow(String label, String value, IconData icon) {
     return Row(
       children: [
         Icon(icon, size: 20, color: Color(0xFF64748B)),
@@ -589,9 +647,267 @@ class _BookingDetailsPageState extends State<BookingDetailsPage>
         ),
       ],
     );
+  } */
+  Widget _buildPatientInfoRow(String label, String value, IconData icon) {
+    return Container(
+      padding: EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Color(0xFFF8FAFB),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: Color(0xFFE2E8F0), width: 1),
+      ),
+      child: Row(
+        children: [
+          Icon(icon, size: 22, color: colorPrimary),
+          SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: secondoryColor.withOpacity(0.7),
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                SizedBox(height: 4),
+                Text(
+                  value,
+                  style: TextStyle(
+                    fontSize: 15,
+                    color: secondoryColor,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   Widget _buildAppointmentDetailsCard() {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(24),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 20,
+            offset: Offset(0, 8),
+          ),
+        ],
+      ),
+      child: Padding(
+        padding: EdgeInsets.all(28),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Container(
+                  padding: EdgeInsets.all(14),
+                  decoration: BoxDecoration(
+                    color: colorPrimary.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Icon(
+                    Icons.event_note_rounded,
+                    color: colorPrimary,
+                    size: 26,
+                  ),
+                ),
+                SizedBox(width: 16),
+                Text(
+                  'Appointment Details',
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.w800,
+                    color: secondoryColor,
+                    letterSpacing: -0.5,
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 24),
+            _buildDetailRow(
+              'Scheduled Date & Time',
+              formatDateTime(currentBooking.preferredDate),
+              Icons.schedule_rounded,
+              colorPrimary,
+            ),
+            SizedBox(height: 18),
+            _buildDetailRow(
+              'Medical Concern',
+              currentBooking.reason,
+              Icons.medical_information_rounded,
+              Color(0xFF059669),
+            ),
+            SizedBox(height: 18),
+            _buildDetailRow(
+              'Booking Created',
+              formatDateTime(currentBooking.createdAt),
+              Icons.event_available_rounded,
+              Color(0xFFF59E0B),
+            ),
+            SizedBox(height: 18),
+            _buildDetailRow(
+              'Current Status',
+              currentBooking.status.toUpperCase(),
+              getStatusIcon(currentBooking.status),
+              getStatusColor(currentBooking.status),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDetailRow(
+    String label,
+    String value,
+    IconData icon,
+    Color color,
+  ) {
+    return Container(
+      padding: EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: Color(0xFFF8FAFB),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Color(0xFFE2E8F0), width: 1),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: color.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(icon, size: 20, color: color),
+          ),
+          SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: secondoryColor.withOpacity(0.7),
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                SizedBox(height: 6),
+                Text(
+                  value,
+                  style: TextStyle(
+                    fontSize: 15,
+                    color: secondoryColor,
+                    fontWeight: FontWeight.w700,
+                    height: 1.3,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCancelReasonCard() {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: Color(0xFFDC2626).withOpacity(0.2)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 20,
+            offset: Offset(0, 8),
+          ),
+        ],
+      ),
+      child: Padding(
+        padding: EdgeInsets.all(28),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Container(
+                  padding: EdgeInsets.all(14),
+                  decoration: BoxDecoration(
+                    color: Color(0xFFDC2626).withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Icon(
+                    Icons.cancel_outlined,
+                    color: Color(0xFFDC2626),
+                    size: 26,
+                  ),
+                ),
+                SizedBox(width: 16),
+                Text(
+                  'Cancellation Details',
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.w800,
+                    color: secondoryColor,
+                    letterSpacing: -0.5,
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 24),
+            Container(
+              padding: EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: Color(0xFFFEF2F2),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: Color(0xFFDC2626).withOpacity(0.2),
+                  width: 1,
+                ),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Reason for Cancellation',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Color(0xFFDC2626).withOpacity(0.8),
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  SizedBox(height: 12),
+                  Text(
+                    'Patient requested to reschedule due to personal emergency.',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: secondoryColor,
+                      fontWeight: FontWeight.w600,
+                      height: 1.4,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+  /* Widget _buildAppointmentDetailsCard() {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -677,242 +993,350 @@ class _BookingDetailsPageState extends State<BookingDetailsPage>
         ),
       ),
     );
-  }
+  } */
 
-  Widget _buildDetailRow(
-    String label,
-    String value,
-    IconData icon,
-    Color color,
-  ) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Container(
-          padding: EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: color.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: Icon(icon, size: 16, color: color),
-        ),
-        SizedBox(width: 12),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                label,
-                style: TextStyle(
-                  fontSize: 12,
-                  color: Color(0xFF94A3B8),
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              SizedBox(height: 4),
-              Text(
-                value,
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Color(0xFF1E293B),
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
+  // Widget _buildDetailRow(
+  //   String label,
+  //   String value,
+  //   IconData icon,
+  //   Color color,
+  // ) {
+  //   return Row(
+  //     crossAxisAlignment: CrossAxisAlignment.start,
+  //     children: [
+  //       Container(
+  //         padding: EdgeInsets.all(8),
+  //         decoration: BoxDecoration(
+  //           color: color.withOpacity(0.1),
+  //           borderRadius: BorderRadius.circular(10),
+  //         ),
+  //         child: Icon(icon, size: 16, color: color),
+  //       ),
+  //       SizedBox(width: 12),
+  //       Expanded(
+  //         child: Column(
+  //           crossAxisAlignment: CrossAxisAlignment.start,
+  //           children: [
+  //             Text(
+  //               label,
+  //               style: TextStyle(
+  //                 fontSize: 12,
+  //                 color: Color(0xFF94A3B8),
+  //                 fontWeight: FontWeight.w600,
+  //               ),
+  //             ),
+  //             SizedBox(height: 4),
+  //             Text(
+  //               value,
+  //               style: TextStyle(
+  //                 fontSize: 14,
+  //                 color: Color(0xFF1E293B),
+  //                 fontWeight: FontWeight.w700,
+  //               ),
+  //             ),
+  //           ],
+  //         ),
+  //       ),
+  //     ],
+  //   );
+  // }
 
-  Widget _buildCancelReasonCard() {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: Color(0xFFEF4444).withOpacity(0.2)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.08),
-            blurRadius: 20,
-            offset: Offset(0, 8),
-          ),
-        ],
-      ),
-      child: Padding(
-        padding: EdgeInsets.all(24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+  // Widget _buildCancelReasonCard() {
+  //   return Container(
+  //     decoration: BoxDecoration(
+  //       color: Colors.white,
+  //       borderRadius: BorderRadius.circular(24),
+  //       border: Border.all(color: Color(0xFFEF4444).withOpacity(0.2)),
+  //       boxShadow: [
+  //         BoxShadow(
+  //           color: Colors.black.withOpacity(0.08),
+  //           blurRadius: 20,
+  //           offset: Offset(0, 8),
+  //         ),
+  //       ],
+  //     ),
+  //     child: Padding(
+  //       padding: EdgeInsets.all(24),
+  //       child: Column(
+  //         crossAxisAlignment: CrossAxisAlignment.start,
+  //         children: [
+  //           Row(
+  //             children: [
+  //               Container(
+  //                 padding: EdgeInsets.all(12),
+  //                 decoration: BoxDecoration(
+  //                   color: Color(0xFFEF4444).withOpacity(0.1),
+  //                   borderRadius: BorderRadius.circular(16),
+  //                 ),
+  //                 child: Icon(
+  //                   Icons.cancel_outlined,
+  //                   color: Color(0xFFEF4444),
+  //                   size: 24,
+  //                 ),
+  //               ),
+  //               SizedBox(width: 16),
+  //               Text(
+  //                 'Cancellation Details',
+  //                 style: TextStyle(
+  //                   fontSize: 20,
+  //                   fontWeight: FontWeight.w800,
+  //                   color: Color(0xFF1E293B),
+  //                 ),
+  //               ),
+  //             ],
+  //           ),
+  //           SizedBox(height: 20),
+  //           Container(
+  //             padding: EdgeInsets.all(20),
+  //             decoration: BoxDecoration(
+  //               color: Color(0xFFFEF2F2),
+  //               borderRadius: BorderRadius.circular(16),
+  //             ),
+  //             child: Column(
+  //               crossAxisAlignment: CrossAxisAlignment.start,
+  //               children: [
+  //                 Text(
+  //                   'Reason for Cancellation',
+  //                   style: TextStyle(
+  //                     fontSize: 14,
+  //                     color: Color(0xFF94A3B8),
+  //                     fontWeight: FontWeight.w600,
+  //                   ),
+  //                 ),
+  //                 SizedBox(height: 8),
+  //                 Text(
+  //                   'Patient requested to reschedule due to personal emergency.', // You can add this to your model
+  //                   style: TextStyle(
+  //                     fontSize: 16,
+  //                     color: Color(0xFF1E293B),
+  //                     fontWeight: FontWeight.w600,
+  //                   ),
+  //                 ),
+  //               ],
+  //             ),
+  //           ),
+  //         ],
+  //       ),
+  //     ),
+  //   );
+  // }
+
+  Widget _buildFloatingActionButtons() {
+    final status = currentBooking.status.toLowerCase();
+    final Color colorPrimary = Color(0xFF3CB8B8);
+    final Color secondaryColor = Color(0xFF333F48);
+
+    if (status == 'pending') {
+      return Container(
+        margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        child: Row(
           children: [
-            Row(
-              children: [
-                Container(
-                  padding: EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: Color(0xFFEF4444).withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: Icon(
-                    Icons.cancel_outlined,
-                    color: Color(0xFFEF4444),
-                    size: 24,
-                  ),
-                ),
-                SizedBox(width: 16),
-                Text(
-                  'Cancellation Details',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w800,
-                    color: Color(0xFF1E293B),
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(height: 20),
-            Container(
-              padding: EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: Color(0xFFFEF2F2),
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Reason for Cancellation',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Color(0xFF94A3B8),
-                      fontWeight: FontWeight.w600,
+            // Cancel Button
+            Expanded(
+              child: Container(
+                height: 56,
+                margin: EdgeInsets.only(right: 8),
+                child: ElevatedButton.icon(
+                  onPressed: () async {
+                    _showCancelDialog(context);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Color(0xFFEF4444),
+                    foregroundColor: Colors.white,
+                    elevation: 4,
+                    shadowColor: Color(0xFFEF4444).withOpacity(0.3),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
                     ),
+                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                   ),
-                  SizedBox(height: 8),
-                  Text(
-                    'Patient requested to reschedule due to personal emergency.', // You can add this to your model
+                  icon: Icon(Icons.cancel_outlined, size: 20),
+                  label: Text(
+                    'Cancel',
                     style: TextStyle(
+                      fontWeight: FontWeight.w600,
                       fontSize: 16,
-                      color: Color(0xFF1E293B),
-                      fontWeight: FontWeight.w600,
+                      letterSpacing: 0.5,
                     ),
                   ),
-                ],
+                ),
+              ),
+            ),
+            // Update Button
+            Expanded(
+              child: Container(
+                height: 56,
+                margin: EdgeInsets.only(left: 8),
+                child: ElevatedButton.icon(
+                  onPressed: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => BookingScreen(
+                          doctorsModel: widget.booking.doctor,
+                          booking: BookingModel(
+                            id: widget.booking.id,
+                            fullName: widget.booking.patientName,
+                            gender: widget.booking.patientGender,
+                            age: int.tryParse(widget.booking.patientAge) ?? 0,
+                            mobile: widget.booking.patientContact,
+                            symptoms: widget.booking.reason,
+                            preferredDate: widget.booking.preferredDate,
+                            patientId: widget.booking.patientId,
+                            status: "cancelled",
+                            clinicId: widget.booking.clinicId,
+                            doctorId: widget.booking.doctorId,
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: colorPrimary,
+                    foregroundColor: Colors.white,
+                    elevation: 4,
+                    shadowColor: colorPrimary.withOpacity(0.3),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  ),
+                  icon: Icon(Icons.edit_rounded, size: 20),
+                  label: Text(
+                    'Update',
+                    style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 16,
+                      letterSpacing: 0.5,
+                    ),
+                  ),
+                ),
               ),
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildFloatingActionButtons() {
-    final status = currentBooking.status.toLowerCase();
-
-    if (status == 'pending') {
-      return Row(
-        spacing: 10,
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          // Cancel Button
-          Expanded(
-            child: FloatingActionButton.extended(
-              heroTag: "cancel",
-              onPressed: () async {
-                _showCancelDialog(context);
-              },
-              backgroundColor: Color(0xFFEF4444),
-              icon: Icon(Icons.cancel_outlined, color: Colors.white),
-              label: Text(
-                'Cancel',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-          ),
-          // Update Button
-          Expanded(
-            child: FloatingActionButton.extended(
-              heroTag: "update",
-              onPressed: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (_) => BookingScreen(
-                      doctorsModel: widget.booking.doctor,
-                      booking: BookingModel(
-                        // Use the cancellation reason as note
-                        id: widget.booking.id,
-                        fullName: widget.booking.patientName,
-                        gender: widget.booking.patientGender,
-                        age: int.tryParse(widget.booking.patientAge) ?? 0,
-                        mobile: widget.booking.patientContact,
-                        symptoms: widget.booking.reason,
-                        preferredDate: widget.booking.preferredDate,
-                        patientId: widget.booking.patientId,
-                        status: "cancelled",
-                        clinicId: widget.booking.clinicId,
-                        doctorId: widget.booking.doctorId,
-                      ),
-                    ),
-                  ),
-                );
-              },
-              backgroundColor: Color(0xFF667EEA),
-              icon: Icon(Icons.edit_rounded, color: Colors.white),
-              label: Text(
-                'Update',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-          ),
-        ],
       );
     } else if (status == 'confirmed' || status == 'accepted') {
-      return FloatingActionButton.extended(
-        heroTag: "token",
-        onPressed: () {},
-        backgroundColor: Color(0xFF10B981),
-        icon: Icon(Icons.receipt_long_rounded, color: Colors.white),
-        label: Text(
-          'Get Token',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+      return Container(
+        width: double.infinity,
+        height: 56,
+        margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        child: ElevatedButton.icon(
+          onPressed: () {},
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Color(0xFF10B981),
+            foregroundColor: Colors.white,
+            elevation: 6,
+            shadowColor: Color(0xFF10B981).withOpacity(0.4),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+          ),
+          icon: Container(
+            padding: EdgeInsets.all(2),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.2),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(Icons.receipt_long_rounded, size: 22),
+          ),
+          label: Text(
+            'Get Token',
+            style: TextStyle(
+              fontWeight: FontWeight.w700,
+              fontSize: 18,
+              letterSpacing: 0.8,
+            ),
+          ),
         ),
       );
     } else if (status == 'completed') {
-      return FloatingActionButton.extended(
-        heroTag: "prescription",
-        onPressed: () {
-          Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (_) => PdfPreviewPage(
-                bookingId: widget.booking.id,
-                detailsModel: widget.booking,
+      return Container(
+        width: double.infinity,
+        height: 56,
+        margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        child: ElevatedButton.icon(
+          onPressed: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (_) => PdfPreviewPage(
+                  bookingId: widget.booking.id,
+                  detailsModel: widget.booking,
+                ),
               ),
+            );
+          },
+          style: ElevatedButton.styleFrom(
+            backgroundColor: colorPrimary,
+            foregroundColor: Colors.white,
+            elevation: 6,
+            shadowColor: colorPrimary.withOpacity(0.4),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
             ),
-          );
-        },
-        backgroundColor: Color(0xFF3B82F6),
-        icon: Icon(Icons.receipt_rounded, color: Colors.white),
-        label: Text(
-          'Get Prescription',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+            padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+          ),
+          icon: Container(
+            padding: EdgeInsets.all(2),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.2),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(Icons.receipt_rounded, size: 22),
+          ),
+          label: Text(
+            'Get Prescription',
+            style: TextStyle(
+              fontWeight: FontWeight.w700,
+              fontSize: 18,
+              letterSpacing: 0.8,
+            ),
+          ),
         ),
       );
     } else if (status == 'cancelled') {
-      // return FloatingActionButton.extended(
-      //   heroTag: "reason",
-      //   onPressed: () {},
-      //   backgroundColor: Color(0xFF64748B),
-      //   icon: Icon(Icons.info_outline_rounded, color: Colors.white),
-      //   label: Text(
-      //     'Cancel Reason',
-      //     style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
-      //   ),
-      // );
+      return Container(
+        width: double.infinity,
+        height: 56,
+        margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        child: ElevatedButton.icon(
+          onPressed: () {
+            // Show cancel reason dialog or navigate to reason page
+          },
+          style: ElevatedButton.styleFrom(
+            backgroundColor: secondaryColor,
+            foregroundColor: Colors.white70,
+            elevation: 2,
+            shadowColor: secondaryColor.withOpacity(0.3),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+              side: BorderSide(color: Colors.white.withOpacity(0.1), width: 1),
+            ),
+            padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+          ),
+          icon: Container(
+            padding: EdgeInsets.all(2),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(
+              Icons.info_outline_rounded,
+              size: 22,
+              color: Colors.white70,
+            ),
+          ),
+          label: Text(
+            'View Cancel Reason',
+            style: TextStyle(
+              fontWeight: FontWeight.w600,
+              fontSize: 16,
+              letterSpacing: 0.5,
+              color: Colors.white70,
+            ),
+          ),
+        ),
+      );
     }
 
     return SizedBox.shrink();
@@ -1275,6 +1699,92 @@ class _BookingDetailsPageState extends State<BookingDetailsPage>
     );
   }
 
+  Widget _buildQuickInfoCards() {
+    return Row(
+      children: [
+        Expanded(
+          child: Container(
+            padding: EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
+                  color: colorPrimary.withOpacity(0.1),
+                  blurRadius: 15,
+                  offset: Offset(0, 5),
+                ),
+              ],
+            ),
+            child: Column(
+              children: [
+                Icon(
+                  Icons.calendar_today_rounded,
+                  color: colorPrimary,
+                  size: 24,
+                ),
+                SizedBox(height: 8),
+                Text(
+                  formatDate(currentBooking.preferredDate),
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w700,
+                    color: secondoryColor,
+                  ),
+                ),
+                Text(
+                  'Date',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: secondoryColor.withOpacity(0.6),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        SizedBox(width: 12),
+        Expanded(
+          child: Container(
+            padding: EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
+                  color: colorPrimary.withOpacity(0.1),
+                  blurRadius: 15,
+                  offset: Offset(0, 5),
+                ),
+              ],
+            ),
+            child: Column(
+              children: [
+                Icon(Icons.access_time_rounded, color: colorPrimary, size: 24),
+                SizedBox(height: 8),
+                Text(
+                  formatTime(currentBooking.preferredDate),
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w700,
+                    color: secondoryColor,
+                  ),
+                ),
+                Text(
+                  'Time',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: secondoryColor.withOpacity(0.6),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
   // Add this method to your class
   void _showDeleteConfirmationDialog(BuildContext context) {
     bool isLoading = false;
@@ -1504,3 +2014,159 @@ class _BookingDetailsPageState extends State<BookingDetailsPage>
     );
   }
 }
+
+
+
+/* 
+  
+
+ 
+  Widget _buildPatientInfoCard() {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(24),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 20,
+            offset: Offset(0, 8),
+          ),
+        ],
+      ),
+      child: Padding(
+        padding: EdgeInsets.all(28),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Container(
+                  padding: EdgeInsets.all(14),
+                  decoration: BoxDecoration(
+                    color: secondoryColor.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Icon(
+                    Icons.person_outline_rounded,
+                    color: secondoryColor,
+                    size: 26,
+                  ),
+                ),
+                SizedBox(width: 16),
+                Text(
+                  'Patient Information',
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.w800,
+                    color: secondoryColor,
+                    letterSpacing: -0.5,
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 24),
+            _buildPatientInfoRow(
+              'Full Name',
+              currentBooking.patientName,
+              Icons.badge_rounded,
+            ),
+            SizedBox(height: 18),
+            _buildPatientInfoRow(
+              'Age',
+              '${currentBooking.patientAge} years old',
+              Icons.cake_rounded,
+            ),
+            SizedBox(height: 18),
+            _buildPatientInfoRow(
+              'Gender',
+              currentBooking.patientGender,
+              Icons.wc_rounded,
+            ),
+            SizedBox(height: 18),
+            _buildPatientInfoRow(
+              'Phone Number',
+              currentBooking.patientContact,
+              Icons.phone_rounded,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  
+}/* 
+
+  Widget _buildFloatingActionButtons() {
+    final status = currentBooking.status.toLowerCase();
+
+    if (status == 'pending') {
+      return Container(
+        margin: EdgeInsets.symmetric(horizontal: 20),
+        child: Row(
+          children: [
+            // Cancel Button
+            Expanded(
+              child: Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [Color(0xFFDC2626), Color(0xFFEF4444)],
+                  ),
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Color(0xFFDC2626).withOpacity(0.3),
+                      blurRadius: 12,
+                      offset: Offset(0, 6),
+                    ),
+                  ],
+                ),
+                child: FloatingActionButton.extended(
+                  heroTag: "cancel",
+                  onPressed: () async {
+                    _showCancelDialog(context);
+                  },
+                  backgroundColor: Colors.transparent,
+                  elevation: 0,
+                  icon: Icon(Icons.cancel_outlined, color: Colors.white, size: 22),
+                  label: Text(
+                    'Cancel',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w700,
+                      fontSize: 16,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            SizedBox(width: 12),
+            // Update Button
+            Expanded(
+              child: Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [colorPrimary, colorPrimary.withOpacity(0.8)],
+                  ),
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: colorPrimary.withOpacity(0.3),
+                      blurRadius: 12,
+                      offset: Offset(0, 6),
+                    ),
+                  ],
+                ),
+                child: FloatingActionButton.extended(
+                  heroTag: "update",
+                  onPressed: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => BookingScreen(
+                          doctorsModel: widget.booking.doctor,
+                          booking: BookingModel(
+                            id: widget.booking.id,
+                            fullName: widget.booking.patientName,
+                            gender: widget.booking.patientGender,
+                            age: int.tryParse(widget */ */
