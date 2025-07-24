@@ -3,12 +3,14 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:intl/intl.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:mediora/apis/patients/booking_apis.dart';
 import 'package:mediora/apis/patients/preference_controller.dart';
 import 'package:mediora/helper/syntoms_model.dart';
 import 'package:mediora/models/booking_model.dart';
 import 'package:mediora/models/doctors_model.dart';
 import 'package:mediora/patients/views/patient_home_screen.dart';
+import 'package:mediora/widgets/new_loading_screen.dart';
 
 class BookingScreen extends StatefulWidget {
   const BookingScreen({super.key, this.booking, required this.doctorsModel});
@@ -120,6 +122,7 @@ class _BookingScreenState extends State<BookingScreen> {
   Future _save() async {
     if (!_formKey.currentState!.validate()) return;
 
+    MedicalLoadingOverlay.show(context, title: "Requesting...");
     final booking = BookingModel(
       patientId: PatientController.patientModel?.id ?? "",
       id: widget.booking?.id,
@@ -139,14 +142,17 @@ class _BookingScreenState extends State<BookingScreen> {
     );
 
     if (booking.id != null) {
+      // MedicalLoadingOverlay.hide();
       ApiResult added = await BookingApi.updateBooking(booking);
 
       if (added.isOk) {
+        MedicalLoadingOverlay.hide();
         Navigator.of(context).pushAndRemoveUntil(
           MaterialPageRoute(builder: (_) => PatientHomeScreen()),
           (r) => false,
         );
       } else {
+        MedicalLoadingOverlay.hide();
         ScaffoldMessenger.of(
           context,
         ).showSnackBar(SnackBar(content: Text(added.message)));
@@ -159,11 +165,13 @@ class _BookingScreenState extends State<BookingScreen> {
       ); */
 
       if (added.isOk) {
+        MedicalLoadingOverlay.hide();
         Navigator.of(context).pushAndRemoveUntil(
           MaterialPageRoute(builder: (_) => PatientHomeScreen()),
           (r) => false,
         );
       } else {
+        MedicalLoadingOverlay.hide();
         ScaffoldMessenger.of(
           context,
         ).showSnackBar(SnackBar(content: Text(added.message)));
