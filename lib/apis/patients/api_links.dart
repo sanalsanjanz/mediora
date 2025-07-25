@@ -14,3 +14,4 @@ String ambulance = "${baseUrl}ambulance";
 
 //Booking
 String bookingUrl = "${baseUrl}bookings";
+String orderBaseUrl = "${baseUrl}orders";

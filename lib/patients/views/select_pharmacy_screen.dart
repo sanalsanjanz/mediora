@@ -3,16 +3,18 @@ import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:mediora/apis/patients/api_helpers.dart';
 import 'package:mediora/apis/patients/preference_controller.dart';
 import 'package:mediora/models/pharmacy_model.dart';
-import 'package:mediora/patients/views/pharmacy_home_screen.dart';
+import 'package:mediora/models/prescription_details_model.dart';
+import 'package:mediora/patients/views/book_medicine_screen.dart';
 
-class ViewAllPharmacies extends StatefulWidget {
-  const ViewAllPharmacies({super.key});
+class SelectPharmacyScreen extends StatefulWidget {
+  const SelectPharmacyScreen({super.key, required this.prescription});
+  final PrescriptionDetailsModel prescription;
 
   @override
-  State<ViewAllPharmacies> createState() => _ViewAllPharmaciesState();
+  State<SelectPharmacyScreen> createState() => _SelectPharmacyScreenState();
 }
 
-class _ViewAllPharmaciesState extends State<ViewAllPharmacies> {
+class _SelectPharmacyScreenState extends State<SelectPharmacyScreen> {
   final TextEditingController _searchController = TextEditingController();
   late Future<List<PharmacyModel>> _filteredPharmacies;
 
@@ -47,16 +49,6 @@ class _ViewAllPharmaciesState extends State<ViewAllPharmacies> {
           ),
         ),
         centerTitle: false,
-        /*  actions: [
-          IconButton(
-            icon: const Icon(Icons.filter_list, color: Color(0xFF64748B)),
-            onPressed: () {},
-          ),
-          IconButton(
-            icon: const Icon(Icons.map, color: Color(0xFF64748B)),
-            onPressed: () {},
-          ),
-        ], */
       ),
       body: Column(
         children: [
@@ -116,26 +108,6 @@ class _ViewAllPharmaciesState extends State<ViewAllPharmacies> {
             ),
           ),
 
-          // Filter Chips
-          /* Container(
-            color: Colors.white,
-            padding: const EdgeInsets.only(left: 20, right: 20, bottom: 20),
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: [
-                  _buildFilterChip('Open Now', Icons.access_time, true),
-                  const SizedBox(width: 12),
-                  _buildFilterChip('Delivery', Icons.delivery_dining, false),
-                  const SizedBox(width: 12),
-                  _buildFilterChip('24/7', Icons.schedule, false),
-                  const SizedBox(width: 12),
-                  _buildFilterChip('Insurance', Icons.verified_user, false),
-                ],
-              ),
-            ),
-          ), */
-
           // Results Header
           Expanded(
             child: FutureBuilder(
@@ -152,44 +124,6 @@ class _ViewAllPharmaciesState extends State<ViewAllPharmacies> {
                 } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
                   return Column(
                     children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                          vertical: 16,
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              '${snapshot.data!.length} pharmacies found',
-                              style: const TextStyle(
-                                color: Color(0xFF64748B),
-                                fontSize: 16,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                            Row(
-                              children: [
-                                const Icon(
-                                  Icons.location_on,
-                                  color: Color(0xFF10B981),
-                                  size: 16,
-                                ),
-                                const SizedBox(width: 4),
-                                Text(
-                                  'Near you',
-                                  style: const TextStyle(
-                                    color: Color(0xFF10B981),
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-
                       // Pharmacies List
                       Expanded(
                         child: snapshot.data!.isEmpty
@@ -272,7 +206,10 @@ class _ViewAllPharmaciesState extends State<ViewAllPharmacies> {
           onTap: () {
             Navigator.of(context).push(
               MaterialPageRoute(
-                builder: (_) => PharmacyHomeScreen(items: pharmacy),
+                builder: (_) => BookMedicineScreen(
+                  items: pharmacy,
+                  prescription: widget.prescription,
+                ),
               ),
             );
           },
@@ -280,21 +217,6 @@ class _ViewAllPharmaciesState extends State<ViewAllPharmacies> {
             padding: const EdgeInsets.all(16),
             child: Row(
               children: [
-                // Pharmacy Image
-                Container(
-                  width: 80,
-                  height: 80,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(16),
-                    image: DecorationImage(
-                      image: NetworkImage(pharmacy.image),
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 16),
-
-                // Pharmacy Details
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -312,28 +234,6 @@ class _ViewAllPharmaciesState extends State<ViewAllPharmacies> {
                               ),
                             ),
                           ),
-                          /*  Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 4,
-                            ),
-                            decoration: BoxDecoration(
-                              color: pharmacy.
-                                  ? const Color(0xFFDCFCE7)
-                                  : const Color(0xFFFEF2F2),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Text(
-                              pharmacy.isOpen ? 'Open' : 'Closed',
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w600,
-                                color: pharmacy.isOpen
-                                    ? const Color(0xFF166534)
-                                    : const Color(0xFF991B1B),
-                              ),
-                            ),
-                          ), */
                         ],
                       ),
                       const SizedBox(height: 4),
@@ -359,38 +259,6 @@ class _ViewAllPharmaciesState extends State<ViewAllPharmacies> {
                       const SizedBox(height: 8),
                       Row(
                         children: [
-                          // Rating
-                          /*  Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 4,
-                            ),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFFEF3C7),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                const Icon(
-                                  Icons.star,
-                                  color: Color(0xFFF59E0B),
-                                  size: 14,
-                                ),
-                                const SizedBox(width: 4),
-                                Text(
-                                  pharmacy.rating.toString(),
-                                  style: const TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w600,
-                                    color: Color(0xFFA16207),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ), */
-                          // const SizedBox(width: 8),
-
                           // Distance
                           Container(
                             padding: const EdgeInsets.symmetric(
@@ -413,39 +281,8 @@ class _ViewAllPharmaciesState extends State<ViewAllPharmacies> {
                               ),
                             ),
                           ),
-                          const SizedBox(width: 8),
 
-                          // Delivery Badge
-                          /* if (pharmacy.i)
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 8,
-                                vertical: 4,
-                              ),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFFECFDF5),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: const [
-                                  Icon(
-                                    Icons.delivery_dining,
-                                    color: Color(0xFF059669),
-                                    size: 12,
-                                  ),
-                                  SizedBox(width: 4),
-                                  Text(
-                                    'Delivery',
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w600,
-                                      color: Color(0xFF059669),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ), */
+                          const SizedBox(width: 8),
                         ],
                       ),
                     ],

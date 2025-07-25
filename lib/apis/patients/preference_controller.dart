@@ -1,6 +1,8 @@
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:mediora/helper/check_opened.dart';
 import 'package:mediora/models/patient_model.dart';
+import 'package:mediora/models/working_hours_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class PatientController {
@@ -53,5 +55,28 @@ class PatientController {
     await preferences.clear();
     patientModel = null;
     return;
+  }
+
+  static checkShopStatus(List<WorkingHourModel> hours) {
+    final status = getShopStatus(hours);
+    switch (status) {
+      case ShopStatus.open:
+        print("✅ Shop is currently **OPEN**");
+        // break;
+        return "Open";
+
+      case ShopStatus.closesSoon:
+        print("⚠️ Shop is **CLOSING SOON**");
+        // break;
+        return "Close Soon";
+      case ShopStatus.closed:
+        print("❌ Shop is **CLOSED**");
+        // break;
+        return "Closed";
+      case ShopStatus.opensSoon:
+        print("🕑 Shop is **OPENING SOON**");
+        // break;
+        return "Opening Soon";
+    }
   }
 }

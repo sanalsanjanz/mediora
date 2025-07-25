@@ -9,6 +9,8 @@ import 'package:mediora/helper/colors.dart';
 import 'package:mediora/models/booking_details_model.dart';
 import 'package:mediora/models/prescription_details_model.dart';
 import 'package:mediora/patients/views/genarate_prescription_pdf.dart';
+import 'package:mediora/patients/views/select_pharmacy_screen.dart';
+import 'package:mediora/widgets/order_banner.dart';
 import 'package:printing/printing.dart';
 
 class PdfPreviewPage extends StatefulWidget {
@@ -70,7 +72,20 @@ class _PdfPreviewPageState extends State<PdfPreviewPage> {
             )
           : Column(
               children: [
-                _buildHeader(),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  child: PharmacyOrderBanner(
+                    onTap: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => SelectPharmacyScreen(
+                            prescription: locationDetails!,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
                 Expanded(
                   child: Container(
                     margin: const EdgeInsets.symmetric(horizontal: 16),
@@ -89,7 +104,7 @@ class _PdfPreviewPageState extends State<PdfPreviewPage> {
                       borderRadius: BorderRadius.circular(12),
                       child: PdfPreview(
                         previewPageMargin: EdgeInsets.zero,
-                        padding: const EdgeInsets.all(16),
+                        /*  padding: const EdgeInsets.all(16), */
                         loadingWidget: const CircularProgressIndicator(),
                         scrollViewDecoration: const BoxDecoration(
                           color: Colors.white,

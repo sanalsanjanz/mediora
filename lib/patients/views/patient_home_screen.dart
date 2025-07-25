@@ -4,12 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:icons_plus/icons_plus.dart';
 import 'package:mediora/apis/patients/api_helpers.dart';
 import 'package:mediora/apis/patients/preference_controller.dart';
-import 'package:mediora/patients/games/breathin_game.dart';
 import 'package:mediora/patients/views/ambulance_services.dart';
 import 'package:mediora/patients/views/breath_in_banner.dart';
 import 'package:mediora/patients/views/clinic_list.dart';
 import 'package:mediora/patients/views/doctors_list.dart';
 import 'package:mediora/patients/views/my_bookings.dart';
+import 'package:mediora/patients/views/my_order_screen.dart';
 import 'package:mediora/patients/views/pharmacy_list.dart';
 import 'package:mediora/splash_screen.dart';
 import 'package:mediora/widgets/custom_indicator.dart';
@@ -218,66 +218,76 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
             const SizedBox(height: 20),
 
             // Medical Banner - Health Checkup Reminder
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.15),
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: Colors.white.withOpacity(0.25)),
-              ),
-              child: Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFFF6B6B).withOpacity(0.8),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: const Icon(
-                      Icons.favorite_outline,
-                      color: Colors.white,
-                      size: 18,
-                    ),
-                  ),
-                  const SizedBox(width: 14),
-                  const Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Annual Health Checkup Due',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 15,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                        Text(
-                          'Book your appointment today',
-                          style: TextStyle(color: Colors.white70, fontSize: 12),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 6,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.2),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: const Text(
-                      'Book Now',
-                      style: TextStyle(
+            GestureDetector(
+              onTap: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(builder: (_) => NearestAmbulanceScreen()),
+                );
+              },
+              child: Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.15),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: Colors.white.withOpacity(0.25)),
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFFF6B6B).withOpacity(0.8),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Icon(
+                        Icons.emergency,
                         color: Colors.white,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
+                        size: 18,
                       ),
                     ),
-                  ),
-                ],
+                    const SizedBox(width: 14),
+                    const Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Emergency Medical Help Needed?',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 15,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          Text(
+                            'Call an ambulance immediately — we’re here 24/7',
+                            style: TextStyle(
+                              color: Colors.white70,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    /*  Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.2),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Text(
+                        'Book Now',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ), */
+                  ],
+                ),
               ),
             ),
 
@@ -381,11 +391,9 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                 Expanded(
                   child: GestureDetector(
                     onTap: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (_) => NearestAmbulanceScreen(),
-                        ),
-                      );
+                      Navigator.of(
+                        context,
+                      ).push(MaterialPageRoute(builder: (_) => OrdersScreen()));
                     },
                     child: Container(
                       padding: const EdgeInsets.all(14),
@@ -405,14 +413,14 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                               borderRadius: BorderRadius.circular(10),
                             ),
                             child: const Icon(
-                              Icons.emoji_objects_sharp,
+                              Icons.history_outlined,
                               color: Colors.white,
                               size: 16,
                             ),
                           ),
                           const SizedBox(height: 8),
                           const Text(
-                            'Emergency',
+                            'My Orders',
                             style: TextStyle(
                               color: Colors.white,
                               fontSize: 13,

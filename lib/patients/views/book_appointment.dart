@@ -3,13 +3,12 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:intl/intl.dart';
-import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:mediora/apis/patients/booking_apis.dart';
 import 'package:mediora/apis/patients/preference_controller.dart';
 import 'package:mediora/helper/syntoms_model.dart';
 import 'package:mediora/models/booking_model.dart';
 import 'package:mediora/models/doctors_model.dart';
-import 'package:mediora/patients/views/patient_home_screen.dart';
+import 'package:mediora/patients/views/patient_landing_screen.dart';
 import 'package:mediora/widgets/new_loading_screen.dart';
 
 class BookingScreen extends StatefulWidget {
@@ -148,7 +147,7 @@ class _BookingScreenState extends State<BookingScreen> {
       if (added.isOk) {
         MedicalLoadingOverlay.hide();
         Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(builder: (_) => PatientHomeScreen()),
+          MaterialPageRoute(builder: (_) => PatientLandingScreen()),
           (r) => false,
         );
       } else {
@@ -160,14 +159,14 @@ class _BookingScreenState extends State<BookingScreen> {
     } else {
       ApiResult added = await BookingApi.addBooking(booking);
       /*   Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(builder: (_) => PatientHomeScreen()),
+        MaterialPageRoute(builder: (_) => PatientLandingScreen()),
         (r) => false,
       ); */
 
       if (added.isOk) {
         MedicalLoadingOverlay.hide();
         Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(builder: (_) => PatientHomeScreen()),
+          MaterialPageRoute(builder: (_) => PatientLandingScreen()),
           (r) => false,
         );
       } else {

@@ -785,7 +785,7 @@
 //     if (!_isLoginMode) print('Name: $name');
 //     Navigator.of(
 //       context,
-//     ).push(MaterialPageRoute(builder: (c) => PatientHomeScreen()));
+//     ).push(MaterialPageRoute(builder: (c) => PatientLandingScreen()));
 
 //     ScaffoldMessenger.of(context).showSnackBar(
 //       SnackBar(

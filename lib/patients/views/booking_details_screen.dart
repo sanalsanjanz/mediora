@@ -5,7 +5,7 @@ import 'package:mediora/models/booking_details_model.dart';
 import 'package:mediora/models/booking_model.dart';
 import 'package:mediora/patients/views/book_appointment.dart';
 import 'package:mediora/patients/views/get_prescription_screen.dart';
-import 'package:mediora/patients/views/patient_home_screen.dart';
+import 'package:mediora/patients/views/patient_landing_screen.dart';
 
 class BookingDetailsPage extends StatefulWidget {
   final BookingDetailsModel booking;
@@ -211,7 +211,7 @@ class _BookingDetailsPageState extends State<BookingDetailsPage>
                   if (widget.isFromNotification) {
                     Navigator.pushReplacement(
                       context,
-                      MaterialPageRoute(builder: (_) => PatientHomeScreen()),
+                      MaterialPageRoute(builder: (_) => PatientLandingScreen()),
                     );
                   } else {
                     Navigator.pop(context);
@@ -376,7 +376,7 @@ class _BookingDetailsPageState extends State<BookingDetailsPage>
               child: SlideTransition(
                 position: _slideAnimation,
                 child: Padding(
-                  padding: EdgeInsets.fromLTRB(20, 20, 20, 100),
+                  padding: EdgeInsets.fromLTRB(10, 20, 10, 100),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -384,6 +384,7 @@ class _BookingDetailsPageState extends State<BookingDetailsPage>
                       _buildQuickInfoCards(),
                       SizedBox(height: 24),
 
+                      // SizedBox(height: 24),
                       // Doctor Information Card
                       _buildDoctorInfoCard(),
                       SizedBox(height: 20),
@@ -464,7 +465,7 @@ class _BookingDetailsPageState extends State<BookingDetailsPage>
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Dr. ${currentBooking.doctor.name}',
+                        currentBooking.doctor.name,
                         style: TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.w800,
@@ -1622,7 +1623,8 @@ class _BookingDetailsPageState extends State<BookingDetailsPage>
                                           context,
                                         ).pushAndRemoveUntil(
                                           MaterialPageRoute(
-                                            builder: (_) => PatientHomeScreen(),
+                                            builder: (_) =>
+                                                PatientLandingScreen(),
                                           ),
                                           (_) => false,
                                         );
@@ -1937,7 +1939,8 @@ class _BookingDetailsPageState extends State<BookingDetailsPage>
                                           context,
                                         ).pushAndRemoveUntil(
                                           MaterialPageRoute(
-                                            builder: (_) => PatientHomeScreen(),
+                                            builder: (_) =>
+                                                PatientLandingScreen(),
                                           ),
                                           (_) => false,
                                         );
