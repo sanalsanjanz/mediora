@@ -1,4 +1,4 @@
-package com.mediora.doctor
+package com.mediora.pharmacy
 
 import io.flutter.embedding.android.FlutterActivity
 

@@ -17,7 +17,7 @@ plugins {
 
 android {
     // Defines the unique application ID for your Android app.
-    namespace = "com.mediora.doctor"
+    namespace = "com.mediora.pharmacy"
 
     // Specifies the Android API level to compile against, pulled from Flutter configuration.
     compileSdk = flutter.compileSdkVersion
@@ -44,7 +44,7 @@ android {
     // Configures default settings for all build variants.
     defaultConfig {
         // The unique application ID, which should match the namespace.
-        applicationId = "com.mediora.doctor"
+        applicationId = "com.mediora.pharmacy"
         // Specifies the minimum Android API level required to run the app, pulled from Flutter config.
         minSdk = flutter.minSdkVersion
         // Specifies the target Android API level, pulled from Flutter config.

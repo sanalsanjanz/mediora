@@ -51,7 +51,7 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyA07jdgCKU3c_Fmzeml0XBN8756hlQ3P-A',
-    appId: '1:757631954736:android:3f1f3907e65d39a906a2f5',
+    appId: '1:757631954736:android:9e44712dacf77ab706a2f5',
     messagingSenderId: '757631954736',
     projectId: 'mediora-connect',
     storageBucket: 'mediora-connect.firebasestorage.app',
@@ -59,11 +59,11 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyAolIllpTK8XpfPLRHfDQCfHBJPpOcVwgA',
-    appId: '1:757631954736:ios:59ab86374332b1f706a2f5',
+    appId: '1:757631954736:ios:458fa982558a100a06a2f5',
     messagingSenderId: '757631954736',
     projectId: 'mediora-connect',
     storageBucket: 'mediora-connect.firebasestorage.app',
-    iosBundleId: 'com.mediora.doctor',
+    iosBundleId: 'com.mediora.pharmacy',
   );
 
 }
