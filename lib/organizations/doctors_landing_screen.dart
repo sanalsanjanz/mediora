@@ -1,15 +1,14 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:mediora/apis/patients/booking_apis.dart';
 import 'package:mediora/apis/patients/preference_controller.dart';
 import 'package:mediora/helper/call_navigation_helper.dart';
 import 'package:mediora/models/booking_details_model.dart';
-import 'package:mediora/models/patient_model.dart';
 import 'package:mediora/organizations/booking_status_screen.dart';
 import 'package:mediora/organizations/manage_appointments.dart';
 import 'package:mediora/organizations/org_doc_screen.dart';
 import 'package:mediora/widgets/shimmer_box.dart';
-import 'package:mediora/widgets/show_loading.dart';
 
 class DoctorsLandingScreen extends StatefulWidget {
   const DoctorsLandingScreen({super.key, this.fcm});
@@ -184,7 +183,7 @@ class _DoctorsLandingScreenState extends State<DoctorsLandingScreen> {
                                 ),
                                 child: CircleAvatar(
                                   radius: 28,
-                                  backgroundImage: NetworkImage(
+                                  backgroundImage: CachedNetworkImageProvider(
                                     PatientController.doctorModel?.user.image ??
                                         '',
                                   ),

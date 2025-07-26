@@ -141,7 +141,7 @@ class _MedicalLoginScreenState extends State<MedicalLoginScreen>
             colors: [medicalBlue, calmTeal],
           ).createShader(bounds),
           child: const Text(
-            'MediCare+',
+            'MEDIORA',
             style: TextStyle(
               fontSize: 32,
               fontWeight: FontWeight.bold,

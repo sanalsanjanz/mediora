@@ -7,7 +7,7 @@ import 'package:mediora/organizations/booking_status_screen.dart';
 import 'package:mediora/widgets/shimmer_box.dart';
 
 class AllAppointmentsScreen extends StatefulWidget {
-  const AllAppointmentsScreen({Key? key}) : super(key: key);
+  const AllAppointmentsScreen({super.key});
 
   @override
   State<AllAppointmentsScreen> createState() => _AllAppointmentsScreenState();
@@ -218,7 +218,7 @@ class _AllAppointmentsScreenState extends State<AllAppointmentsScreen>
   }
 
   Widget _buildBookingsList(String status) {
-    final filteredBookings = _getFilteredBookings(status);
+    final filteredBookings = _getFilteredBookings(status).reversed.toList();
 
     if (filteredBookings.isEmpty) {
       return _buildEmptyState(status);
@@ -251,14 +251,20 @@ class _AllAppointmentsScreenState extends State<AllAppointmentsScreen>
     if (status == 'confirmed') {
       statusFiltered = _allBookings
           .where((booking) => booking.status.toLowerCase() == 'confirmed')
+          .toList()
+          .reversed
           .toList();
     } else if (status == 'pending') {
       statusFiltered = _allBookings
           .where((booking) => booking.status.toLowerCase() == 'pending')
+          .toList()
+          .reversed
           .toList();
     } else if (status == 'completed') {
       statusFiltered = _allBookings
           .where((booking) => booking.status.toLowerCase() == 'completed')
+          .toList()
+          .reversed
           .toList();
     }
 

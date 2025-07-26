@@ -1,6 +1,4 @@
 import 'dart:convert';
-import 'dart:typed_data';
-import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -10,10 +8,8 @@ import 'package:mediora/apis/patients/prescreption_api.dart';
 import 'package:mediora/models/booking_details_model.dart';
 import 'package:mediora/organizations/doctors_landing_screen.dart';
 import 'package:mediora/organizations/genarate_prescription_pdf.dart';
+import 'package:mediora/widgets/show_loading.dart';
 import 'package:signature/signature.dart';
-
-import 'package:path_provider/path_provider.dart';
-import 'package:open_file/open_file.dart';
 
 class CheckUpPatientScreen extends StatefulWidget {
   final BookingDetailsModel booking;
@@ -27,10 +23,16 @@ class CheckUpPatientScreen extends StatefulWidget {
 class _CheckUpPatientScreenState extends State<CheckUpPatientScreen> {
   final TextEditingController _medicineController = TextEditingController();
   final TextEditingController _notesController = TextEditingController();
+  final TextEditingController _customDaysController = TextEditingController();
   final FocusNode _medicineFocusNode = FocusNode();
 
   final List<String> _selectedMedicines = [];
   List<String> _suggestions = [];
+
+  // Days selection variables
+  int _selectedDays = 7; // Default to 1 week
+  String _selectedDuration = '1 Week';
+  bool _isCustomDays = false;
 
   final SignatureController _signatureController = SignatureController(
     penStrokeWidth: 2,
@@ -40,13 +42,21 @@ class _CheckUpPatientScreenState extends State<CheckUpPatientScreen> {
 
   String? _base64Signature;
   bool showExamineView = true;
-  bool _isGeneratingPdf = false;
+  final bool _isGeneratingPdf = false;
 
   // Royal blue color palette
   static const Color primaryRoyalBlue = Color(0xFF1565C0);
   static const Color lightRoyalBlue = Color(0xFF1976D2);
   static const Color darkRoyalBlue = Color(0xFF0D47A1);
   static const Color accentBlue = Color(0xFF42A5F5);
+
+  // Predefined duration options
+  final List<Map<String, dynamic>> _durationOptions = [
+    {'label': '1 Week', 'days': 7},
+    {'label': '2 Weeks', 'days': 14},
+    {'label': '1 Month', 'days': 30},
+    {'label': 'Custom', 'days': 0}, // 0 indicates custom
+  ];
 
   Future<List<String>> fetchMedicineSuggestions(String query) async {
     final url = Uri.parse('$baseUrl/medicine/suggest?q=$query');
@@ -83,18 +93,40 @@ class _CheckUpPatientScreenState extends State<CheckUpPatientScreen> {
     }
   }
 
+  void _onDurationSelected(String duration, int days) {
+    setState(() {
+      _selectedDuration = duration;
+      _isCustomDays = duration == 'Custom';
+      if (!_isCustomDays) {
+        _selectedDays = days;
+        _customDaysController.clear();
+      }
+    });
+  }
+
+  void _onCustomDaysChanged(String value) {
+    final customDays = int.tryParse(value);
+    if (customDays != null && customDays > 0) {
+      setState(() {
+        _selectedDays = customDays;
+      });
+    }
+  }
+
   void _completeExamination() async {
+    MedioraLoadingScreen.show(message: "Sending Prescription", context);
     final Uint8List? signatureBytes = await _signatureController.toPngBytes();
     _base64Signature = signatureBytes != null
         ? base64Encode(signatureBytes)
         : null;
-
+    /* 
     print("✅ Examination Completed");
     print("Medicines: $_selectedMedicines");
     print("Notes: ${_notesController.text}");
+    print("Days: $_selectedDays");
     print(
       "Signature (base64): ${_base64Signature != null ? 'Captured' : 'Not captured'}",
-    );
+    ); */
 
     final result = await PrescriptionAPI.addPrescription({
       'doctor_id': widget.booking.doctorId,
@@ -103,6 +135,7 @@ class _CheckUpPatientScreenState extends State<CheckUpPatientScreen> {
       'medicines': _selectedMedicines,
       'notes': _notesController.text,
       'diagnosis': widget.booking.reason,
+      'days': _selectedDays,
       'signature_base64': _base64Signature ?? "",
     });
 
@@ -115,12 +148,13 @@ class _CheckUpPatientScreenState extends State<CheckUpPatientScreen> {
         notesController: _notesController.text,
         base64Signature: _base64Signature,
       );
-
+      MedioraLoadingScreen.hide();
       Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(builder: (_) => DoctorsLandingScreen()),
         (S) => false,
       );
     } else {
+      MedioraLoadingScreen.hide();
       print('Error: ${result['error']}');
     }
 
@@ -131,6 +165,7 @@ class _CheckUpPatientScreenState extends State<CheckUpPatientScreen> {
   void dispose() {
     _medicineController.dispose();
     _notesController.dispose();
+    _customDaysController.dispose();
     _signatureController.dispose();
     _medicineFocusNode.dispose();
     super.dispose();
@@ -194,6 +229,8 @@ class _CheckUpPatientScreenState extends State<CheckUpPatientScreen> {
             _buildPatientHeader(),
             const SizedBox(height: 20),
             _buildPrescriptionInput(),
+            const SizedBox(height: 20),
+            _buildDurationSelector(),
             const SizedBox(height: 20),
             _buildNotesInput(),
             const SizedBox(height: 20),
@@ -279,17 +316,6 @@ class _CheckUpPatientScreenState extends State<CheckUpPatientScreen> {
   Widget _buildPrescriptionInput() {
     return Container(
       padding: const EdgeInsets.all(10),
-      /* decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            blurRadius: 15,
-            offset: const Offset(0, 5),
-          ),
-        ],
-      ), */
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -398,20 +424,129 @@ class _CheckUpPatientScreenState extends State<CheckUpPatientScreen> {
     );
   }
 
+  Widget _buildDurationSelector() {
+    return Container(
+      padding: const EdgeInsets.all(10),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: primaryRoyalBlue.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Icon(
+                  Icons.schedule,
+                  color: primaryRoyalBlue,
+                  size: 20,
+                ),
+              ),
+              const SizedBox(width: 12),
+              const Text(
+                'Medicine Duration',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: primaryRoyalBlue,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: _durationOptions.map((option) {
+              final isSelected = _selectedDuration == option['label'];
+              return ChoiceChip(
+                label: Text(option['label']),
+                selected: isSelected,
+                onSelected: (selected) {
+                  if (selected) {
+                    _onDurationSelected(option['label'], option['days']);
+                  }
+                },
+                selectedColor: primaryRoyalBlue.withOpacity(0.2),
+                backgroundColor: Colors.grey.shade100,
+                labelStyle: TextStyle(
+                  color: isSelected ? primaryRoyalBlue : Colors.grey.shade700,
+                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                ),
+                side: BorderSide(
+                  color: isSelected ? primaryRoyalBlue : Colors.grey.shade300,
+                ),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
+                ),
+              );
+            }).toList(),
+          ),
+          if (_isCustomDays) ...[
+            const SizedBox(height: 16),
+            TextField(
+              controller: _customDaysController,
+              keyboardType: TextInputType.number,
+              onChanged: _onCustomDaysChanged,
+              decoration: InputDecoration(
+                hintText: 'Enter number of days',
+                prefixIcon: const Icon(
+                  Icons.edit_calendar,
+                  color: primaryRoyalBlue,
+                ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: Colors.grey.shade300),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: const BorderSide(
+                    color: primaryRoyalBlue,
+                    width: 2,
+                  ),
+                ),
+              ),
+            ),
+          ],
+          if (_selectedDays > 0) ...[
+            const SizedBox(height: 12),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: primaryRoyalBlue.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: primaryRoyalBlue.withOpacity(0.3)),
+              ),
+              child: Row(
+                children: [
+                  const Icon(
+                    Icons.info_outline,
+                    color: primaryRoyalBlue,
+                    size: 20,
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    'Selected: $_selectedDays days',
+                    style: const TextStyle(
+                      color: primaryRoyalBlue,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
   Widget _buildNotesInput() {
     return Container(
       padding: const EdgeInsets.all(10),
-      /* decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            blurRadius: 15,
-            offset: const Offset(0, 5),
-          ),
-        ],
-      ), */
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -465,17 +600,6 @@ class _CheckUpPatientScreenState extends State<CheckUpPatientScreen> {
   Widget _buildSignaturePad() {
     return Container(
       padding: const EdgeInsets.all(10),
-      /* decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            blurRadius: 15,
-            offset: const Offset(0, 5),
-          ),
-        ],
-      ), */
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -537,8 +661,8 @@ class _CheckUpPatientScreenState extends State<CheckUpPatientScreen> {
                   ),
                 ),
               ),
-              const SizedBox(width: 12),
-              Expanded(
+              // const SizedBox(width: 12),
+              /*  Expanded(
                 child: ElevatedButton.icon(
                   icon: const Icon(Icons.save),
                   label: const Text("Save"),
@@ -563,7 +687,7 @@ class _CheckUpPatientScreenState extends State<CheckUpPatientScreen> {
                     ),
                   ),
                 ),
-              ),
+              ), */
             ],
           ),
         ],
@@ -575,17 +699,6 @@ class _CheckUpPatientScreenState extends State<CheckUpPatientScreen> {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(10),
-      /* decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            blurRadius: 15,
-            offset: const Offset(0, 5),
-          ),
-        ],
-      ), */
       child: ElevatedButton(
         onPressed: _isGeneratingPdf ? null : _completeExamination,
         style: ElevatedButton.styleFrom(
