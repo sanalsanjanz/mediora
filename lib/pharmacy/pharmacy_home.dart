@@ -1,125 +1,169 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:mediora/apis/patients/pharmacies/order_api_handler.dart';
+import 'package:mediora/apis/patients/preference_controller.dart';
+import 'package:mediora/models/pharmacy/order_history_model.dart';
 import 'package:mediora/models/pharmacy/pharmacy_model.dart';
+import 'package:mediora/pharmacy/all_orders_screen.dart';
+import 'package:mediora/pharmacy/update_order_history.dart';
+
 import 'pharmacy_profile_screen.dart';
 
-class PharmacyHome extends StatelessWidget {
+class PharmacyHome extends StatefulWidget {
   final PharmacyAuthModel pharmacy;
 
   const PharmacyHome({super.key, required this.pharmacy});
 
   @override
+  State<PharmacyHome> createState() => _PharmacyHomeState();
+}
+
+class _PharmacyHomeState extends State<PharmacyHome> {
+  List<OrderHistoryModel> _orders = [];
+  bool _isLoading = true;
+
+  int get pendingCount =>
+      _orders.where((order) => order.status == 'Pending').length;
+
+  int get completedCount =>
+      _orders.where((order) => order.status == 'Completed').length;
+
+  int get processingCount =>
+      _orders.where((order) => order.status == 'Processing').length;
+
+  List<OrderHistoryModel> get recentOrders => _orders.take(5).toList();
+
+  @override
+  void initState() {
+    super.initState();
+    _loadOrders();
+  }
+
+  Future<void> _loadOrders() async {
+    setState(() => _isLoading = true);
+
+    try {
+      final data = await OrderService.getOrders(
+        pharmacyId: PatientController.pharmacyModel?.id ?? "",
+      );
+
+      if (mounted) {
+        data.sort((a, b) => b.orderDate.compareTo(a.orderDate));
+        setState(() {
+          _orders = data;
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isLoading = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to load orders: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
+  Future<void> _refreshData() async {
+    await _loadOrders();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[50],
-      body: CustomScrollView(
-        slivers: [
-          // Modern App Bar
-          SliverAppBar(
-            expandedHeight: 120,
-            floating: false,
-            pinned: true,
-            backgroundColor: Colors.teal,
-            elevation: 0,
-            flexibleSpace: FlexibleSpaceBar(
-              title: Text(
-                'Welcome, ${pharmacy.pharmacistName.split(' ').first}',
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.white,
-                ),
-              ),
-              background: Container(
-                decoration: const BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [Colors.teal, Color(0xFF00695C)],
-                  ),
+      backgroundColor: const Color(0xFFF5F7FA),
+      body: RefreshIndicator(
+        onRefresh: _refreshData,
+        child: CustomScrollView(
+          slivers: [
+            _buildAppBar(),
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildWelcomeCard(),
+                    const SizedBox(height: 24),
+                    _buildOverviewSection(),
+                    const SizedBox(height: 24),
+                    _buildRecentOrdersSection(),
+                  ],
                 ),
               ),
             ),
-            actions: [
-              Container(
-                margin: const EdgeInsets.only(right: 16),
-                child: GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) =>
-                            PharmacyProfileScreen(pharmacy: pharmacy),
-                      ),
-                    );
-                  },
-                  child: CircleAvatar(
-                    radius: 18,
-                    backgroundColor: Colors.white.withOpacity(0.2),
-                    child: const Icon(
-                      Icons.person,
-                      color: Colors.white,
-                      size: 20,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-
-          // Content
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Pharmacy Info Card
-                  _buildPharmacyInfoCard(),
-                  const SizedBox(height: 24),
-
-                  // Statistics Cards
-                  const Text(
-                    'Overview',
-                    style: TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF2E3440),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  _buildStatisticsCards(),
-                  const SizedBox(height: 24),
-
-                  // Recent Orders Section
-                  const Text(
-                    'Recent Activity',
-                    style: TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF2E3440),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  _buildRecentOrdersList(),
-                ],
-              ),
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
 
-  Widget _buildPharmacyInfoCard() {
+  Widget _buildAppBar() {
+    return SliverAppBar(
+      expandedHeight: 120,
+      pinned: true,
+      backgroundColor: const Color(0xFF1E88E5),
+      elevation: 0,
+      flexibleSpace: FlexibleSpaceBar(
+        title: const Text(
+          'Pharmacy Dashboard',
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+            color: Colors.white,
+          ),
+        ),
+        background: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [Color(0xFF1E88E5), Color(0xFF1565C0)],
+            ),
+          ),
+        ),
+      ),
+      actions: [
+        IconButton(
+          onPressed: _refreshData,
+          icon: const Icon(Icons.refresh, color: Colors.white),
+        ),
+        Container(
+          margin: const EdgeInsets.only(right: 16),
+          child: GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) =>
+                      PharmacyProfileScreen(pharmacy: widget.pharmacy),
+                ),
+              );
+            },
+            child: CircleAvatar(
+              radius: 18,
+              backgroundColor: Colors.white.withOpacity(0.2),
+              child: const Icon(Icons.person, color: Colors.white, size: 20),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildWelcomeCard() {
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
+            color: Colors.black.withOpacity(0.08),
+            blurRadius: 20,
             offset: const Offset(0, 4),
           ),
         ],
@@ -129,55 +173,79 @@ class PharmacyHome extends StatelessWidget {
           Container(
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              border: Border.all(color: Colors.teal, width: 3),
+              border: Border.all(color: const Color(0xFF1E88E5), width: 3),
+              boxShadow: [
+                BoxShadow(
+                  color: const Color(0xFF1E88E5).withOpacity(0.2),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
             ),
             child: CircleAvatar(
-              backgroundImage: NetworkImage(pharmacy.image),
+              backgroundImage: NetworkImage(widget.pharmacy.image),
               radius: 35,
             ),
           ),
-          const SizedBox(width: 16),
+          const SizedBox(width: 20),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  pharmacy.pharmacyName,
+                  'Welcome, ${widget.pharmacy.pharmacistName.split(' ').first}!',
                   style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF2E3440),
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFF1E88E5),
                   ),
                 ),
                 const SizedBox(height: 4),
+                Text(
+                  widget.pharmacy.pharmacyName,
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF2D3748),
+                  ),
+                ),
+                const SizedBox(height: 8),
                 Row(
                   children: [
-                    const Icon(Icons.location_on, size: 16, color: Colors.grey),
+                    const Icon(
+                      Icons.location_on,
+                      size: 16,
+                      color: Color(0xFF718096),
+                    ),
                     const SizedBox(width: 4),
                     Expanded(
                       child: Text(
-                        pharmacy.locationName,
+                        widget.pharmacy.locationName,
                         style: const TextStyle(
-                          color: Colors.grey,
+                          color: Color(0xFF718096),
                           fontSize: 14,
                         ),
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 12),
                 Row(
                   children: [
-                    _buildInfoChip(
+                    _buildStatusChip(
                       icon: Icons.work_outline,
-                      label: '${pharmacy.experience} years',
-                      color: Colors.blue,
+                      label: '${widget.pharmacy.experience} years exp',
+                      color: const Color(0xFF805AD5),
                     ),
                     const SizedBox(width: 8),
-                    _buildInfoChip(
-                      icon: pharmacy.status ? Icons.check_circle : Icons.cancel,
-                      label: pharmacy.status ? 'Active' : 'Inactive',
-                      color: pharmacy.status ? Colors.green : Colors.red,
+                    _buildStatusChip(
+                      icon: widget.pharmacy.status
+                          ? Icons.check_circle_outline
+                          : Icons.cancel_outlined,
+                      label: widget.pharmacy.status ? 'Active' : 'Inactive',
+                      color: widget.pharmacy.status
+                          ? const Color(0xFF38A169)
+                          : const Color(0xFFE53E3E),
                     ),
                   ],
                 ),
@@ -189,16 +257,17 @@ class PharmacyHome extends StatelessWidget {
     );
   }
 
-  Widget _buildInfoChip({
+  Widget _buildStatusChip({
     required IconData icon,
     required String label,
     required Color color,
   }) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
         color: color.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: color.withOpacity(0.3)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -210,7 +279,7 @@ class PharmacyHome extends StatelessWidget {
             style: TextStyle(
               color: color,
               fontSize: 12,
-              fontWeight: FontWeight.w500,
+              fontWeight: FontWeight.w600,
             ),
           ),
         ],
@@ -218,43 +287,89 @@ class PharmacyHome extends StatelessWidget {
     );
   }
 
-  Widget _buildStatisticsCards() {
-    return Row(
+  Widget _buildOverviewSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Expanded(
-          child: _buildStatCard(
-            title: 'Pending Orders',
-            count: '12',
-            icon: Icons.pending_actions,
-            color: Colors.orange,
-            gradient: const LinearGradient(
-              colors: [Color(0xFFFF9800), Color(0xFFFF5722)],
-            ),
+        const Text(
+          'Order Overview',
+          style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            color: Color(0xFF2D3748),
           ),
         ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: _buildStatCard(
-            title: 'Requests',
-            count: '8',
-            icon: Icons.request_page,
-            color: Colors.blue,
-            gradient: const LinearGradient(
-              colors: [Color(0xFF2196F3), Color(0xFF1976D2)],
+        const SizedBox(height: 16),
+        if (_isLoading)
+          const Center(
+            child: Padding(
+              padding: EdgeInsets.all(40),
+              child: CircularProgressIndicator(),
             ),
-          ),
+          )
+        else
+          _buildStatisticsCards(),
+      ],
+    );
+  }
+
+  Widget _buildStatisticsCards() {
+    return Column(
+      children: [
+        Row(
+          children: [
+            Expanded(
+              child: _buildStatCard(
+                title: 'Pending',
+                count: pendingCount.toString(),
+                icon: Icons.schedule,
+                gradient: const LinearGradient(
+                  colors: [Color(0xFFFF6B6B), Color(0xFFEE5A52)],
+                ),
+                onTap: () => _navigateToFilteredOrders('Pending'),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: _buildStatCard(
+                title: 'Processing',
+                count: processingCount.toString(),
+                icon: Icons.hourglass_empty,
+                gradient: const LinearGradient(
+                  colors: [Color(0xFFFFB946), Color(0xFFFF9500)],
+                ),
+                onTap: () => _navigateToFilteredOrders('Processing'),
+              ),
+            ),
+          ],
         ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: _buildStatCard(
-            title: 'Completed',
-            count: '45',
-            icon: Icons.check_circle,
-            color: Colors.green,
-            gradient: const LinearGradient(
-              colors: [Color(0xFF4CAF50), Color(0xFF388E3C)],
+        const SizedBox(height: 12),
+        Row(
+          children: [
+            Expanded(
+              child: _buildStatCard(
+                title: 'Completed',
+                count: completedCount.toString(),
+                icon: Icons.check_circle,
+                gradient: const LinearGradient(
+                  colors: [Color(0xFF51CF66), Color(0xFF40C057)],
+                ),
+                onTap: () => _navigateToFilteredOrders('Completed'),
+              ),
             ),
-          ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: _buildStatCard(
+                title: 'Total Orders',
+                count: _orders.length.toString(),
+                icon: Icons.receipt_long,
+                gradient: const LinearGradient(
+                  colors: [Color(0xFF339AF0), Color(0xFF1C7ED6)],
+                ),
+                onTap: () => _navigateToAllOrders(),
+              ),
+            ),
+          ],
         ),
       ],
     );
@@ -264,84 +379,131 @@ class PharmacyHome extends StatelessWidget {
     required String title,
     required String count,
     required IconData icon,
-    required Color color,
     required Gradient gradient,
+    required VoidCallback onTap,
   }) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        gradient: gradient,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: color.withOpacity(0.3),
-            blurRadius: 8,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          Icon(icon, color: Colors.white, size: 32),
-          const SizedBox(height: 8),
-          Text(
-            count,
-            style: const TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          gradient: gradient,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
             ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            title,
-            style: const TextStyle(
-              fontSize: 12,
-              color: Colors.white,
-              fontWeight: FontWeight.w500,
+          ],
+        ),
+        child: Column(
+          children: [
+            Icon(icon, color: Colors.white, size: 32),
+            const SizedBox(height: 12),
+            Text(
+              count,
+              style: const TextStyle(
+                fontSize: 28,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
             ),
-            textAlign: TextAlign.center,
-          ),
-        ],
+            const SizedBox(height: 4),
+            Text(
+              title,
+              style: const TextStyle(
+                fontSize: 14,
+                color: Colors.white,
+                fontWeight: FontWeight.w600,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
       ),
     );
   }
 
+  Widget _buildRecentOrdersSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const Text(
+              'Recent Orders',
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF2D3748),
+              ),
+            ),
+            if (_orders.isNotEmpty)
+              TextButton.icon(
+                onPressed: _navigateToAllOrders,
+                icon: const Icon(Icons.arrow_forward, size: 16),
+                label: const Text('View All'),
+                style: TextButton.styleFrom(
+                  foregroundColor: const Color(0xFF1E88E5),
+                  textStyle: const TextStyle(fontWeight: FontWeight.w600),
+                ),
+              ),
+          ],
+        ),
+        const SizedBox(height: 16),
+        _buildRecentOrdersList(),
+      ],
+    );
+  }
+
   Widget _buildRecentOrdersList() {
-    final recentOrders = [
-      {
-        'id': '#ORD001',
-        'customer': 'John Smith',
-        'medication': 'Paracetamol 500mg',
-        'status': 'Pending',
-        'time': '2 hours ago',
-        'statusColor': Colors.orange,
-      },
-      {
-        'id': '#ORD002',
-        'customer': 'Sarah Johnson',
-        'medication': 'Amoxicillin 250mg',
-        'status': 'Completed',
-        'time': '4 hours ago',
-        'statusColor': Colors.green,
-      },
-      {
-        'id': '#ORD003',
-        'customer': 'Mike Davis',
-        'medication': 'Ibuprofen 400mg',
-        'status': 'Processing',
-        'time': '6 hours ago',
-        'statusColor': Colors.blue,
-      },
-      {
-        'id': '#ORD004',
-        'customer': 'Emma Wilson',
-        'medication': 'Vitamin D3',
-        'status': 'Pending',
-        'time': '1 day ago',
-        'statusColor': Colors.orange,
-      },
-    ];
+    if (_isLoading) {
+      return const Center(
+        child: Padding(
+          padding: EdgeInsets.all(40),
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
+
+    if (_orders.isEmpty) {
+      return Container(
+        padding: const EdgeInsets.all(40),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 10,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Column(
+          children: [
+            Icon(Icons.inventory_2_outlined, size: 64, color: Colors.grey[400]),
+            const SizedBox(height: 16),
+            Text(
+              'No Orders Yet',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: Colors.grey[600],
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Orders will appear here when patients place them',
+              style: TextStyle(fontSize: 14, color: Colors.grey[500]),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      );
+    }
 
     return Container(
       decoration: BoxDecoration(
@@ -351,112 +513,124 @@ class PharmacyHome extends StatelessWidget {
           BoxShadow(
             color: Colors.black.withOpacity(0.05),
             blurRadius: 10,
-            offset: const Offset(0, 4),
+            offset: const Offset(0, 2),
           ),
         ],
       ),
-      child: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text(
-                  'Recent Orders',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                ),
-                TextButton(onPressed: () {}, child: const Text('View All')),
-              ],
-            ),
+      child: ListView.separated(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        itemCount: recentOrders.length,
+        separatorBuilder: (context, index) =>
+            Divider(height: 1, color: Colors.grey[200]),
+        itemBuilder: (context, index) {
+          final order = recentOrders[index];
+          return _buildOrderTile(order);
+        },
+      ),
+    );
+  }
+
+  Widget _buildOrderTile(OrderHistoryModel order) {
+    Color statusColor;
+    IconData statusIcon;
+
+    switch (order.status.toLowerCase()) {
+      case 'pending':
+        statusColor = const Color(0xFFFF6B6B);
+        statusIcon = Icons.schedule;
+        break;
+      case 'processing':
+        statusColor = const Color(0xFFFFB946);
+        statusIcon = Icons.hourglass_empty;
+        break;
+      case 'completed':
+        statusColor = const Color(0xFF51CF66);
+        statusIcon = Icons.check_circle;
+        break;
+      default:
+        statusColor = const Color(0xFF718096);
+        statusIcon = Icons.help_outline;
+    }
+
+    return ListTile(
+      contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+      leading: CircleAvatar(
+        radius: 24,
+        backgroundColor: const Color(0xFF1E88E5).withOpacity(0.1),
+        child: Text(
+          order.patient.name[0].toUpperCase(),
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Color(0xFF1E88E5),
+            fontSize: 16,
           ),
-          ListView.separated(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: recentOrders.length,
-            separatorBuilder: (context, index) => const Divider(height: 1),
-            itemBuilder: (context, index) {
-              final order = recentOrders[index];
-              return ListTile(
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 8,
+        ),
+      ),
+      title: Text(
+        order.patient.name,
+        style: const TextStyle(
+          fontWeight: FontWeight.w600,
+          fontSize: 16,
+          color: Color(0xFF2D3748),
+        ),
+      ),
+      subtitle: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const SizedBox(height: 4),
+          Row(
+            children: [
+              Icon(statusIcon, size: 14, color: statusColor),
+              const SizedBox(width: 4),
+              Text(
+                order.status,
+                style: TextStyle(
+                  color: statusColor,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 12,
                 ),
-                leading: CircleAvatar(
-                  backgroundColor: (order['statusColor'] as Color).withOpacity(
-                    0.1,
-                  ),
-                  child: Text(
-                    order['customer']
-                        .toString()
-                        .split(' ')
-                        .map((e) => e[0])
-                        .join(),
-                    style: TextStyle(
-                      color: order['statusColor'] as Color,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-                title: Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        order['id'] as String,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 14,
-                        ),
-                      ),
-                    ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 4,
-                      ),
-                      decoration: BoxDecoration(
-                        color: (order['statusColor'] as Color).withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Text(
-                        order['status'] as String,
-                        style: TextStyle(
-                          color: order['statusColor'] as Color,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                subtitle: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const SizedBox(height: 4),
-                    Text(
-                      order['customer'] as String,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.w500,
-                        fontSize: 13,
-                      ),
-                    ),
-                    Text(
-                      order['medication'] as String,
-                      style: const TextStyle(color: Colors.grey, fontSize: 12),
-                    ),
-                    Text(
-                      order['time'] as String,
-                      style: const TextStyle(color: Colors.grey, fontSize: 11),
-                    ),
-                  ],
-                ),
-                onTap: () {
-                  // Handle order tap
-                },
-              );
-            },
+              ),
+            ],
+          ),
+          const SizedBox(height: 2),
+          Text(
+            DateFormat('MMM dd, yyyy • hh:mm a').format(order.orderDate),
+            style: const TextStyle(color: Color(0xFF718096), fontSize: 12),
           ),
         ],
+      ),
+      trailing: const Icon(
+        Icons.arrow_forward_ios,
+        size: 16,
+        color: Color(0xFF718096),
+      ),
+      onTap: () => _navigateToOrderDetails(order),
+    );
+  }
+
+  void _navigateToOrderDetails(OrderHistoryModel order) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => UpdateOrderStatusScreen(order: order)),
+    );
+  }
+
+  void _navigateToAllOrders() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => AllOrdersScreen(pharmacy: widget.pharmacy),
+      ),
+    );
+  }
+
+  void _navigateToFilteredOrders(String status) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) =>
+            AllOrdersScreen(pharmacy: widget.pharmacy, initialFilter: status),
       ),
     );
   }
