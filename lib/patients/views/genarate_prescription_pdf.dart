@@ -79,6 +79,19 @@ Future<Uint8List> generatePrescriptionPdf(
               buildPrescriptionTitle(materialIconsFont),
               pw.SizedBox(height: 10),
               buildProfessionalMedicineTable(medicinesOnPage, 15),
+              pw.SizedBox(height: 10),
+              pw.Row(
+                mainAxisAlignment: pw.MainAxisAlignment.end,
+                children: [
+                  pw.Text(
+                    "${prescription.days} Days",
+                    style: pw.TextStyle(
+                      fontSize: smallText,
+                      color: PdfColors.grey800,
+                    ),
+                  ),
+                ],
+              ),
               pw.Spacer(),
               if (page == totalPages - 1) ...[
                 buildNotesSection(prescription),

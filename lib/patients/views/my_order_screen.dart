@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:icons_plus/icons_plus.dart';
 import 'package:mediora/apis/patients/order_api_handler.dart';
 import 'package:mediora/apis/patients/preference_controller.dart';
+import 'package:mediora/helper/colors.dart';
 import 'package:mediora/models/order_history_model.dart';
+import 'package:mediora/patients/views/my_order_details_screen.dart';
 
 class OrdersScreen extends StatefulWidget {
   const OrdersScreen({super.key});
@@ -69,7 +72,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[50],
+      backgroundColor: Colors.white,
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.white,
@@ -94,6 +97,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
                   return Padding(
                     padding: const EdgeInsets.only(right: 8),
                     child: ChoiceChip(
+                      showCheckmark: false,
                       label: Text(status.capitalize()),
                       selected: isSelected,
                       onSelected: (selected) {
@@ -244,14 +248,24 @@ class _OrdersScreenState extends State<OrdersScreen> {
 
   Widget _buildOrderCard(OrderHistoryModel order) {
     return Card(
+      color: colorPrimary.withAlpha(10),
       elevation: 2,
       shadowColor: Colors.black12,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: InkWell(
         borderRadius: BorderRadius.circular(12),
-        onTap: () {
+        onTap: () async {
           // Navigate to order details
-          // Navigator.push(context, MaterialPageRoute(builder: (_) => OrderDetailsScreen(order: order)));
+          //
+          var res = await Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => MyOrderDetailsScreen(order: order),
+            ),
+          );
+          if (res != null) {
+            setState(() {});
+          }
         },
         child: Padding(
           padding: const EdgeInsets.all(16),
@@ -359,7 +373,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
                   vertical: 8,
                 ),
                 decoration: BoxDecoration(
-                  color: Colors.grey[50],
+                  color: Colors.white,
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(color: Colors.grey[200]!),
                 ),
@@ -379,27 +393,53 @@ class _OrdersScreenState extends State<OrdersScreen> {
                 ),
               ),
 
-              const SizedBox(height: 12),
+              const SizedBox(height: 10),
 
               // Order date and action
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.calendar_today,
-                        size: 16,
-                        color: Colors.grey[600],
-                      ),
-                      const SizedBox(width: 6),
-                      Text(
-                        _formatDate(order.orderDate),
-                        style: TextStyle(fontSize: 13, color: Colors.grey[600]),
-                      ),
-                    ],
+                  Expanded(
+                    child: Row(
+                      children: [
+                        Icon(
+                          FontAwesome.stethoscope_solid,
+                          size: 16,
+                          color: Colors.grey[600],
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          order.doctor.name,
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: Colors.grey[600],
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                  TextButton.icon(
+                  Expanded(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Icon(
+                          Icons.calendar_today,
+                          size: 15,
+                          color: Colors.grey[600],
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          _formatDate(order.orderDate),
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: Colors.grey[600],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  /* TextButton.icon(
                     onPressed: () {
                       // Navigate to order details
                     },
@@ -412,7 +452,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
                         fontWeight: FontWeight.w500,
                       ),
                     ),
-                  ),
+                  ), */
                 ],
               ),
             ],
@@ -424,7 +464,9 @@ class _OrdersScreenState extends State<OrdersScreen> {
 
   String _formatDate(DateTime date) {
     final now = DateTime.now();
-    final difference = now.difference(date).inDays;
+    final today = DateTime(now.year, now.month, now.day);
+    final inputDate = DateTime(date.year, date.month, date.day);
+    final difference = today.difference(inputDate).inDays;
 
     if (difference == 0) {
       return 'Today';

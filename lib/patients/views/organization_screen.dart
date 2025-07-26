@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:mediora/helper/about_bulder.dart';
 import 'package:mediora/helper/call_navigation_helper.dart';
@@ -39,7 +40,14 @@ class OrganizationScreen extends StatelessWidget {
                 fit: StackFit.expand,
                 children: [
                   // Cover Image
-                  Image.network(data.coverImage ?? "", fit: BoxFit.cover),
+                  CachedNetworkImage(
+                    imageUrl: data.coverImage ?? "",
+                    fit: BoxFit.cover,
+                    placeholder: (context, url) =>
+                        Center(child: CircularProgressIndicator()),
+                    errorWidget: (context, url, error) =>
+                        Icon(Icons.broken_image),
+                  ),
                   // Gradient Overlay
                   Container(
                     decoration: BoxDecoration(
@@ -78,9 +86,13 @@ class OrganizationScreen extends StatelessWidget {
                           ),
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(12),
-                            child: Image.network(
-                              data.image ?? "",
+                            child: CachedNetworkImage(
+                              imageUrl: data.image ?? "",
                               fit: BoxFit.cover,
+                              placeholder: (context, url) =>
+                                  Center(child: CircularProgressIndicator()),
+                              errorWidget: (context, url, error) =>
+                                  Icon(Icons.broken_image),
                             ),
                           ),
                         ),
@@ -489,7 +501,13 @@ class OrganizationScreen extends StatelessWidget {
             ),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(12),
-              child: Image.network(doctor.image, fit: BoxFit.cover),
+              child: CachedNetworkImage(
+                imageUrl: doctor.image,
+                fit: BoxFit.cover,
+                placeholder: (context, url) =>
+                    Center(child: CircularProgressIndicator()),
+                errorWidget: (context, url, error) => Icon(Icons.broken_image),
+              ),
             ),
           ),
           const SizedBox(width: 16),

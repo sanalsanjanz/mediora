@@ -38,6 +38,7 @@ class Prescription {
   String signatureBase64;
   dynamic pdfUrl;
   DateTime createdAt;
+  int days;
   DateTime updatedAt;
   List<String> medicines;
 
@@ -53,6 +54,7 @@ class Prescription {
     required this.pdfUrl,
     required this.createdAt,
     required this.updatedAt,
+    required this.days,
     required this.medicines,
   });
 
@@ -66,6 +68,7 @@ class Prescription {
     diagnosis: json["diagnosis"],
     signatureBase64: json["signature_base64"],
     pdfUrl: json["pdf_url"],
+    days: json["days"] ?? 0,
     createdAt: DateTime.parse(json["created_at"]),
     updatedAt: DateTime.parse(json["updated_at"]),
     medicines: List<String>.from(json["medicines"].map((x) => x)),
@@ -73,6 +76,7 @@ class Prescription {
 
   Map<String, dynamic> toJson() => {
     "id": id,
+    "days": days,
     "doctor_id": doctorId,
     "patient_id": patientId,
     "booking_id": bookingId,

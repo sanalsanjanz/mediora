@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:mediora/apis/patients/api_helpers.dart';
 import 'package:mediora/helper/call_navigation_helper.dart';
@@ -84,7 +85,14 @@ class DoctorBookingScreen extends StatelessWidget {
                         ), */
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(16),
-                          child: Image.network(doctor.image, fit: BoxFit.cover),
+                          child: CachedNetworkImage(
+                            imageUrl: doctor.image,
+                            fit: BoxFit.cover,
+                            placeholder: (context, url) =>
+                                Center(child: CircularProgressIndicator()),
+                            errorWidget: (context, url, error) =>
+                                Icon(Icons.error),
+                          ),
                         ),
                       ),
                       const SizedBox(width: 16),

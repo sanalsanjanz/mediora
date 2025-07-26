@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:mediora/apis/patients/api_helpers.dart';
@@ -305,7 +306,7 @@ class _ViewAllOrganizationsState extends State<ViewAllOrganizations> {
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(16),
                     image: DecorationImage(
-                      image: NetworkImage(clinic.image ?? ""),
+                      image: CachedNetworkImageProvider(clinic.image ?? ""),
                       fit: BoxFit.cover,
                     ),
                   ),

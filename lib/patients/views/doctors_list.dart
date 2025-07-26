@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:icons_plus/icons_plus.dart';
 import 'package:mediora/apis/patients/api_helpers.dart';
@@ -251,7 +252,7 @@ Widget buildCard(DoctorsModel item) {
               topRight: Radius.circular(16),
             ),
             image: DecorationImage(
-              image: NetworkImage(item.image ?? ""),
+              image: CachedNetworkImageProvider(item.image ?? ""),
               fit: BoxFit.cover,
             ),
           ),

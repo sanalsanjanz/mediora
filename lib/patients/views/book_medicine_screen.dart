@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:mediora/apis/patients/order_api_handler.dart';
 import 'package:mediora/models/pharmacy_model.dart';
@@ -178,7 +179,9 @@ class _BookMedicineScreenState extends State<BookMedicineScreen> {
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(12),
                               image: DecorationImage(
-                                image: NetworkImage(widget.items.image),
+                                image: CachedNetworkImageProvider(
+                                  widget.items.image,
+                                ),
                                 fit: BoxFit.cover,
                               ),
                             ),

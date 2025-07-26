@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:icons_plus/icons_plus.dart';
@@ -509,7 +510,7 @@ class _DoctorsListingScreenState extends State<DoctorsListingScreen>
           });
         },
         message:
-            "We couldn\'t find any doctors matching your criteria. Try adjusting your search or filters.",
+            "We couldn't find any doctors matching your criteria. Try adjusting your search or filters.",
       );
     }
 
@@ -615,9 +616,13 @@ class _DoctorsListingScreenState extends State<DoctorsListingScreen>
                               border: Border.all(color: Colors.white, width: 2),
                             ),
                             child: ClipOval(
-                              child: Image.network(
-                                doctor.image,
+                              child: CachedNetworkImage(
+                                imageUrl: doctor.image,
                                 fit: BoxFit.cover,
+                                placeholder: (context, url) =>
+                                    Center(child: CircularProgressIndicator()),
+                                errorWidget: (context, url, error) =>
+                                    Icon(Icons.broken_image),
                               ),
                             ),
                           ),

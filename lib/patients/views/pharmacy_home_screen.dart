@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mediora/apis/patients/preference_controller.dart';
@@ -209,9 +210,13 @@ class _PharmacyHomeScreenState extends State<PharmacyHomeScreen>
                       ],
                     ),
                     child: ClipOval(
-                      child: Image.network(
-                        widget.items.image,
+                      child: CachedNetworkImage(
+                        imageUrl: widget.items.image,
                         fit: BoxFit.cover,
+                        placeholder: (context, url) =>
+                            Center(child: CircularProgressIndicator()),
+                        errorWidget: (context, url, error) =>
+                            Icon(Icons.broken_image),
                       ),
                     ),
                   ),
@@ -541,7 +546,14 @@ class _PharmacyHomeScreenState extends State<PharmacyHomeScreen>
                     border: Border.all(color: Colors.white, width: 2),
                   ),
                   child: ClipOval(
-                    child: Image.network(widget.items.image, fit: BoxFit.cover),
+                    child: CachedNetworkImage(
+                      imageUrl: widget.items.image,
+                      fit: BoxFit.cover,
+                      placeholder: (context, url) =>
+                          Center(child: CircularProgressIndicator()),
+                      errorWidget: (context, url, error) =>
+                          Icon(Icons.broken_image),
+                    ),
                   ),
                 ),
               ),
