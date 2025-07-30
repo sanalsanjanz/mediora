@@ -65,7 +65,7 @@ class BookingDetailsModel {
 
         patientName: json["patient_name"],
         patientGender: json["patient_gender"],
-        patientAge: json["patient_age"],
+        patientAge: json["patient_age"] ?? "0",
         patientContact: json["patient_contact"],
         reason: json["reason"],
         preferredDate: DateTime.parse(json["preferred_date"]),
