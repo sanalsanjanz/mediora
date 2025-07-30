@@ -215,7 +215,7 @@ Widget buildSection({
           },
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: count,
-            mainAxisExtent: count == 2 ? 250 : 220,
+            mainAxisExtent: count == 2 ? 220 : 220,
             mainAxisSpacing: 15,
             crossAxisSpacing: 15,
           ),
@@ -280,14 +280,14 @@ Widget buildCard(PharmacyModel item) {
               Text(
                 item.pharmacyName,
                 style: const TextStyle(
-                  fontSize: 16,
+                  /*   fontSize: 16, */
                   fontWeight: FontWeight.bold,
                   color: Color(0xFF1E293B),
                 ),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 5),
 
               Row(
                 children: [
@@ -301,7 +301,7 @@ Widget buildCard(PharmacyModel item) {
                     child: Text(
                       item.locationName,
                       style: const TextStyle(
-                        fontSize: 14,
+                        /*  fontSize: 14, */
                         color: Color(0xFF64748B),
                       ),
                       maxLines: 1,
@@ -310,7 +310,7 @@ Widget buildCard(PharmacyModel item) {
                   const Spacer(),
                 ],
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 5),
 
               Row(
                 children: [
@@ -323,7 +323,7 @@ Widget buildCard(PharmacyModel item) {
                   Text(
                     ApiHelpers.calculateDistanceString(item.lat, item.lon),
                     style: const TextStyle(
-                      fontSize: 14,
+                      /*  fontSize: 14, */
                       color: Color(0xFF64748B),
                     ),
                   ),
@@ -343,7 +343,7 @@ Widget buildCard(PharmacyModel item) {
                 ],
               ),
 
-              const SizedBox(height: 8),
+              /* const SizedBox(height: 8),
 
               Row(
                 children: [
@@ -365,7 +365,7 @@ Widget buildCard(PharmacyModel item) {
                     ),
                   ), */
                 ],
-              ),
+              ), */
             ],
           ),
         ),

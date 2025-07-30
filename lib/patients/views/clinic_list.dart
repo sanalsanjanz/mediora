@@ -287,7 +287,7 @@ Widget buildCard(ClinicModel item) {
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 5),
               Row(
                 children: [
                   const Icon(
@@ -299,7 +299,7 @@ Widget buildCard(ClinicModel item) {
                   Text(
                     item.locationName,
                     style: const TextStyle(
-                      fontSize: 14,
+                      /*  fontSize: 14, */
                       color: Color(0xFF64748B),
                     ),
                   ),
@@ -318,7 +318,7 @@ Widget buildCard(ClinicModel item) {
                   ], */
                 ],
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 5),
               Row(
                 children: [
                   const Icon(
@@ -330,7 +330,7 @@ Widget buildCard(ClinicModel item) {
                   Text(
                     ApiHelpers.calculateDistanceString(item.lat, item.lon),
                     style: const TextStyle(
-                      fontSize: 14,
+                      /*                       fontSize: 14, */
                       color: Color(0xFF64748B),
                     ),
                   ),

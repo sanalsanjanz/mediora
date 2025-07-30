@@ -280,14 +280,14 @@ Widget buildCard(DoctorsModel item) {
               Text(
                 item.name,
                 style: const TextStyle(
-                  fontSize: 16,
+                  // fontSize: 16,
                   fontWeight: FontWeight.bold,
                   color: Color(0xFF1E293B),
                 ),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 5),
               Row(
                 children: [
                   const Icon(
@@ -300,7 +300,7 @@ Widget buildCard(DoctorsModel item) {
                     child: Text(
                       item.locationName,
                       style: const TextStyle(
-                        fontSize: 12,
+                        // fontSize: 12,
                         color: Color(0xFF64748B),
                       ),
                       maxLines: 1,
@@ -308,7 +308,7 @@ Widget buildCard(DoctorsModel item) {
                   ),
                 ],
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 5),
               Row(
                 children: [
                   const Icon(
@@ -320,7 +320,7 @@ Widget buildCard(DoctorsModel item) {
                   Text(
                     ApiHelpers.calculateDistanceString(item.lat, item.lon),
                     style: const TextStyle(
-                      fontSize: 14,
+                      // fontSize: 14,
                       color: Color(0xFF64748B),
                     ),
                   ),
@@ -342,7 +342,7 @@ Widget buildCard(DoctorsModel item) {
 
               // const SizedBox(height: 8),
               if (item.specialization.isNotEmpty) ...[
-                const SizedBox(height: 8),
+                const SizedBox(height: 5),
                 Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 8,
@@ -355,7 +355,7 @@ Widget buildCard(DoctorsModel item) {
                   child: Text(
                     item.specialization,
                     style: const TextStyle(
-                      fontSize: 12,
+                      // fontSize: 12,
                       color: Color(0xFF667EEA),
                       fontWeight: FontWeight.w500,
                     ),

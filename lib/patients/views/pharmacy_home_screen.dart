@@ -233,20 +233,21 @@ class _PharmacyHomeScreenState extends State<PharmacyHomeScreen>
                           fontWeight: FontWeight.bold,
                         ),
                       ),
+                      SizedBox(height: 5),
                       Row(
                         children: [
-                          Icon(Icons.star, color: Colors.amber, size: 20),
-                          SizedBox(width: 5),
-                          Text(
+                          // Icon(Icons.star, color: Colors.amber, size: 20),
+                          // SizedBox(width: 5),
+                          /*   Text(
                             // '${pharmacyData['rating']} (${pharmacyData['reviews']} reviews)',
                             widget.items.locationName,
                             style: TextStyle(
                               color: Colors.white70,
                               fontSize: 14,
                             ),
-                          ),
+                          ), */
                           if (widget.items.licenseNumber.isNotEmpty) ...[
-                            SizedBox(width: 10),
+                            // SizedBox(width: 10),
                             Container(
                               padding: EdgeInsets.symmetric(
                                 horizontal: 8,

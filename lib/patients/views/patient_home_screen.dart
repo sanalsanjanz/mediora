@@ -37,7 +37,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
         return MyIndicator(controller: controller, child: child);
       },
       child: Scaffold(
-        backgroundColor: const Color(0xFFF8FAFC),
+        backgroundColor: const Color.fromARGB(255, 255, 255, 255),
         body: CustomScrollView(
           slivers: [
             SliverAppBar(
@@ -125,7 +125,7 @@ class _PatientHomeScreenState extends State<PatientHomeScreen> {
                           letterSpacing: -0.3,
                         ),
                       ),
-                      const SizedBox(height: 4),
+                      // const SizedBox(height: 4),
                       InkWell(
                         onTap: () async {
                           LocationResult location = await Navigator.of(context)

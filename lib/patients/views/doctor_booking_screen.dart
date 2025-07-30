@@ -1,11 +1,15 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:icons_plus/icons_plus.dart';
 import 'package:mediora/apis/patients/api_helpers.dart';
 import 'package:mediora/helper/call_navigation_helper.dart';
+import 'package:mediora/helper/colors.dart';
 import 'package:mediora/helper/expirence_formatter.dart';
 import 'package:mediora/models/doctors_model.dart';
 import 'package:mediora/patients/views/book_appointment.dart';
 import 'package:mediora/widgets/working_hours_widget.dart';
+import 'package:quickalert/models/quickalert_type.dart';
+import 'package:quickalert/widgets/quickalert_dialog.dart';
 
 class DoctorBookingScreen extends StatelessWidget {
   final DoctorsModel doctor;
@@ -107,7 +111,7 @@ class DoctorBookingScreen extends StatelessWidget {
                                   child: Text(
                                     doctor.name,
                                     style: TextStyle(
-                                      fontSize: 20,
+                                      fontSize: 18,
                                       fontWeight: FontWeight.bold,
                                       color: Colors.black87,
                                     ),
@@ -134,19 +138,41 @@ class DoctorBookingScreen extends StatelessWidget {
                               ],
                             ),
                             const SizedBox(height: 4),
-                            Text(
-                              doctor.specialization,
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: Colors.grey,
-                                fontWeight: FontWeight.w500,
-                              ),
+                            Row(
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(3),
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      colors: [
+                                        Colors.amber[400]!,
+                                        Colors.orange[400]!,
+                                      ],
+                                    ),
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: const Icon(
+                                    FontAwesome.stethoscope_solid,
+                                    color: Colors.white,
+                                    size: 12,
+                                  ),
+                                ),
+                                const SizedBox(width: 5),
+                                Text(
+                                  doctor.specialization,
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: Colors.grey,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
                             ),
                             const SizedBox(height: 8),
                             Row(
                               children: [
                                 Container(
-                                  padding: const EdgeInsets.all(2),
+                                  padding: const EdgeInsets.all(3),
                                   decoration: BoxDecoration(
                                     gradient: LinearGradient(
                                       colors: [
@@ -159,7 +185,7 @@ class DoctorBookingScreen extends StatelessWidget {
                                   child: const Icon(
                                     Icons.my_location_rounded,
                                     color: Colors.white,
-                                    size: 16,
+                                    size: 13,
                                   ),
                                 ),
                                 const SizedBox(width: 5),
@@ -370,12 +396,15 @@ class DoctorBookingScreen extends StatelessWidget {
               margin: const EdgeInsets.symmetric(horizontal: 16),
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [Colors.blue[500]!, Colors.blue[700]!],
+                  colors: [
+                    colorPrimary.withAlpha(150),
+                    colorPrimary.withAlpha(200),
+                  ],
                 ),
                 borderRadius: BorderRadius.circular(12),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.blue.withOpacity(0.4),
+                    color: colorPrimary.withOpacity(0.4),
                     spreadRadius: 0,
                     blurRadius: 12,
                     offset: const Offset(0, 6),
@@ -676,19 +705,21 @@ class DoctorBookingScreen extends StatelessWidget {
               color: color.withOpacity(0.15),
               borderRadius: BorderRadius.circular(8),
             ),
-            child: Icon(icon, color: color, size: 24),
+            child: Icon(icon, color: color, size: 20),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 10),
           Expanded(
             child: Column(
               children: [
                 Text(
                   value,
                   style: TextStyle(
-                    fontSize: 18,
+                    fontSize: 14,
                     fontWeight: FontWeight.bold,
                     color: color,
                   ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 4),
                 Text(
@@ -698,6 +729,8 @@ class DoctorBookingScreen extends StatelessWidget {
                     color: Colors.grey,
                     fontWeight: FontWeight.w500,
                   ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ],
             ),
@@ -711,22 +744,24 @@ class DoctorBookingScreen extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
-        gradient: LinearGradient(colors: [Colors.blue[50]!, Colors.blue[100]!]),
+        gradient: LinearGradient(
+          colors: [colorPrimary.withAlpha(100), colorPrimary.withAlpha(180)],
+        ),
         borderRadius: BorderRadius.circular(25),
-        border: Border.all(color: Colors.blue.withOpacity(0.2), width: 1),
+        border: Border.all(color: colorPrimary.withOpacity(0.2), width: 1),
       ),
       child: Text(
         specialization,
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 13,
-          color: Colors.blue,
+          color: Colors.white,
           fontWeight: FontWeight.w600,
         ),
       ),
     );
   }
 
-  void _showCallDialog(BuildContext context) {
+  /* void _showCallDialog(BuildContext context) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -750,9 +785,9 @@ class DoctorBookingScreen extends StatelessWidget {
         );
       },
     );
-  }
+  } */
 
-  void _showNavigationDialog(BuildContext context) {
+  /* void _showNavigationDialog(BuildContext context) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -778,10 +813,33 @@ class DoctorBookingScreen extends StatelessWidget {
         );
       },
     );
-  }
+  } */
 
   void _showBookingDialog(BuildContext context) {
-    showDialog(
+    QuickAlert.show(
+      context: context,
+      type: QuickAlertType.confirm,
+      text: 'Proceed to book an appointment with ${doctor.name}',
+      confirmBtnText: 'Book Now',
+      cancelBtnText: 'Cancel',
+      confirmBtnColor: Colors.grey,
+      onCancelBtnTap: () => Navigator.of(context).pop(false),
+      onConfirmBtnTap: () async {
+        Navigator.of(context).pop();
+        // Navigate to booking screen or implement booking logic
+        /*  ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Redirecting to booking page...'),
+                  ),
+                ); */
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (_) => BookingScreen(doctorsModel: doctor),
+          ),
+        );
+      },
+    );
+    /* showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
@@ -814,6 +872,6 @@ class DoctorBookingScreen extends StatelessWidget {
           ],
         );
       },
-    );
+    ); */
   }
 }

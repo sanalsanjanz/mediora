@@ -6,7 +6,14 @@ Widget buildWorkingHour(String day, String time) {
     child: Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(day, style: const TextStyle(fontSize: 14, color: Colors.black87)),
+        Text(
+          day,
+          style: TextStyle(
+            fontSize: 14,
+            color: time == 'Closed' ? Colors.red : Colors.black87,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
         Text(
           time,
           style: TextStyle(

@@ -91,6 +91,7 @@ class _PatientLandingScreenState extends State<PatientLandingScreen> {
         }
       },
       child: Scaffold(
+        backgroundColor: Colors.white,
         body: _pages[_currentIndex],
         bottomNavigationBar: BottomBarInspiredFancy(
           styleIconFooter: StyleIconFooter.dot,

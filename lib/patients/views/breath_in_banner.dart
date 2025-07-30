@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:icons_plus/icons_plus.dart';
 import 'package:mediora/patients/games/breathin_game.dart';
 
 class BreathingExerciseBanner extends StatefulWidget {
   final VoidCallback? onTap;
 
-  const BreathingExerciseBanner({Key? key, this.onTap}) : super(key: key);
+  const BreathingExerciseBanner({super.key, this.onTap});
 
   @override
   State<BreathingExerciseBanner> createState() =>
@@ -31,7 +30,7 @@ class _BreathingExerciseBannerState extends State<BreathingExerciseBanner> {
       child: Container(
         height: 200,
         width: double.infinity,
-        margin: const EdgeInsets.all(16),
+        margin: const EdgeInsets.all(12),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(24),
           gradient: LinearGradient(
@@ -167,10 +166,10 @@ class _BreathingExerciseBannerState extends State<BreathingExerciseBanner> {
                           ),
                         ),
 
-                        const SizedBox(height: 16),
+                        // const SizedBox(height: 16),
 
                         // Call to action button
-                        Container(
+                        /*   Container(
                           padding: const EdgeInsets.symmetric(
                             horizontal: 16,
                             vertical: 10,
@@ -205,7 +204,7 @@ class _BreathingExerciseBannerState extends State<BreathingExerciseBanner> {
                               ),
                             ],
                           ),
-                        ),
+                        ), */
                       ],
                     ),
                   ),

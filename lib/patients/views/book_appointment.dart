@@ -385,6 +385,38 @@ class _BookingScreenState extends State<BookingScreen> {
                   ),
 
                   _buildFormField(
+                    label: 'Preferred Date',
+                    icon: Icons.calendar_month_outlined,
+                    child: InkWell(
+                      onTap: _pickDate,
+                      child: Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(16),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              _preferredDate == null
+                                  ? 'Select preferred date'
+                                  : '${_preferredDate!.day}/${_preferredDate!.month}/${_preferredDate!.year}',
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: _preferredDate == null
+                                    ? Colors.grey.shade600
+                                    : const Color(0xFF333333),
+                              ),
+                            ),
+                            const Icon(
+                              Icons.calendar_today,
+                              color: Color(0xFF2E8B57),
+                              size: 20,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  _buildFormField(
                     label: 'Symptoms / Reason',
                     icon: Icons.medical_information_outlined,
                     child: TypeAheadField<String>(
@@ -438,38 +470,6 @@ class _BookingScreenState extends State<BookingScreen> {
                     ),
                   ),
 
-                  _buildFormField(
-                    label: 'Preferred Date',
-                    icon: Icons.calendar_month_outlined,
-                    child: InkWell(
-                      onTap: _pickDate,
-                      child: Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.all(16),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              _preferredDate == null
-                                  ? 'Select preferred date'
-                                  : '${_preferredDate!.day}/${_preferredDate!.month}/${_preferredDate!.year}',
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: _preferredDate == null
-                                    ? Colors.grey.shade600
-                                    : const Color(0xFF333333),
-                              ),
-                            ),
-                            const Icon(
-                              Icons.calendar_today,
-                              color: Color(0xFF2E8B57),
-                              size: 20,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
                   if (_preferredDate != null)
                     Text(
                       message,
