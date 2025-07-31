@@ -233,22 +233,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "7.0.3"
-  dio:
-    dependency: transitive
-    description:
-      name: dio
-      sha256: "253a18bbd4851fecba42f7343a1df3a9a4c1d31a2c1b37e221086b4fa8c8dbc9"
-      url: "https://pub.dev"
-    source: hosted
-    version: "5.8.0+1"
-  dio_web_adapter:
-    dependency: transitive
-    description:
-      name: dio_web_adapter
-      sha256: "7586e476d70caecaf1686d21eee7247ea43ef5c345eab9e0cc3583ff13378d78"
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.1.1"
   dot_navigation_bar:
     dependency: "direct main"
     description:
@@ -446,30 +430,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.1"
-  flutter_osm_interface:
-    dependency: transitive
-    description:
-      name: flutter_osm_interface
-      sha256: fe7b02fee205aec861d0f08f643d4d6c49a5b9df06d3b43919fdf6699a275829
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.4.0"
-  flutter_osm_plugin:
-    dependency: "direct main"
-    description:
-      name: flutter_osm_plugin
-      sha256: "9fc37fedc936844a1d3724aa172d67deb01a7f65f4b61ccd5ea9725dd64edfbf"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.4.1"
-  flutter_osm_web:
-    dependency: transitive
-    description:
-      name: flutter_osm_web
-      sha256: "41d37c4a7c6e3836835088d10362a808feac9342b9f074098f57440ff5e45bdd"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.4.1"
   flutter_plugin_android_lifecycle:
     dependency: transitive
     description:
@@ -632,14 +592,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.5.12+2"
-  google_polyline_algorithm:
-    dependency: transitive
-    description:
-      name: google_polyline_algorithm
-      sha256: "357874f00d3f93c3ba1bf4b4d9a154aa9ee87147c068238c1e8392012b686a03"
-      url: "https://pub.dev"
-    source: hosted
-    version: "3.1.0"
   html:
     dependency: transitive
     description:
@@ -976,14 +928,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.1.0"
-  routing_client_dart:
-    dependency: transitive
-    description:
-      name: routing_client_dart
-      sha256: "4e2acf1145bb8056e04fd93101a9f2bab2fd769c9d972f7f403f9733a670cb33"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.5.5"
   rxdart:
     dependency: transitive
     description:
