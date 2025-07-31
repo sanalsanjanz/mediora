@@ -79,7 +79,7 @@ class _PharmacyHomeState extends State<PharmacyHome> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: const Color.fromARGB(255, 255, 255, 255),
       body: RefreshIndicator(
         onRefresh: _refreshData,
         color: const Color(0xFF3B82F6),
