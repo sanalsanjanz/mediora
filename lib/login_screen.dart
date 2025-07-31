@@ -592,6 +592,15 @@ class _MedicalLoginScreenState extends State<MedicalLoginScreen>
   }
 
   void _handleSubmit() async {
+    /*     if (widget.fcmTocken.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Failed Device Tocken"),
+          backgroundColor: Colors.red,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    } else  */
     if (_formKey.currentState?.validate() ?? false) {
       // Handle login/signup
 

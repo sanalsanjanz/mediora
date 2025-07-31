@@ -77,6 +77,7 @@ class PatientController {
     await preferences.clear();
     patientModel = null;
     doctorModel = null;
+    pharmacyModel = null;
     return;
   }
 }

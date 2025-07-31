@@ -78,10 +78,11 @@ class _MedioraSplashScreenState extends State<MedioraSplashScreen>
         );
       } else if (isLogged && type == "clinic") {
       } else {
-        Navigator.of(context).push(
+        Navigator.of(context).pushAndRemoveUntil(
           MaterialPageRoute(
-            builder: (_) => MedicalLoginScreen(fcmTocken: widget.fcm ?? ""),
+            builder: (c) => MedicalLoginScreen(fcmTocken: widget.fcm ?? ""),
           ),
+          (_) => false,
         );
       }
     });

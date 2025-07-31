@@ -33,9 +33,9 @@ class _AllOrdersScreenState extends State<AllOrdersScreen>
   final List<String> _filterOptions = [
     'All',
     'Pending',
-    'Processing',
+    'Accepted',
     'Completed',
-    'Cancelled',
+    'Rejected',
   ];
 
   @override
@@ -88,7 +88,11 @@ class _AllOrdersScreenState extends State<AllOrdersScreen>
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Failed to load orders: $e'),
-            backgroundColor: Colors.red,
+            backgroundColor: Colors.red[400],
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
           ),
         );
       }
@@ -133,95 +137,135 @@ class _AllOrdersScreenState extends State<AllOrdersScreen>
   Color _getStatusColor(String status) {
     switch (status.toLowerCase()) {
       case 'pending':
-        return const Color(0xFFFF6B6B);
+        return const Color(0xFFF59E0B);
       case 'processing':
-        return const Color(0xFFFFB946);
+        return const Color(0xFF3B82F6);
       case 'completed':
-        return const Color(0xFF51CF66);
+        return const Color(0xFF10B981);
       case 'cancelled':
-        return const Color(0xFF868E96);
+        return const Color(0xFF6B7280);
       default:
-        return const Color(0xFF718096);
+        return const Color(0xFF9CA3AF);
     }
   }
 
   IconData _getStatusIcon(String status) {
     switch (status.toLowerCase()) {
       case 'pending':
-        return Icons.schedule;
+        return Icons.schedule_rounded;
       case 'processing':
-        return Icons.hourglass_empty;
+        return Icons.hourglass_empty_rounded;
       case 'completed':
-        return Icons.check_circle;
+        return Icons.check_circle_rounded;
       case 'cancelled':
-        return Icons.cancel;
+        return Icons.cancel_rounded;
       default:
-        return Icons.help_outline;
+        return Icons.help_outline_rounded;
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F7FA),
-      appBar: AppBar(
-        title: const Text(
-          'All Orders',
-          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
-        ),
-        backgroundColor: const Color(0xFF1E88E5),
-        elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.white),
-        actions: [
-          IconButton(onPressed: _loadOrders, icon: const Icon(Icons.refresh)),
-        ],
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(100),
-          child: Container(
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [Color(0xFF1E88E5), Color(0xFF1565C0)],
-              ),
-            ),
+      backgroundColor: const Color(0xFFF8FAFC),
+      body: CustomScrollView(
+        slivers: [
+          _buildAppBar(),
+          SliverToBoxAdapter(
             child: Column(children: [_buildSearchBar(), _buildTabBar()]),
           ),
+          _isLoading
+              ? SliverToBoxAdapter(child: _buildLoadingState())
+              : _buildOrdersList(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAppBar() {
+    return SliverAppBar(
+      expandedHeight: 100,
+      pinned: true,
+      backgroundColor: Colors.white,
+      foregroundColor: const Color(0xFF1F2937),
+      elevation: 0,
+      leading: IconButton(
+        onPressed: () => Navigator.pop(context),
+        icon: const Icon(Icons.arrow_back_rounded),
+        style: IconButton.styleFrom(
+          backgroundColor: const Color(0xFFF1F5F9),
+          foregroundColor: const Color(0xFF64748B),
         ),
       ),
-      body: _isLoading ? _buildLoadingState() : _buildOrdersList(),
+      flexibleSpace: FlexibleSpaceBar(
+        title: const Text(
+          'All Orders',
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.w700,
+            color: Color(0xFF1F2937),
+          ),
+        ),
+        centerTitle: false,
+        titlePadding: const EdgeInsets.only(left: 16, bottom: 16),
+      ),
+      actions: [
+        Container(
+          margin: const EdgeInsets.only(right: 16),
+          child: IconButton(
+            onPressed: _loadOrders,
+            icon: const Icon(Icons.refresh_rounded),
+            style: IconButton.styleFrom(
+              backgroundColor: const Color(0xFFF1F5F9),
+              foregroundColor: const Color(0xFF64748B),
+            ),
+          ),
+        ),
+      ],
     );
   }
 
   Widget _buildSearchBar() {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      margin: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.2),
-        borderRadius: BorderRadius.circular(25),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 12,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: TextField(
         controller: _searchController,
         onChanged: _onSearchChanged,
-        style: const TextStyle(color: Colors.white),
+        style: const TextStyle(color: Color(0xFF1F2937), fontSize: 16),
         decoration: InputDecoration(
           hintText: 'Search orders by patient name...',
-          hintStyle: TextStyle(color: Colors.white.withOpacity(0.7)),
-          prefixIcon: Icon(Icons.search, color: Colors.white.withOpacity(0.7)),
+          hintStyle: TextStyle(color: Colors.grey[500], fontSize: 16),
+          prefixIcon: Icon(
+            Icons.search_rounded,
+            color: Colors.grey[500],
+            size: 20,
+          ),
           suffixIcon: _searchQuery.isNotEmpty
               ? IconButton(
                   onPressed: () {
                     _searchController.clear();
                     _onSearchChanged('');
                   },
-                  icon: Icon(Icons.clear, color: Colors.white.withOpacity(0.7)),
+                  icon: Icon(
+                    Icons.clear_rounded,
+                    color: Colors.grey[500],
+                    size: 20,
+                  ),
                 )
               : null,
           border: InputBorder.none,
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 20,
-            vertical: 12,
-          ),
+          contentPadding: const EdgeInsets.all(16),
         ),
       ),
     );
@@ -229,19 +273,25 @@ class _AllOrdersScreenState extends State<AllOrdersScreen>
 
   Widget _buildTabBar() {
     return Container(
-      height: 50,
+      height: 60,
       margin: const EdgeInsets.symmetric(horizontal: 16),
       child: TabBar(
+        tabAlignment: TabAlignment.start,
         controller: _tabController,
         isScrollable: true,
         indicator: BoxDecoration(
-          color: Colors.white.withOpacity(0.3),
-          borderRadius: BorderRadius.circular(25),
+          color: const Color(0xFF3B82F6),
+          borderRadius: BorderRadius.circular(12),
         ),
         labelColor: Colors.white,
-        unselectedLabelColor: Colors.white.withOpacity(0.7),
-        labelStyle: const TextStyle(fontWeight: FontWeight.w600),
-        unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.normal),
+        unselectedLabelColor: const Color(0xFF64748B),
+        labelStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+        unselectedLabelStyle: const TextStyle(
+          fontWeight: FontWeight.w500,
+          fontSize: 14,
+        ),
+        dividerColor: Colors.transparent,
+        indicatorSize: TabBarIndicatorSize.tab,
         tabs: _filterOptions.map((filter) {
           final count = filter == 'All'
               ? _allOrders.length
@@ -259,24 +309,31 @@ class _AllOrdersScreenState extends State<AllOrdersScreen>
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(filter),
-                  const SizedBox(width: 8),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 6,
-                      vertical: 2,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.3),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Text(
-                      '$count',
-                      style: const TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
+                  if (count > 0) ...[
+                    const SizedBox(width: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 6,
+                        vertical: 2,
+                      ),
+                      decoration: BoxDecoration(
+                        color: _selectedFilter == filter
+                            ? Colors.white.withOpacity(0.2)
+                            : const Color(0xFF3B82F6).withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Text(
+                        '$count',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w700,
+                          color: _selectedFilter == filter
+                              ? Colors.white
+                              : const Color(0xFF3B82F6),
+                        ),
                       ),
                     ),
-                  ),
+                  ],
                 ],
               ),
             ),
@@ -287,15 +344,103 @@ class _AllOrdersScreenState extends State<AllOrdersScreen>
   }
 
   Widget _buildLoadingState() {
-    return const Center(
+    return Container(
+      padding: const EdgeInsets.all(16),
+      child: Column(children: List.generate(6, (index) => _buildShimmerCard())),
+    );
+  }
+
+  Widget _buildShimmerCard() {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 12,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          CircularProgressIndicator(),
-          SizedBox(height: 16),
-          Text(
-            'Loading orders...',
-            style: TextStyle(fontSize: 16, color: Color(0xFF718096)),
+          Row(
+            children: [
+              Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  color: Colors.grey[200],
+                  shape: BoxShape.circle,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      width: 140,
+                      height: 16,
+                      decoration: BoxDecoration(
+                        color: Colors.grey[200],
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Container(
+                      width: 100,
+                      height: 12,
+                      decoration: BoxDecoration(
+                        color: Colors.grey[200],
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                width: 80,
+                height: 24,
+                decoration: BoxDecoration(
+                  color: Colors.grey[200],
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Container(
+            height: 40,
+            decoration: BoxDecoration(
+              color: Colors.grey[100],
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Row(
+              children: [
+                const SizedBox(width: 12),
+                Container(
+                  width: 16,
+                  height: 16,
+                  decoration: BoxDecoration(
+                    color: Colors.grey[200],
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Container(
+                  width: 120,
+                  height: 12,
+                  decoration: BoxDecoration(
+                    color: Colors.grey[200],
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                ),
+              ],
+            ),
           ),
         ],
       ),
@@ -304,59 +449,57 @@ class _AllOrdersScreenState extends State<AllOrdersScreen>
 
   Widget _buildOrdersList() {
     if (_filteredOrders.isEmpty) {
-      return _buildEmptyState();
+      return SliverToBoxAdapter(child: _buildEmptyState());
     }
 
-    return Column(
-      children: [
-        Container(
-          padding: const EdgeInsets.all(16),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                '${_filteredOrders.length} Orders',
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF2D3748),
-                ),
-              ),
-              if (_searchQuery.isNotEmpty || _selectedFilter != 'All')
-                TextButton.icon(
-                  onPressed: () {
-                    setState(() {
-                      _searchQuery = '';
-                      _selectedFilter = 'All';
-                      _searchController.clear();
-                      _tabController.animateTo(0);
-                    });
-                    _applyFilters();
-                  },
-                  icon: const Icon(Icons.clear_all, size: 16),
-                  label: const Text('Clear Filters'),
-                  style: TextButton.styleFrom(
-                    foregroundColor: const Color(0xFF1E88E5),
-                    textStyle: const TextStyle(fontWeight: FontWeight.w600),
-                  ),
-                ),
-            ],
-          ),
-        ),
-        Expanded(
-          child: RefreshIndicator(
-            onRefresh: _loadOrders,
-            child: ListView.builder(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              itemCount: _filteredOrders.length,
-              itemBuilder: (context, index) {
-                final order = _filteredOrders[index];
-                return _buildOrderCard(order, index);
-              },
+    return SliverList(
+      delegate: SliverChildBuilderDelegate((context, index) {
+        if (index == 0) {
+          return _buildOrdersHeader();
+        }
+        final order = _filteredOrders[index - 1];
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: _buildOrderCard(order),
+        );
+      }, childCount: _filteredOrders.length + 1),
+    );
+  }
+
+  Widget _buildOrdersHeader() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            '${_filteredOrders.length} Orders',
+            style: const TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w700,
+              color: Color(0xFF1F2937),
             ),
           ),
-        ),
-      ],
+          if (_searchQuery.isNotEmpty || _selectedFilter != 'All')
+            TextButton.icon(
+              onPressed: () {
+                setState(() {
+                  _searchQuery = '';
+                  _selectedFilter = 'All';
+                  _searchController.clear();
+                  _tabController.animateTo(0);
+                });
+                _applyFilters();
+              },
+              icon: const Icon(Icons.clear_all_rounded, size: 16),
+              label: const Text('Clear'),
+              style: TextButton.styleFrom(
+                foregroundColor: const Color(0xFF3B82F6),
+                textStyle: const TextStyle(fontWeight: FontWeight.w600),
+              ),
+            ),
+        ],
+      ),
     );
   }
 
@@ -365,76 +508,82 @@ class _AllOrdersScreenState extends State<AllOrdersScreen>
     IconData icon;
 
     if (_searchQuery.isNotEmpty) {
-      message = 'No orders found for "$_searchQuery"';
-      icon = Icons.search_off;
+      message = 'No orders found';
+      icon = Icons.search_off_rounded;
     } else if (_selectedFilter != 'All') {
-      message = 'No $_selectedFilter orders found';
-      icon = Icons.filter_alt_off;
+      message = 'No $_selectedFilter orders';
+      icon = Icons.filter_alt_off_rounded;
     } else {
       message = 'No orders available';
       icon = Icons.inventory_2_outlined;
     }
 
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(32),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(icon, size: 80, color: Colors.grey[400]),
-            const SizedBox(height: 24),
-            Text(
-              message,
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.w600,
-                color: Colors.grey[600],
-              ),
-              textAlign: TextAlign.center,
+    return Container(
+      padding: const EdgeInsets.all(40),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: const Color(0xFF3B82F6).withOpacity(0.1),
+              borderRadius: BorderRadius.circular(20),
             ),
-            const SizedBox(height: 8),
-            Text(
-              _searchQuery.isNotEmpty || _selectedFilter != 'All'
-                  ? 'Try adjusting your search or filter criteria'
-                  : 'Orders will appear here when patients place them',
-              style: TextStyle(fontSize: 14, color: Colors.grey[500]),
-              textAlign: TextAlign.center,
+            child: Icon(icon, size: 64, color: const Color(0xFF3B82F6)),
+          ),
+          const SizedBox(height: 24),
+          Text(
+            message,
+            style: const TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w600,
+              color: Color(0xFF1F2937),
             ),
-            if (_searchQuery.isNotEmpty || _selectedFilter != 'All')
-              Padding(
-                padding: const EdgeInsets.only(top: 16),
-                child: ElevatedButton.icon(
-                  onPressed: () {
-                    setState(() {
-                      _searchQuery = '';
-                      _selectedFilter = 'All';
-                      _searchController.clear();
-                      _tabController.animateTo(0);
-                    });
-                    _applyFilters();
-                  },
-                  icon: const Icon(Icons.clear_all),
-                  label: const Text('Clear All Filters'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF1E88E5),
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 24,
-                      vertical: 12,
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(25),
-                    ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 8),
+          Text(
+            _searchQuery.isNotEmpty || _selectedFilter != 'All'
+                ? 'Try adjusting your search or filter'
+                : 'Orders will appear here when patients place them',
+            style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+            textAlign: TextAlign.center,
+          ),
+          if (_searchQuery.isNotEmpty || _selectedFilter != 'All')
+            Padding(
+              padding: const EdgeInsets.only(top: 24),
+              child: ElevatedButton.icon(
+                onPressed: () {
+                  setState(() {
+                    _searchQuery = '';
+                    _selectedFilter = 'All';
+                    _searchController.clear();
+                    _tabController.animateTo(0);
+                  });
+                  _applyFilters();
+                },
+                icon: const Icon(Icons.clear_all_rounded),
+                label: const Text('Clear All Filters'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF3B82F6),
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 12,
                   ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  elevation: 0,
                 ),
               ),
-          ],
-        ),
+            ),
+        ],
       ),
     );
   }
 
-  Widget _buildOrderCard(OrderHistoryModel order, int index) {
+  Widget _buildOrderCard(OrderHistoryModel order) {
     final statusColor = _getStatusColor(order.status);
     final statusIcon = _getStatusIcon(order.status);
 
@@ -445,8 +594,8 @@ class _AllOrdersScreenState extends State<AllOrdersScreen>
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 12,
             offset: const Offset(0, 2),
           ),
         ],
@@ -465,12 +614,12 @@ class _AllOrdersScreenState extends State<AllOrdersScreen>
                   children: [
                     CircleAvatar(
                       radius: 24,
-                      backgroundColor: const Color(0xFF1E88E5).withOpacity(0.1),
+                      backgroundColor: const Color(0xFF3B82F6).withOpacity(0.1),
                       child: Text(
                         order.patient.name[0].toUpperCase(),
                         style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF1E88E5),
+                          fontWeight: FontWeight.w700,
+                          color: Color(0xFF3B82F6),
                           fontSize: 16,
                         ),
                       ),
@@ -483,16 +632,16 @@ class _AllOrdersScreenState extends State<AllOrdersScreen>
                           Text(
                             order.patient.name,
                             style: const TextStyle(
-                              fontWeight: FontWeight.bold,
+                              fontWeight: FontWeight.w600,
                               fontSize: 16,
-                              color: Color(0xFF2D3748),
+                              color: Color(0xFF1F2937),
                             ),
                           ),
                           const SizedBox(height: 4),
                           Text(
                             'Order #${order.id.substring(0, 8).toUpperCase()}',
-                            style: const TextStyle(
-                              color: Color(0xFF718096),
+                            style: TextStyle(
+                              color: Colors.grey[600],
                               fontSize: 12,
                               fontWeight: FontWeight.w500,
                             ),
@@ -507,20 +656,19 @@ class _AllOrdersScreenState extends State<AllOrdersScreen>
                       ),
                       decoration: BoxDecoration(
                         color: statusColor.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(20),
-                        border: Border.all(color: statusColor.withOpacity(0.3)),
+                        borderRadius: BorderRadius.circular(12),
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(statusIcon, size: 14, color: statusColor),
+                          Icon(statusIcon, size: 12, color: statusColor),
                           const SizedBox(width: 4),
                           Text(
                             order.status,
                             style: TextStyle(
                               color: statusColor,
                               fontWeight: FontWeight.w600,
-                              fontSize: 12,
+                              fontSize: 11,
                             ),
                           ),
                         ],
@@ -532,13 +680,13 @@ class _AllOrdersScreenState extends State<AllOrdersScreen>
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFF7FAFC),
+                    color: const Color(0xFFF8FAFC),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Row(
                     children: [
                       Icon(
-                        Icons.access_time,
+                        Icons.access_time_rounded,
                         size: 16,
                         color: Colors.grey[600],
                       ),
@@ -555,7 +703,7 @@ class _AllOrdersScreenState extends State<AllOrdersScreen>
                       ),
                       const Spacer(),
                       Icon(
-                        Icons.arrow_forward_ios,
+                        Icons.arrow_forward_ios_rounded,
                         size: 14,
                         color: Colors.grey[400],
                       ),
