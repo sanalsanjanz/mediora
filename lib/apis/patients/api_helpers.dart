@@ -3,6 +3,7 @@ import 'dart:developer';
 
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
+import 'package:mediora/apis/get_fcm_token.dart';
 import 'package:mediora/apis/patients/api_links.dart';
 import 'package:mediora/apis/patients/preference_controller.dart';
 import 'package:mediora/models/ambulance_model.dart';
@@ -190,26 +191,25 @@ class ApiHelpers {
     }
   }
 
-  static Future<(bool, String)> loginPatirent({
+  static Future<(bool, String)> loginPatient({
     required String userName,
     required String password,
-    required String fcm,
   }) async {
-    final fcmnew = await NotificationService.getFcmToken();
+    final fcmToken = await PushNotificationService.getFcmToken();
+
+    if (fcmToken == null) {
+      return (false, "FCM Token Error");
+    }
 
     try {
-      var request = http.MultipartRequest(
-        'POST',
-        Uri.parse(patientUrl),
-      ); // ✅ Make sure manageDoctors has trailing slash
+      var request = http.MultipartRequest('POST', Uri.parse(patientUrl));
 
       request.fields['payload'] = jsonEncode({
-        'username': userName,
+        'username': userName, // ✅ match backend param (not usernameOrMobile)
         "password": password,
-        "fcm": fcmnew,
+        "fcmToken": fcmToken, // ✅ backend expects camelCase here
       });
       request.fields['action'] = 'login';
-      // request.headers['Accept'] = 'application/json';
 
       final response = await request.send();
       final responseBody = await response.stream.bytesToString();
@@ -223,12 +223,12 @@ class ApiHelpers {
         return (true, "Successfully logged in");
       } else {
         var data = jsonDecode(responseBody);
-        log('failed: ${response.statusCode}, $responseBody');
+        log('Login failed: ${response.statusCode}, $responseBody');
         return (false, data["error"].toString());
       }
     } catch (e) {
-      log('Error doctor: $e');
-      throw Exception('$e');
+      log('Login error: $e');
+      return (false, "Login failed: $e");
     }
   }
 
@@ -236,33 +236,38 @@ class ApiHelpers {
     required Map<String, dynamic> details,
   }) async {
     try {
-      var request = http.MultipartRequest('POST', Uri.parse(patientUrl));
+      final fcmToken = await PushNotificationService.getFcmToken();
+      if (fcmToken == null) {
+        return (false, "FCM Token Error");
+      }
 
+      // ✅ backend expects snake_case for signup: "fcm_token"
+      details['fcm_token'] = fcmToken;
+
+      var request = http.MultipartRequest('POST', Uri.parse(patientUrl));
       request.fields['payload'] = jsonEncode(details);
       request.fields['action'] = 'add';
       request.headers['Accept'] = 'application/json';
 
       final response = await request.send();
       final responseBody = await response.stream.bytesToString();
-      log('Response body: $responseBody');
+      log('Signup response: $responseBody');
 
-      if (response.statusCode == 200) {
-        // final Map<String, dynamic> jsonResponse = jsonDecode(responseBody);
-
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final data = jsonDecode(responseBody);
         SharedPreferences pre = await SharedPreferences.getInstance();
-        var data = jsonDecode(responseBody);
         await pre.setString("patientData", jsonEncode(data["data"]));
         await pre.setBool("logged", true);
         PatientController.getPatientDetails();
         return (true, "Success");
       } else {
-        var data = jsonDecode(responseBody);
-        log('failed: ${response.statusCode}, $responseBody');
+        final data = jsonDecode(responseBody);
+        log('Signup failed: ${response.statusCode}, $responseBody');
         return (false, data["error"].toString());
       }
     } catch (e) {
       print('Error signing up patient: $e');
-      throw Exception('Error signing up patient: $e');
+      return (false, "Signup Error: $e");
     }
   }
 

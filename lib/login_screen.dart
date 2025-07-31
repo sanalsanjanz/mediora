@@ -832,6 +832,7 @@
 //   });
 // }
 import 'package:flutter/material.dart';
+import 'package:mediora/apis/get_fcm_token.dart';
 import 'package:mediora/apis/patients/api_helpers.dart';
 import 'package:mediora/patients/views/patient_landing_screen.dart';
 import 'package:mediora/services/notification_service.dart';
@@ -1424,10 +1425,9 @@ class _MedicalLoginScreenState extends State<MedicalLoginScreen>
 
       if (_isLogin) {
         MedicalLoadingOverlay.show(context);
-        (bool, String) res = await ApiHelpers.loginPatirent(
+        (bool, String) res = await ApiHelpers.loginPatient(
           userName: _emailController.text.trim(),
           password: _passwordController.text.trim(),
-          fcm: widget.fcmTocken.trim(),
         );
         // LoadingScreen.hide();
         MedicalLoadingOverlay.hide();
@@ -1447,7 +1447,6 @@ class _MedicalLoginScreenState extends State<MedicalLoginScreen>
         }
       } else {
         MedicalLoadingOverlay.show(context);
-        final fcmnew = await NotificationService.getFcmToken();
 
         (bool, String) res = await ApiHelpers.signupPatient(
           details: {
@@ -1460,7 +1459,6 @@ class _MedicalLoginScreenState extends State<MedicalLoginScreen>
             "lat": latCtrl.text.trim(),
             "lon": longCtrl.text.trim(),
             "location": _location.text.trim(),
-            "fcm_token": fcmnew ?? "".trim(),
           },
 
           /* userName: _emailController.text.trim(),
