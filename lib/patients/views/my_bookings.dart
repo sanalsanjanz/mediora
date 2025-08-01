@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:icons_plus/icons_plus.dart';
+import 'package:intl/intl.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:mediora/apis/patients/booking_apis.dart';
 import 'package:mediora/helper/colors.dart';
@@ -134,7 +134,7 @@ class _MyBookingsPageState extends State<MyBookingsPage>
           style: TextStyle(
             color: Colors.grey.shade900,
             fontWeight: FontWeight.w700,
-            fontSize: 24,
+            fontSize: 22,
           ),
         ),
         centerTitle: false,
@@ -169,7 +169,7 @@ class _MyBookingsPageState extends State<MyBookingsPage>
   }
 
   Widget _buildLoadingState() {
-    return Container(
+    return SizedBox(
       height: MediaQuery.of(context).size.height * 0.6,
       child: Center(
         child: Column(
@@ -215,13 +215,13 @@ class _MyBookingsPageState extends State<MyBookingsPage>
               controller: searchController,
               decoration: InputDecoration(
                 hintText: 'Search doctors, appointments...',
-                hintStyle: TextStyle(color: Colors.grey.shade500, fontSize: 16),
+                hintStyle: TextStyle(color: Colors.grey.shade500, fontSize: 14),
                 prefixIcon: Container(
                   margin: EdgeInsets.all(12),
                   child: Icon(
                     Icons.search_rounded,
                     color: Colors.grey.shade400,
-                    size: 20,
+                    size: 18,
                   ),
                 ),
                 suffixIcon: searchQuery.isNotEmpty
@@ -326,7 +326,7 @@ class _MyBookingsPageState extends State<MyBookingsPage>
                     children: [
                       Icon(
                         filter['icon'] as IconData,
-                        size: 18,
+                        size: 16,
                         color: isSelected ? Colors.white : Colors.grey.shade600,
                       ),
                       SizedBox(width: 8),
@@ -339,7 +339,7 @@ class _MyBookingsPageState extends State<MyBookingsPage>
                           fontWeight: isSelected
                               ? FontWeight.w600
                               : FontWeight.w500,
-                          fontSize: 14,
+                          fontSize: 12,
                         ),
                       ),
                     ],
@@ -445,7 +445,7 @@ class _MyBookingsPageState extends State<MyBookingsPage>
                       height: 48,
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
-                          colors: [colorPrimary, secondoryColor],
+                          colors: [colorPrimary, colorPrimary.withAlpha(100)],
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
                         ),
@@ -465,8 +465,8 @@ class _MyBookingsPageState extends State<MyBookingsPage>
                           Text(
                             booking.doctor.name,
                             style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w700,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
                               color: Colors.grey.shade900,
                             ),
                           ),
@@ -482,32 +482,9 @@ class _MyBookingsPageState extends State<MyBookingsPage>
                         ],
                       ),
                     ),
-                    Container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 6,
-                      ),
-                      decoration: BoxDecoration(
-                        color: statusColor.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(20),
-                        border: Border.all(
-                          color: statusColor.withOpacity(0.3),
-                          width: 1,
-                        ),
-                      ),
-                      child: Text(
-                        booking.status.toUpperCase(),
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w700,
-                          color: statusColor,
-                          letterSpacing: 0.5,
-                        ),
-                      ),
-                    ),
                   ],
                 ),
-                SizedBox(height: 16),
+                SizedBox(height: 10),
                 Container(
                   padding: EdgeInsets.all(16),
                   decoration: BoxDecoration(
@@ -516,27 +493,53 @@ class _MyBookingsPageState extends State<MyBookingsPage>
                   ),
                   child: Row(
                     children: [
-                      Icon(
+                      /*       Icon(
                         Icons.description_rounded,
                         color: Colors.grey.shade600,
                         size: 18,
                       ),
-                      SizedBox(width: 12),
+                      SizedBox(width: 12), */
                       Expanded(
                         child: Text(
-                          booking.patientName,
+                          DateFormat(
+                            "dd-MMM-yyyy",
+                          ).format(booking.preferredDate),
                           style: TextStyle(
-                            fontSize: 15,
+                            fontSize: 14,
                             color: Colors.grey.shade700,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
                       ),
-                      Icon(
+                      Text(
+                        booking.status.toUpperCase(),
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: statusColor,
+                          /*  letterSpacing: 0.5, */
+                        ),
+                      ),
+                      /* Container(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 6,
+                        ),
+                        decoration: BoxDecoration(
+                          color: statusColor.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(
+                            color: statusColor.withOpacity(0.3),
+                            width: 1,
+                          ),
+                        ),
+                        child: 
+                      ), */
+                      /* Icon(
                         Icons.arrow_forward_ios_rounded,
                         color: Colors.grey.shade400,
                         size: 16,
-                      ),
+                      ), */
                     ],
                   ),
                 ),
@@ -549,7 +552,7 @@ class _MyBookingsPageState extends State<MyBookingsPage>
   }
 
   Widget _buildErrorState() {
-    return Container(
+    return SizedBox(
       height: MediaQuery.of(context).size.height * 0.6,
       child: Center(
         child: Column(
@@ -615,7 +618,7 @@ class _MyBookingsPageState extends State<MyBookingsPage>
   }
 
   Widget _buildEmptyState() {
-    return Container(
+    return SizedBox(
       height: MediaQuery.of(context).size.height * 0.5,
       child: Center(
         child: Column(
@@ -657,7 +660,7 @@ class _MyBookingsPageState extends State<MyBookingsPage>
 
 extension StringCap on String {
   String capitalize() {
-    if (this.isEmpty) return this;
+    if (isEmpty) return this;
     return this[0].toUpperCase() + substring(1);
   }
 }

@@ -351,9 +351,18 @@ class _BookingDetailsPageState extends State<BookingDetailsPage>
                               height: 1.1,
                             ),
                           ),
-                          SizedBox(height: 8),
+                          /*   SizedBox(height: 4),
                           Text(
                             'ID: ${currentBooking.id}',
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: Colors.white.withOpacity(0.85),
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ), */
+                          SizedBox(height: 4),
+                          Text(
+                            formatDate(currentBooking.preferredDate),
                             style: TextStyle(
                               fontSize: 16,
                               color: Colors.white.withOpacity(0.85),
@@ -382,20 +391,20 @@ class _BookingDetailsPageState extends State<BookingDetailsPage>
                     children: [
                       // Quick Info Cards Row
                       _buildQuickInfoCards(),
-                      SizedBox(height: 24),
+                      SizedBox(height: 10),
 
                       // SizedBox(height: 24),
                       // Doctor Information Card
                       _buildDoctorInfoCard(),
-                      SizedBox(height: 20),
+                      SizedBox(height: 10),
 
                       // Patient Information Card
                       _buildPatientInfoCard(),
-                      SizedBox(height: 20),
+                      SizedBox(height: 10),
 
                       // Appointment Details Card
                       _buildAppointmentDetailsCard(),
-                      SizedBox(height: 20),
+                      SizedBox(height: 10),
 
                       // Status-specific Information
                       if (currentBooking.status.toLowerCase() == 'cancelled')
@@ -436,8 +445,8 @@ class _BookingDetailsPageState extends State<BookingDetailsPage>
             Row(
               children: [
                 Container(
-                  width: 85,
-                  height: 85,
+                  width: 45,
+                  height: 45,
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       begin: Alignment.topLeft,
@@ -456,7 +465,7 @@ class _BookingDetailsPageState extends State<BookingDetailsPage>
                   child: Icon(
                     Icons.medical_services_rounded,
                     color: Colors.white,
-                    size: 36,
+                    size: 30,
                   ),
                 ),
                 SizedBox(width: 20),
@@ -467,18 +476,18 @@ class _BookingDetailsPageState extends State<BookingDetailsPage>
                       Text(
                         currentBooking.doctor.name,
                         style: TextStyle(
-                          fontSize: 24,
+                          fontSize: 18,
                           fontWeight: FontWeight.w800,
                           color: secondoryColor,
                           letterSpacing: -0.5,
                           height: 1.2,
                         ),
                       ),
-                      SizedBox(height: 6),
+                      SizedBox(height: 2),
                       Text(
                         currentBooking.doctor.specialization,
                         style: TextStyle(
-                          fontSize: 16,
+                          fontSize: 14,
                           color: colorPrimary,
                           fontWeight: FontWeight.w600,
                         ),
@@ -488,7 +497,7 @@ class _BookingDetailsPageState extends State<BookingDetailsPage>
                 ),
               ],
             ),
-            SizedBox(height: 24),
+            SizedBox(height: 10),
             Container(
               padding: EdgeInsets.all(20),
               decoration: BoxDecoration(
@@ -502,7 +511,7 @@ class _BookingDetailsPageState extends State<BookingDetailsPage>
               child: Row(
                 children: [
                   Container(
-                    padding: EdgeInsets.all(8),
+                    /*       padding: EdgeInsets.all(8), */
                     decoration: BoxDecoration(
                       color: colorPrimary.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(10),
@@ -569,22 +578,26 @@ class _BookingDetailsPageState extends State<BookingDetailsPage>
             Row(
               children: [
                 Container(
-                  padding: EdgeInsets.all(14),
+                  height: 45,
+                  width: 45,
+
                   decoration: BoxDecoration(
                     color: secondoryColor.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(16),
                   ),
-                  child: Icon(
-                    Icons.person_outline_rounded,
-                    color: secondoryColor,
-                    size: 26,
+                  child: Center(
+                    child: Icon(
+                      Icons.person_outline_rounded,
+                      color: secondoryColor,
+                      size: 26,
+                    ),
                   ),
                 ),
                 SizedBox(width: 16),
                 Text(
                   'Patient Information',
                   style: TextStyle(
-                    fontSize: 22,
+                    fontSize: 18,
                     fontWeight: FontWeight.w800,
                     color: secondoryColor,
                     letterSpacing: -0.5,
@@ -592,25 +605,25 @@ class _BookingDetailsPageState extends State<BookingDetailsPage>
                 ),
               ],
             ),
-            SizedBox(height: 24),
+            SizedBox(height: 28),
             _buildPatientInfoRow(
               'Full Name',
               currentBooking.patientName,
               Icons.badge_rounded,
             ),
-            SizedBox(height: 18),
+            Divider(color: Colors.grey.shade200),
             _buildPatientInfoRow(
               'Age',
               '${currentBooking.patientAge} years old',
               Icons.cake_rounded,
             ),
-            SizedBox(height: 18),
+            Divider(color: Colors.grey.shade200),
             _buildPatientInfoRow(
               'Gender',
               currentBooking.patientGender,
               Icons.wc_rounded,
             ),
-            SizedBox(height: 18),
+            Divider(color: Colors.grey.shade200),
             _buildPatientInfoRow(
               'Phone Number',
               currentBooking.patientContact,
@@ -651,12 +664,12 @@ class _BookingDetailsPageState extends State<BookingDetailsPage>
   } */
   Widget _buildPatientInfoRow(String label, String value, IconData icon) {
     return Container(
-      padding: EdgeInsets.all(16),
+      /*  padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Color(0xFFF8FAFB),
         borderRadius: BorderRadius.circular(14),
         border: Border.all(color: Color(0xFFE2E8F0), width: 1),
-      ),
+      ), */
       child: Row(
         children: [
           Icon(icon, size: 22, color: colorPrimary),
@@ -711,7 +724,9 @@ class _BookingDetailsPageState extends State<BookingDetailsPage>
             Row(
               children: [
                 Container(
-                  padding: EdgeInsets.all(14),
+                  height: 45,
+                  width: 45,
+                  // padding: EdgeInsets.all(14),
                   decoration: BoxDecoration(
                     color: colorPrimary.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(16),
@@ -726,7 +741,7 @@ class _BookingDetailsPageState extends State<BookingDetailsPage>
                 Text(
                   'Appointment Details',
                   style: TextStyle(
-                    fontSize: 22,
+                    fontSize: 18,
                     fontWeight: FontWeight.w800,
                     color: secondoryColor,
                     letterSpacing: -0.5,
@@ -734,28 +749,28 @@ class _BookingDetailsPageState extends State<BookingDetailsPage>
                 ),
               ],
             ),
-            SizedBox(height: 24),
+            SizedBox(height: 28),
             _buildDetailRow(
               'Scheduled Date & Time',
               formatDateTime(currentBooking.preferredDate),
               Icons.schedule_rounded,
               colorPrimary,
             ),
-            SizedBox(height: 18),
+            Divider(color: Colors.grey.shade200),
             _buildDetailRow(
               'Medical Concern',
               currentBooking.reason,
               Icons.medical_information_rounded,
               Color(0xFF059669),
             ),
-            SizedBox(height: 18),
+            Divider(color: Colors.grey.shade200),
             _buildDetailRow(
               'Booking Created',
               formatDateTime(currentBooking.createdAt),
               Icons.event_available_rounded,
               Color(0xFFF59E0B),
             ),
-            SizedBox(height: 18),
+            Divider(color: Colors.grey.shade200),
             _buildDetailRow(
               'Current Status',
               currentBooking.status.toUpperCase(),
@@ -775,12 +790,12 @@ class _BookingDetailsPageState extends State<BookingDetailsPage>
     Color color,
   ) {
     return Container(
-      padding: EdgeInsets.all(18),
-      decoration: BoxDecoration(
+      /*  padding: EdgeInsets.all(18), */
+      /*  decoration: BoxDecoration(
         color: Color(0xFFF8FAFB),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: Color(0xFFE2E8F0), width: 1),
-      ),
+      ), */
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
