@@ -315,7 +315,7 @@ class _PdfPreviewPageState extends State<PdfPreviewPage> {
                   const Icon(Icons.person, color: Colors.white70, size: 16),
                   const SizedBox(width: 8),
                   Text(
-                    "Dr. ${PatientController.patientModel!.name}",
+                    "Dr. ${widget.detailsModel.doctor.name}",
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 14,
