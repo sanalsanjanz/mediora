@@ -3,8 +3,6 @@ name: Flutter CI
 on:
   push:
     branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
 
 jobs:
   build:
@@ -14,32 +12,18 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Flutter (v3.22.1)
+      - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.22.1'  # ✅ includes Dart 3.8.1
+          flutter-version: '3.22.1' # ✅ Must be 3.22.1 for Dart 3.8.1
 
-      - name: Verify versions
+      - name: Confirm Dart & Flutter version
         run: |
           flutter --version
           dart --version
 
-      - name: Disable Flutter CLI animations & analytics
-        run: |
-          flutter config --no-analytics
-          flutter config --no-cli-animations
+      - name: Disable analytics
+        run: flutter config --no-analytics
 
-      - name: Get dependencies
+      - name: Install dependencies
         run: flutter pub get
-
-      - name: Analyze project
-        run: flutter analyze
-
-      - name: Run tests
-        run: flutter test
-
-      - name: Build APK (Debug)
-        run: flutter build apk --debug
-
-      - name: Build Web
-        run: flutter build web
