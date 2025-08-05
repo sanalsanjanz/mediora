@@ -1,34 +1,78 @@
-name: Flutter CI
+name: Flutter CI and Release
 
 on:
   push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+    tags:
+      - 'v*'  # Trigger only for version tags like v1.0.0
+
+permissions:
+  contents: write
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+    - name: Clone repository
+      uses: actions/checkout@v4
 
-      - name: Remove Flutter tool cache (force fresh install)
-        run: rm -rf "$HOME/.flutter"
+    - name: Set up Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        channel: stable
 
-      - name: Setup Flutter 3.22.1
-        uses: subosito/flutter-action@v2
-        with:
-          flutter-version: '3.22.1'
+    - run: flutter --version
 
-      - name: Confirm Flutter & Dart version
-        run: |
-          flutter --version
-          dart --version
+    - name: Cache Pub Dependencies
+      uses: actions/cache@v4
+      with:
+        path: ~/.pub-cache
+        key: ${{ runner.os }}-pub-${{ hashFiles('pubspec.yaml') }}
+        restore-keys: |
+          ${{ runner.os }}-pub-
 
-      - name: Disable analytics
-        run: flutter config --no-analytics
+    - name: Install dependencies
+      run: flutter pub get
 
-      - name: Install dependencies
-        run: flutter pub get
+    # Build APK
+    - name: Build APK
+      run: flutter build apk --release
+
+    # Build AAB
+    - name: Build AAB
+      run: flutter build appbundle --release
+
+    # Create GitHub Release
+    - name: Create GitHub Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref_name }}
+        release_name: Release ${{ github.ref_name }}
+        draft: false
+        prerelease: false
+
+    # Upload APK to Release
+    - name: Upload APK to Release
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: build/app/outputs/flutter-apk/app-release.apk
+        asset_name: app-release.apk
+        asset_content_type: application/vnd.android.package-archive
+
+    # Upload AAB to Release
+    - name: Upload AAB to Release
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: build/app/outputs/bundle/release/app-release.aab
+        asset_name: app-release.aab
+        asset_content_type: application/octet-stream
+
