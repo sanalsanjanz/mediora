@@ -17,9 +17,14 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.22.1' # ✅ includes Dart 3.8.1
+          flutter-version: '3.22.1' # 👈 Ensure this version is correct
 
-      - name: Enable analytics (optional, just to skip message)
+      - name: Verify Flutter & Dart versions
+        run: |
+          flutter --version
+          dart --version
+
+      - name: Disable analytics (optional)
         run: flutter config --no-analytics
 
       - name: Install dependencies
