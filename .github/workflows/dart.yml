@@ -8,7 +8,6 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
@@ -18,7 +17,10 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.22.1' # Or use: 'stable'
+          flutter-version: '3.22.1' # ✅ includes Dart 3.8.1
+
+      - name: Enable analytics (optional, just to skip message)
+        run: flutter config --no-analytics
 
       - name: Install dependencies
         run: flutter pub get
@@ -29,10 +31,8 @@ jobs:
       - name: Run tests
         run: flutter test
 
-      # Optional: Build APK (for Android)
       - name: Build APK
         run: flutter build apk --debug
 
-      # Optional: Build Web
       - name: Build Web
         run: flutter build web
