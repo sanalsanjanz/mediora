@@ -3,6 +3,8 @@ name: Flutter CI
 on:
   push:
     branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
 
 jobs:
   build:
@@ -12,12 +14,15 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Flutter
+      - name: Remove Flutter tool cache (force fresh install)
+        run: rm -rf "$HOME/.flutter"
+
+      - name: Setup Flutter 3.22.1
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.22.1' # ✅ Must be 3.22.1 for Dart 3.8.1
+          flutter-version: '3.22.1'
 
-      - name: Confirm Dart & Flutter version
+      - name: Confirm Flutter & Dart version
         run: |
           flutter --version
           dart --version
