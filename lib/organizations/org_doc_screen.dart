@@ -23,7 +23,7 @@ class _DoctorsLandingScreenState extends State<OrgDocScreen> {
       slivers: [
         SliverAppBar(
           actions: [
-            IconButton(
+            /* IconButton(
               onPressed: () {
                 showDialog(
                   context: context,
@@ -55,7 +55,7 @@ class _DoctorsLandingScreenState extends State<OrgDocScreen> {
                 );
               },
               icon: Icon(Icons.logout_outlined, color: Colors.white),
-            ),
+            ), */
           ],
           expandedHeight: 140,
           pinned: true,
@@ -76,9 +76,9 @@ class _DoctorsLandingScreenState extends State<OrgDocScreen> {
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                   colors: [
-                    Color(0xFF1E40AF),
-                    Color(0xFF3B82F6),
-                    Color(0xFF60A5FA),
+                    Color.fromARGB(255, 65, 7, 99),
+                    Color.fromARGB(255, 171, 59, 246),
+                    Color.fromARGB(255, 79, 11, 85),
                   ],
                 ),
               ),
@@ -146,7 +146,7 @@ class _DoctorsLandingScreenState extends State<OrgDocScreen> {
           ),
           SizedBox(height: 20),
           Text(
-            PatientController.doctorModel?.user.name ?? 'Dr. John Smith',
+            PatientController.doctorModel?.user.name ?? 'Dr. ',
             style: TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.bold,
@@ -161,7 +161,7 @@ class _DoctorsLandingScreenState extends State<OrgDocScreen> {
               borderRadius: BorderRadius.circular(20),
             ),
             child: Text(
-              'Cardiologist',
+              PatientController.doctorModel?.user.specialization ?? "",
               style: TextStyle(
                 fontSize: 14,
                 color: Color(0xFF1E40AF),
@@ -192,7 +192,44 @@ class _DoctorsLandingScreenState extends State<OrgDocScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
+          InkWell(
+            onTap: () {
+              showDialog(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: const Text('Logout'),
+                  content: const Text('Are you sure you want to logout?'),
+                  actions: [
+                    TextButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      child: const Text('Cancel'),
+                    ),
+                    TextButton(
+                      onPressed: () async {
+                        await PatientController.clearPreferences();
+                        Navigator.pushAndRemoveUntil(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => MedioraSplashScreen(),
+                          ),
+                          (_) => false,
+                        );
+                      },
+                      child: const Text('Logout'),
+                    ),
+                  ],
+                ),
+              );
+            },
+            child: _buildEnhancedProfileItem(
+              Icons.exit_to_app,
+              'Logout',
+              'Logout from app',
+            ),
+          ),
+          /* Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
@@ -219,8 +256,8 @@ class _DoctorsLandingScreenState extends State<OrgDocScreen> {
                 ),
               ),
             ],
-          ),
-          SizedBox(height: 24),
+          ), */
+          /*  SizedBox(height: 24),
           _buildEnhancedProfileItem(
             Icons.email_rounded,
             'Email Address',
@@ -257,7 +294,7 @@ class _DoctorsLandingScreenState extends State<OrgDocScreen> {
             Icons.verified_rounded,
             'Medical License',
             'MD12345',
-          ),
+          ), */
         ],
       ),
     );

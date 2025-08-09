@@ -8,6 +8,7 @@ import 'package:mediora/models/booking_details_model.dart';
 import 'package:mediora/organizations/booking_status_screen.dart';
 import 'package:mediora/organizations/manage_appointments.dart';
 import 'package:mediora/organizations/org_doc_screen.dart';
+import 'package:mediora/organizations/qr_banner.dart';
 import 'package:mediora/widgets/shimmer_box.dart';
 
 class DoctorsLandingScreen extends StatefulWidget {
@@ -144,14 +145,8 @@ class _DoctorsLandingScreenState extends State<DoctorsLandingScreen> {
                                 ),
                               ),
                               SizedBox(height: 4),
-                              Text(
-                                DateFormat('hh:mm a').format(DateTime.now()),
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 24,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
+                              // Live updating time
+                              _LiveTimeWidget(),
                             ],
                           ),
 
@@ -362,6 +357,47 @@ class _DoctorsLandingScreenState extends State<DoctorsLandingScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        /*    TextButton(
+          onPressed: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (_) => DoctorQRCodeScreen(
+                  doctorId: PatientController.doctorModel?.user.id ?? "",
+                  doctorName: PatientController.doctorModel?.user.name ?? "",
+                  clinicName: 'Mediora Doctors',
+                  specialization:
+                      PatientController.doctorModel?.user.specialization ??
+                      "Genaral",
+                ),
+              ),
+            );
+          },
+          child: Text("View QR"),
+        ), */
+        QRCodeNavigationBanner(
+          doctorId: PatientController.doctorModel?.user.id ?? "",
+          doctorName: PatientController.doctorModel?.user.name ?? "",
+          clinicName: 'Mediora Doctors',
+          specialization:
+              PatientController.doctorModel?.user.specialization ?? "Genaral",
+        ),
+        SizedBox(height: 20),
+
+        /*   CompactQRBanner(
+          doctorId: PatientController.doctorModel?.user.id ?? "",
+          doctorName: PatientController.doctorModel?.user.name ?? "",
+          clinicName: 'Mediora Doctors',
+          specialization:
+              PatientController.doctorModel?.user.specialization ?? "Genaral",
+        ),
+
+        QRCardBanner(
+          doctorId: PatientController.doctorModel?.user.id ?? "",
+          doctorName: PatientController.doctorModel?.user.name ?? "",
+          clinicName: 'Mediora Doctors',
+          specialization:
+              PatientController.doctorModel?.user.specialization ?? "Genaral",
+        ), */
         Text(
           'Today\'s Overview',
           style: TextStyle(
@@ -375,7 +411,7 @@ class _DoctorsLandingScreenState extends State<DoctorsLandingScreen> {
           children: [
             Expanded(
               child: _buildEnhancedDashboardCard(
-                'Today\'s Appointments',
+                'Today\'s',
                 todayBookings.toString(),
                 Icons.today_rounded,
                 Color(0xFF667EEA),
@@ -837,6 +873,46 @@ class _DoctorsLandingScreenState extends State<DoctorsLandingScreen> {
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
+    );
+  }
+}
+
+/// Widget that displays the current time and updates every second.
+class _LiveTimeWidget extends StatefulWidget {
+  @override
+  State<_LiveTimeWidget> createState() => _LiveTimeWidgetState();
+}
+
+class _LiveTimeWidgetState extends State<_LiveTimeWidget> {
+  late String _currentTime;
+  late final ticker = Stream<DateTime>.periodic(
+    Duration(seconds: 1),
+    (_) => DateTime.now(),
+  );
+
+  @override
+  void initState() {
+    super.initState();
+    _currentTime = DateFormat('hh:mm a').format(DateTime.now());
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<DateTime>(
+      stream: ticker,
+      builder: (context, snapshot) {
+        final now = snapshot.data ?? DateTime.now();
+        final formatted = DateFormat('hh:mm a').format(now);
+        return Text(
+          formatted,
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 22,
+            fontWeight: FontWeight.bold,
+            letterSpacing: 1.2,
+          ),
+        );
+      },
     );
   }
 }
