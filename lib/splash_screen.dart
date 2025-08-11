@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mediora/apis/patients/preference_controller.dart';
 import 'package:mediora/login_screen.dart';
-import 'package:mediora/organizations/doctors_landing_screen.dart';
 import 'package:mediora/pharmacy/pharmacy_home.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -65,7 +64,7 @@ class _MedioraSplashScreenState extends State<MedioraSplashScreen>
     Future.delayed(Duration(seconds: 5), () async {
       SharedPreferences preferences = await SharedPreferences.getInstance();
       bool isLogged = preferences.getBool("logged") ?? false;
-      String type = await preferences.getString("type") ?? "";
+      String type = preferences.getString("type") ?? "";
 
       if (isLogged) {
         await PatientController.getPharmacyDetails();

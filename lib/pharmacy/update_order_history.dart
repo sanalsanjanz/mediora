@@ -227,8 +227,12 @@ class _UpdateOrderStatusScreenState extends State<UpdateOrderStatusScreen>
                   children: [
                     _buildOrderInfoCard(),
                     const SizedBox(height: 24),
-                    _buildPatientInfoCard(),
+
+                    _buildMedicineCard(),
                     const SizedBox(height: 24),
+
+                    // _buildPatientInfoCard(),
+                    // const SizedBox(height: 24),
                     _buildStatusSelectionCard(),
                     if (status == 'Rejected') ...[
                       const SizedBox(height: 24),
@@ -326,6 +330,15 @@ class _UpdateOrderStatusScreenState extends State<UpdateOrderStatusScreen>
             ],
           ),
           const SizedBox(height: 20),
+          /*    Text(
+            widget.order.patient.name,
+            style: const TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              color: Color(0xFF1F2937),
+            ),
+          ), */
+          _buildInfoRow('Customer', widget.order.patient.name, Icons.person),
           _buildInfoRow(
             'Order ID',
             '#${widget.order.id.substring(0, 8).toUpperCase()}',
@@ -453,10 +466,6 @@ class _UpdateOrderStatusScreenState extends State<UpdateOrderStatusScreen>
                       ),
                     ),
                     const SizedBox(height: 4),
-                    Text(
-                      'Total Medicines : ${widget.order.medicines.length}',
-                      style: TextStyle(fontSize: 14, color: Colors.grey[600]),
-                    ),
                   ],
                 ),
               ),
@@ -778,6 +787,73 @@ class _UpdateOrderStatusScreenState extends State<UpdateOrderStatusScreen>
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildMedicineCard() {
+    return Card(
+      elevation: 0,
+      color: Colors.white,
+      margin: EdgeInsets.zero,
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Medicines',
+              style: Theme.of(
+                context,
+              ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
+            ),
+            Text(
+              'Total Medicines : ${widget.order.medicines.length}',
+              style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+            ),
+            const SizedBox(height: 12.0),
+            if (widget.order.medicines.isEmpty)
+              const Text(
+                'No medicines prescribed',
+                style: TextStyle(
+                  fontStyle: FontStyle.italic,
+                  color: Colors.grey,
+                ),
+              )
+            else
+              ListView.separated(
+                padding: EdgeInsets.zero,
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: widget.order.medicines.length,
+                separatorBuilder: (context, index) => Divider(
+                  height: 1,
+                  color: Colors.grey.shade200,
+                  indent: 10,
+                  endIndent: 10,
+                ),
+                itemBuilder: (context, index) {
+                  final medicine = widget.order.medicines[index];
+                  return ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    leading: const Icon(
+                      Icons.medication_sharp,
+                      color: Colors.blue,
+                      size: 20,
+                    ),
+                    title: Text(
+                      medicine,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    dense: true,
+                  );
+                },
+              ),
+          ],
+        ),
       ),
     );
   }
